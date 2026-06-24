@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import BottomNav from './BottomNav'
 import HomeCards from './HomeCards'
 import AudioInputSheet from './AudioInputSheet'
@@ -16,60 +17,57 @@ export default function HomeClient() {
   const handleDelete = () => setCode((prev) => prev.slice(0, -1))
   const handleClose = () => { setSheetOpen(false); setCode('') }
   const handlePlay = () => router.push('/play?code=' + code)
-  const handleQR = () => router.push('/play?code=1001')  // stub: always demo artwork
+  const handleQR = () => router.push('/play?code=1001')
 
   return (
-    <div className="min-h-screen bg-white flex flex-col pb-16">
-      {/* Top bar */}
-      <div className="px-5 pt-8 pb-4 flex items-start justify-between">
-        <div>
-          <p className="text-[10px] font-medium tracking-[0.2em] text-tfam-mid uppercase">
-            Taipei Fine Arts Museum
-          </p>
-          <h1 className="text-2xl font-bold text-tfam-red mt-0.5 tracking-tight">TFAM</h1>
-        </div>
-        <button
-          className="w-9 h-9 flex flex-col justify-center gap-1.5 items-end"
-          aria-label="Menu"
-        >
-          <span className="block w-5 h-0.5 bg-tfam-dark rounded" />
-          <span className="block w-7 h-0.5 bg-tfam-dark rounded" />
-        </button>
-      </div>
+    <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
-      {/* Hero section */}
-      <div className="mx-4 mb-5 rounded-3xl bg-tfam-dark overflow-hidden relative">
-        <div className="px-6 pt-8 pb-6">
-          <p className="text-xs font-medium tracking-widest text-gray-400 uppercase mb-2">
-            Collection Guide
-          </p>
-          <h2 className="text-2xl font-bold text-white leading-snug mb-1">
-            Discover the<br />Collection
-          </h2>
-          <p className="text-sm text-gray-400 mb-6">
-            Enter an artwork code to hear the curator&apos;s guide.
-          </p>
+      {/* ── Top bar: TFAM mark left / "You're here" right ── */}
+      <header className="h-[60px] px-5 flex items-center justify-between shrink-0">
+        <img src="/tfam-logo.png" width={56} height={38} alt="TFAM" />
+
+        <div className="flex items-center gap-1.5 text-sm text-black">
+          <svg width="10" height="13" viewBox="0 0 10 13" fill="currentColor" aria-hidden="true">
+            <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8C10 2.24 7.76 0 5 0zm0 6.5C4.17 6.5 3.5 5.83 3.5 5S4.17 3.5 5 3.5 6.5 4.17 6.5 5 5.83 6.5 5 6.5z" />
+          </svg>
+          You&rsquo;re here
+        </div>
+      </header>
+
+      {/* ── Hero: welcome card with museum photo background ── */}
+      <section className="relative shrink-0 w-full h-[299px] overflow-hidden">
+        <Image src="/hero-gallery.png" fill className="object-cover" alt="" priority />
+        <div className="absolute inset-0 bg-white/30" />
+
+        {/* Content — centered vertically with 64px top/bottom breathing room */}
+        <div className="absolute inset-0 flex flex-col justify-center gap-5 px-5 py-16">
+          <div className="flex flex-col gap-2 text-black">
+            <p className="text-base font-normal">Welcome!</p>
+            <h2 className="text-hero font-bold leading-[1.1] max-w-[284px]">
+              Audio guide is available
+            </h2>
+            <p className="text-sm font-normal text-black/70">
+              Listen to curator stories while you explore. Works with your phone in your pocket.
+            </p>
+          </div>
+
           <button
             onClick={() => setSheetOpen(true)}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-tfam-red text-white text-sm font-semibold"
+            className="flex items-center justify-center gap-1.5 w-full h-[56px] rounded-pill bg-black text-white text-base font-bold"
           >
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white" aria-hidden="true">
-              <path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z" />
-            </svg>
-            Start Audio Guide
+            <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
+            Start audio guide
           </button>
         </div>
-        {/* Decorative circle */}
-        <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-tfam-red opacity-20" />
-      </div>
+      </section>
 
-      {/* Info cards */}
+      {/* ── Tap cards ── */}
       <HomeCards />
 
-      {/* Bottom nav */}
+      {/* ── Bottom nav ── */}
       <BottomNav active={0} />
 
-      {/* Audio input sheet */}
+      {/* ── Audio input sheet (logic unchanged) ── */}
       <AudioInputSheet
         open={sheetOpen}
         code={code}

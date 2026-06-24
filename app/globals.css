@@ -10,11 +10,31 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Brand */
   --color-tfam-red: #D62027;
   --color-tfam-dark: #111111;
   --color-tfam-mid: #666666;
   --color-tfam-light: #F8F7F5;
   --color-tfam-border: #E5E5E5;
+
+  /* Surface & border — extracted from Figma (Homepage Arrival, Audio Guide Input/Play) */
+  --color-surface: #f5f5f5;          /* page bg on modal/overlay screens */
+  --color-icon-bg: #e4e4e4;          /* icon container fill */
+  --color-border-input: #d9d9d9;     /* input fields, keypad keys, language selector */
+  --color-border-card: #d6d6d6;      /* tap cards, list items */
+  --color-info-bg: #ebf6ff;          /* info banner (e.g. "audio continues when screen locks") */
+  --color-gray-4: #bdbdbd;           /* mid-tone gray — Figma variable "Gray 4" */
+
+  /* Typography */
+  --font-noto: var(--font-noto-sans), 'Noto Sans', sans-serif;
+  --text-2xs: 0.625rem;              /* 10px — bottom-nav labels, audio timestamps */
+  --text-hero: 2rem;                 /* 32px — homepage welcome heading */
+
+  /* Border radius */
+  --radius-nav: 1.25rem;             /* 20px — inactive bottom-nav items */
+  --radius-nav-active: 2.25rem;      /* 36px — active bottom-nav tab */
+  --radius-pill: 5rem;               /* 80px — primary CTA button */
 }
 
 body {
