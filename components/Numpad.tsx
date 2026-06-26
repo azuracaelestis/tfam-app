@@ -1,5 +1,7 @@
 'use client'
 
+import { motion } from 'motion/react'
+
 interface NumpadProps {
   onDigit: (d: string) => void
   onDelete: () => void
@@ -29,9 +31,15 @@ export default function Numpad({ onDigit, onDelete }: NumpadProps) {
       {ROWS.map((row) => (
         <div key={row.join('')} className="flex gap-[14px]">
           {row.map((d) => (
-            <button key={d} onClick={() => onDigit(d)} className={keyClass}>
+            <motion.button
+              key={d}
+              onClick={() => onDigit(d)}
+              className={keyClass}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+            >
               {d}
-            </button>
+            </motion.button>
           ))}
         </div>
       ))}
@@ -39,16 +47,23 @@ export default function Numpad({ onDigit, onDelete }: NumpadProps) {
       {/* Last row: empty · 0 · delete */}
       <div className="flex gap-[14px]">
         <div className="flex-1 h-[60px]" />
-        <button onClick={() => onDigit('0')} className={keyClass}>
+        <motion.button
+          onClick={() => onDigit('0')}
+          className={keyClass}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.15 }}
+        >
           0
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={onDelete}
           className="flex-1 h-[60px] rounded-2xl bg-white border border-[#d9d9d9] flex items-center justify-center active:bg-gray-100 transition-colors"
           aria-label="Delete digit"
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.15 }}
         >
           <DeleteIcon />
-        </button>
+        </motion.button>
       </div>
     </div>
   )

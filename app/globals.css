@@ -49,3 +49,29 @@ input[type="range"] {
   appearance: none;
   background: transparent;
 }
+
+/* ── View transition: Play screen slides in from the right ── */
+::view-transition-new(.nav-forward) {
+  animation: 350ms ease-out both vt-slide-in-right;
+}
+
+@keyframes vt-slide-in-right {
+  from { translate: 100%; opacity: 0; }
+  to   { translate: 0;    opacity: 1; }
+}
+
+/* Hides scrollbars while keeping scroll functionality */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay:    0s !important;
+  }
+}

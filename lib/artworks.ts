@@ -15,16 +15,16 @@ export interface Artwork {
 export const artworks: Artwork[] = [
   {
     code: '1001',
-    imageUrl: '/images/artwork-1.svg',
-    audioSrc: '/audio/guide.wav',
+    imageUrl: '/ground-noise.png',
+    audioSrc: '/audio-sample.mp3',
     locales: {
       en: {
-        title: 'Untitled No. 7',
+        title: 'Ground Noise',
         description:
           'A seminal work from the 1980s exploring the tension between urban memory and natural form. The artist layers industrial materials against organic textures, inviting viewers to reconsider the boundaries between the built and the living.',
       },
       zh: {
-        title: '無題第七號',
+        title: 'Ground Noise',
         description:
           '1980年代的重要作品，探索城市記憶與自然形式之間的張力。藝術家將工業材料與有機質感相互疊加，邀請觀者重新思考人造環境與自然生命之間的界線。',
       },

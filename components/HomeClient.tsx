@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import BottomNav from './BottomNav'
 import HomeCards from './HomeCards'
 import AudioInputSheet from './AudioInputSheet'
 
@@ -63,9 +62,6 @@ export default function HomeClient() {
 
       {/* ── Tap cards ── */}
       <HomeCards />
-
-      {/* ── Bottom nav ── */}
-      <BottomNav active={0} />
 
       {/* ── Audio input sheet (logic unchanged) ── */}
       <AudioInputSheet

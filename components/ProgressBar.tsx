@@ -1,7 +1,7 @@
 'use client'
 
 function formatTime(secs: number): string {
-  const s = Math.floor(secs)
+  const s = Math.floor(Math.abs(secs))
   const m = Math.floor(s / 60)
   const rem = s % 60
   return `${m}:${rem.toString().padStart(2, '0')}`
@@ -15,17 +15,26 @@ interface ProgressBarProps {
 
 export default function ProgressBar({ currentTime, duration, onSeek }: ProgressBarProps) {
   const pct = duration > 0 ? (currentTime / duration) * 100 : 0
+  const remaining = duration > 0 ? duration - currentTime : 0
 
   return (
     <div className="flex flex-col gap-2 px-5">
-      {/* Visual track + invisible range input stacked */}
+      {/* Track + scrubber dot, stacked over invisible range input */}
       <div className="relative h-5 flex items-center">
-        <div className="absolute w-full h-1 bg-tfam-border rounded-full">
+        {/* Gray track */}
+        <div className="absolute w-full h-[3px] bg-[#e5e5e5] rounded-full">
+          {/* Filled portion */}
           <div
-            className="h-full bg-tfam-red rounded-full transition-none"
+            className="h-full bg-black rounded-full transition-none"
             style={{ width: `${pct}%` }}
           />
         </div>
+        {/* Scrubber dot */}
+        <div
+          className="absolute w-[14px] h-[14px] bg-black rounded-full -translate-x-1/2 pointer-events-none"
+          style={{ left: `${pct}%` }}
+        />
+        {/* Invisible range input for interaction */}
         <input
           type="range"
           min={0}
@@ -37,9 +46,10 @@ export default function ProgressBar({ currentTime, duration, onSeek }: ProgressB
           aria-label="Seek"
         />
       </div>
-      <div className="flex justify-between text-xs text-tfam-mid">
+      {/* Time labels */}
+      <div className="flex justify-between text-[10px] text-black">
         <span>{formatTime(currentTime)}</span>
-        <span>{formatTime(duration)}</span>
+        <span>-{formatTime(remaining)}</span>
       </div>
     </div>
   )

@@ -42,7 +42,7 @@ export default function AudioInputSheet({
 }: AudioInputSheetProps) {
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col justify-end transition-all duration-300 ${
+      className={`fixed inset-0 z-50 flex flex-col justify-end overflow-hidden transition-all duration-300 ${
         open ? 'pointer-events-auto' : 'pointer-events-none'
       }`}
     >
