@@ -26,12 +26,6 @@ export function useOnTransitionComplete(fn: Listener) {
 // Keyed by pathname so each navigation gets a fresh instance — prevents
 // the exiting page's onAnimationComplete from firing the entering page's listeners.
 function AnimatedPage({ children }: { children: ReactNode }) {
-  // Suppress slide when navigating to a detail page from a card tap
-  const skipSlide = useRef(
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('from') === 'card'
-  )
-
   const listenersRef = useRef(new Set<Listener>())
   const hasEnteredRef = useRef(false)
 
@@ -52,7 +46,7 @@ function AnimatedPage({ children }: { children: ReactNode }) {
     <TransitionContext.Provider value={{ subscribe }}>
       <motion.div
         className="absolute inset-0 overflow-y-auto"
-        initial={skipSlide.current ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }}
+        initial={{ x: '100%', opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: '-20%', opacity: 0 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}

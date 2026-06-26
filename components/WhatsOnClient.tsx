@@ -1,30 +1,30 @@
 'use client'
 import { useRef, useState, useLayoutEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { motion, useMotionValue, animate } from 'motion/react'
+import { motion, useMotionValue, animate, AnimatePresence } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import ExhibitionCarousel from './ExhibitionCarousel'
+import ExhibitionOverlay from './ExhibitionOverlay'
 import {
   type Exhibition,
   type ExhibitionStatus,
   getFeatured,
   getByStatus,
+  getById,
   metaLine,
 } from '@/lib/exhibitions'
 
 // ── Current card ──────────────────────────────────────────────────────────────
 
-function CurrentCard({ ex }: { ex: Exhibition }) {
-  const router = useRouter()
+function CurrentCard({ ex, onOpen }: { ex: Exhibition; onOpen: (id: string) => void }) {
   return (
     <div
-      onClick={() => router.push('/whats-on/' + ex.id + '?from=card')}
+      onClick={() => onOpen(ex.id)}
       className="flex h-[113px] bg-white active:bg-[#EEEEEE] border border-border-card rounded-[16px] overflow-hidden transition-colors duration-75 cursor-pointer"
     >
-      <div className="relative w-[119px] h-[113px] shrink-0 overflow-hidden rounded-l-[16px]">
+      <motion.div layoutId={`ex-img-${ex.id}`} className="relative w-[119px] h-[113px] shrink-0 overflow-hidden rounded-l-[16px]">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
-      </div>
+      </motion.div>
       <div className="flex-1 flex flex-col gap-1 justify-center px-[18px] min-w-0">
         <p className="text-[16px] font-semibold text-black leading-snug truncate">{ex.title}</p>
         <p className="text-[14px] text-black leading-normal truncate">{metaLine(ex)}</p>
@@ -89,26 +89,21 @@ const TABS: { label: string; value: ExhibitionStatus }[] = [
   { label: 'Coming Soon', value: 'coming-soon' },
 ]
 
-// Calm spring — museum app, not a game
 const SNAP_SPRING = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
-
-// Gap between the two panels (visible mid-swipe)
 const PANEL_GAP = 60
-
-// Drag thresholds
-const SWIPE_OFFSET_RATIO = 0.3  // 30% of panel width
-const SWIPE_VELOCITY     = 400  // px/s
+const SWIPE_OFFSET_RATIO = 0.3
+const SWIPE_VELOCITY     = 400
 
 export default function WhatsOnClient() {
   const [activeTab, setActiveTab] = useState<ExhibitionStatus>('current')
   const [notified,  setNotified]  = useState<Set<string>>(new Set())
+  const [openId,    setOpenId]    = useState<string | null>(null)
 
   // ── Swipe track ──
   const trackX       = useMotionValue(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const [panelW, setPanelW] = useState(0)
 
-  // Measure container synchronously before first paint — no flash
   useLayoutEffect(() => {
     if (containerRef.current) {
       setPanelW(containerRef.current.offsetWidth)
@@ -130,9 +125,7 @@ export default function WhatsOnClient() {
   const countFor = (tab: typeof TABS[number]) =>
     tab.value === 'current' ? currentList.length : comingSoonList.length
 
-  // ── Snap + pill sync ──
   const snapToIndex = (index: number) => {
-    // Always read live width so snap is correct even after resize
     const w = containerRef.current?.offsetWidth ?? panelW
     animate(trackX, -index * (w + PANEL_GAP), SNAP_SPRING)
     setActiveTab(TABS[index].value)
@@ -163,13 +156,12 @@ export default function WhatsOnClient() {
 
       {/* ── Carousel ── */}
       <div className="shrink-0 mb-[42px]">
-        <ExhibitionCarousel exhibitions={featured} />
+        <ExhibitionCarousel exhibitions={featured} onOpen={setOpenId} />
       </div>
 
       {/* ── Tabs + swipeable track ── */}
       <div className="flex-1 flex flex-col px-4 gap-3">
 
-        {/* Tab pills — tap drives the track */}
         <div className="bg-tfam-light rounded-[32px] p-[7px] flex gap-2">
           {TABS.map((tab, i) => (
             <button
@@ -189,7 +181,6 @@ export default function WhatsOnClient() {
           ))}
         </div>
 
-        {/* Clipping container — measured for panel widths */}
         <div ref={containerRef} className="overflow-hidden">
           <motion.div
             className="flex items-start gap-[60px]"
@@ -206,7 +197,7 @@ export default function WhatsOnClient() {
               style={{ width: panelW || '100%' }}
             >
               {currentList.map(ex => (
-                <CurrentCard key={ex.id} ex={ex} />
+                <CurrentCard key={ex.id} ex={ex} onOpen={setOpenId} />
               ))}
             </div>
 
@@ -228,6 +219,16 @@ export default function WhatsOnClient() {
         </div>
 
       </div>
+
+      {/* ── Overlay ── */}
+      <AnimatePresence>
+        {openId !== null && (() => {
+          const ex = getById(openId)
+          return ex ? (
+            <ExhibitionOverlay key={openId} ex={ex} onClose={() => setOpenId(null)} />
+          ) : null
+        })()}
+      </AnimatePresence>
 
     </div>
   )

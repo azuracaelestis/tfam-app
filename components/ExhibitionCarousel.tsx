@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
@@ -8,6 +7,7 @@ import { type Exhibition, metaLine } from '@/lib/exhibitions'
 
 interface ExhibitionCarouselProps {
   exhibitions: Exhibition[]
+  onOpen: (id: string) => void
 }
 
 const CARD_W      = 313
@@ -19,8 +19,7 @@ const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0
 const SWIPE_OFFSET   = CARD_STRIDE * 0.3   // ~98px drag → advance one card
 const SWIPE_VELOCITY = 400                  // px/s fast-flick threshold
 
-export default function ExhibitionCarousel({ exhibitions }: ExhibitionCarouselProps) {
-  const router = useRouter()
+export default function ExhibitionCarousel({ exhibitions, onOpen }: ExhibitionCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX = useMotionValue(0)
 
@@ -60,14 +59,16 @@ export default function ExhibitionCarousel({ exhibitions }: ExhibitionCarouselPr
               key={ex.id}
               className="relative w-[313px] h-[390px] shrink-0 rounded-[16px] overflow-hidden border border-border-card bg-tfam-light"
             >
-              {/* Full-bleed image */}
-              <Image
-                src={ex.image}
-                alt={ex.title}
-                fill
-                className="object-cover"
-                priority={i === 0}
-              />
+              {/* Shared-element image layer */}
+              <motion.div layoutId={`ex-img-${ex.id}`} className="absolute inset-0 overflow-hidden">
+                <Image
+                  src={ex.image}
+                  alt={ex.title}
+                  fill
+                  className="object-cover"
+                  priority={i === 0}
+                />
+              </motion.div>
 
               {/* White content overlay — bottom 57.5% of card (~224px) */}
               <div className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-4 pb-[27px] flex flex-col gap-[18px]">
@@ -77,7 +78,7 @@ export default function ExhibitionCarousel({ exhibitions }: ExhibitionCarouselPr
                 </div>
                 <p className="text-[14px] text-black leading-snug line-clamp-3">{ex.description}</p>
                 <button
-                  onClick={() => router.push('/whats-on/' + ex.id + '?from=card')}
+                  onClick={() => onOpen(ex.id)}
                   className="h-[38px] w-full rounded-pill bg-black active:bg-[#494848] text-white text-[16px] font-bold flex items-center justify-center transition-colors duration-75"
                 >
                   Learn More
