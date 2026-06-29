@@ -99,3 +99,43 @@ export const activities: Activity[] = [
 
 export const getActivityById = (id: string): Activity | undefined =>
   activities.find(a => a.id === id)
+
+export interface ScheduledDate {
+  date: string  // ISO "YYYY-MM-DD"
+  full: boolean
+}
+
+export const scheduledDates: Record<string, ScheduledDate[]> = {
+  'watercolor-basics': [
+    { date: '2026-09-05', full: false },
+    { date: '2026-09-12', full: false },
+    { date: '2026-09-19', full: true  },
+    { date: '2026-09-26', full: false },
+    { date: '2026-10-03', full: false },
+    { date: '2026-10-10', full: false },
+  ],
+  'ink-painting-workshop': [
+    { date: '2026-09-06', full: false },
+    { date: '2026-09-13', full: false },
+    { date: '2026-09-20', full: true  },
+    { date: '2026-09-27', full: false },
+  ],
+  'photography-walk': [
+    { date: '2026-09-07', full: false },
+    { date: '2026-09-14', full: false },
+    { date: '2026-09-21', full: false },
+    { date: '2026-09-28', full: true  },
+  ],
+  'guided-exhibition-tour': [
+    { date: '2026-09-02', full: false },
+    { date: '2026-09-09', full: false },
+    { date: '2026-09-16', full: true  },
+    { date: '2026-09-23', full: false },
+  ],
+  'sculpture-workshop': [
+    { date: '2026-09-04', full: false },
+    { date: '2026-09-11', full: false },
+    { date: '2026-09-18', full: false },
+    { date: '2026-09-25', full: true  },
+  ],
+}
