@@ -101,41 +101,44 @@ export const getActivityById = (id: string): Activity | undefined =>
   activities.find(a => a.id === id)
 
 export interface ScheduledDate {
-  date: string  // ISO "YYYY-MM-DD"
-  full: boolean
+  date: string        // ISO "YYYY-MM-DD"
+  fullSlots: string[] // slot IDs sold out on this date, e.g. ['09:00-12:00']
 }
+
+export const TIME_SLOTS = ['09:00-12:00', '14:00-16:00', '18:00-20:00'] as const
+export type TimeSlot = typeof TIME_SLOTS[number]
 
 export const scheduledDates: Record<string, ScheduledDate[]> = {
   'watercolor-basics': [
-    { date: '2026-09-05', full: false },
-    { date: '2026-09-12', full: false },
-    { date: '2026-09-19', full: true  },
-    { date: '2026-09-26', full: false },
-    { date: '2026-10-03', full: false },
-    { date: '2026-10-10', full: false },
+    { date: '2026-09-05', fullSlots: ['09:00-12:00'] },
+    { date: '2026-09-12', fullSlots: [] },
+    { date: '2026-09-19', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-09-26', fullSlots: [] },
+    { date: '2026-10-03', fullSlots: ['14:00-16:00'] },
+    { date: '2026-10-10', fullSlots: [] },
   ],
   'ink-painting-workshop': [
-    { date: '2026-09-06', full: false },
-    { date: '2026-09-13', full: false },
-    { date: '2026-09-20', full: true  },
-    { date: '2026-09-27', full: false },
+    { date: '2026-09-06', fullSlots: [] },
+    { date: '2026-09-13', fullSlots: ['18:00-20:00'] },
+    { date: '2026-09-20', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-09-27', fullSlots: [] },
   ],
   'photography-walk': [
-    { date: '2026-09-07', full: false },
-    { date: '2026-09-14', full: false },
-    { date: '2026-09-21', full: false },
-    { date: '2026-09-28', full: true  },
+    { date: '2026-09-07', fullSlots: [] },
+    { date: '2026-09-14', fullSlots: ['09:00-12:00', '14:00-16:00'] },
+    { date: '2026-09-21', fullSlots: [] },
+    { date: '2026-09-28', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
   ],
   'guided-exhibition-tour': [
-    { date: '2026-09-02', full: false },
-    { date: '2026-09-09', full: false },
-    { date: '2026-09-16', full: true  },
-    { date: '2026-09-23', full: false },
+    { date: '2026-09-02', fullSlots: [] },
+    { date: '2026-09-09', fullSlots: ['09:00-12:00'] },
+    { date: '2026-09-16', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-09-23', fullSlots: ['14:00-16:00'] },
   ],
   'sculpture-workshop': [
-    { date: '2026-09-04', full: false },
-    { date: '2026-09-11', full: false },
-    { date: '2026-09-18', full: false },
-    { date: '2026-09-25', full: true  },
+    { date: '2026-09-04', fullSlots: [] },
+    { date: '2026-09-11', fullSlots: [] },
+    { date: '2026-09-18', fullSlots: ['18:00-20:00'] },
+    { date: '2026-09-25', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
   ],
 }
