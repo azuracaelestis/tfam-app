@@ -5,14 +5,17 @@ const ITEMS = [
   { label: 'Home',       icon: 'bottom-nav-home.svg',       w: 16, h: 17, href: '/' },
   { label: "What's On",  icon: 'bottom-nav-whats-on.svg',   w: 17, h: 17, href: '/whats-on' },
   { label: 'Map',        icon: 'bottom-nav-map.svg',        w: 19, h: 17, href: null },
-  { label: 'Activities', icon: 'bottom-nav-activities.svg', w: 21, h: 17, href: null },
+  { label: 'Activities', icon: 'bottom-nav-activities.svg', w: 21, h: 17, href: '/activities' },
   { label: 'Settings',   icon: 'bottom-nav-setting.svg',    w: 17, h: 17, href: null },
 ]
 
 export default function BottomNav() {
   const pathname = usePathname()
   const router = useRouter()
-  const active = pathname === '/' ? 0 : pathname.startsWith('/whats-on') ? 1 : -1
+  const active = pathname === '/' ? 0
+    : pathname.startsWith('/whats-on') ? 1
+    : pathname.startsWith('/activities') ? 3
+    : -1
 
   return (
     <nav
