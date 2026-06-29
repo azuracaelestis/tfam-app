@@ -130,7 +130,7 @@ export default function ChooseDateClient({
       </header>
 
       {/* Main content */}
-      <div className="flex flex-col gap-[48px] px-[18px] pt-[16px]">
+      <div className="flex flex-col gap-[20px] px-[18px] pt-[16px]">
 
         {/* Activity summary card */}
         <div className="bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[12px] flex flex-col gap-[4px]">
