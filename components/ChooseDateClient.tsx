@@ -258,7 +258,7 @@ export default function ChooseDateClient({
         {selectedDate && selectedDateEntry && (
           <div className="flex flex-col gap-[12px]">
             <p className="text-[16px] font-semibold text-black leading-none">Choose a time</p>
-            <div className="flex flex-col gap-[8px]">
+            <div className="flex gap-[8px]">
               {TIME_SLOTS.map(slot => {
                 const isFull = selectedDateEntry.fullSlots.includes(slot)
                 const isSlotSelected = selectedSlot === slot
@@ -269,9 +269,9 @@ export default function ChooseDateClient({
                     <button
                       key={slot}
                       onClick={() => handleSlotClick(slot)}
-                      className="bg-black px-[20px] py-[14px] rounded-[12px] text-left active:opacity-70"
+                      className="flex-1 bg-black py-[12px] px-[4px] rounded-[12px] flex items-center justify-center active:opacity-70"
                     >
-                      <span className="text-[15px] font-bold text-white">{label}</span>
+                      <span className="text-[13px] font-bold text-white text-center leading-tight">{label}</span>
                     </button>
                   )
                 }
@@ -280,9 +280,9 @@ export default function ChooseDateClient({
                   return (
                     <div
                       key={slot}
-                      className="bg-[#f5f5f5] px-[20px] py-[14px] rounded-[12px]"
+                      className="flex-1 bg-[#f5f5f5] py-[12px] px-[4px] rounded-[12px] flex items-center justify-center"
                     >
-                      <span className="text-[15px] font-normal text-black line-through opacity-50">{label}</span>
+                      <span className="text-[13px] font-normal text-black line-through opacity-50 text-center leading-tight">{label}</span>
                     </div>
                   )
                 }
@@ -291,9 +291,9 @@ export default function ChooseDateClient({
                   <button
                     key={slot}
                     onClick={() => handleSlotClick(slot)}
-                    className="bg-[#f5f5f5] border border-[#d9d9d9] px-[20px] py-[14px] rounded-[12px] text-left active:opacity-70"
+                    className="flex-1 bg-[#f5f5f5] border border-[#d9d9d9] py-[12px] px-[4px] rounded-[12px] flex items-center justify-center active:opacity-70"
                   >
-                    <span className="text-[15px] font-bold text-black">{label}</span>
+                    <span className="text-[13px] font-bold text-black text-center leading-tight">{label}</span>
                   </button>
                 )
               })}
