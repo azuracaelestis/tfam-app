@@ -3,10 +3,12 @@ export type ActivityCategory = 'class' | 'tour' | 'festival'
 export interface Activity {
   id: string
   title: string
+  titleZh?: string
   image: string
   category: ActivityCategory
   tags: string[]         // rendered as pills, e.g. ['Free', '3 hrs', 'Age 16+']
   description: string    // short — shown on list cards
+  descriptionZh?: string
   popular: boolean       // true → appears in "Most Popular" carousel
 }
 
@@ -15,6 +17,7 @@ export const activities: Activity[] = [
   {
     id: 'watercolor-basics',
     title: 'Watercolor Basics',
+    titleZh: '水彩基礎課程',
     image: '/images/activities/watercolor-basics.jpg',
     category: 'class',
     tags: ['Free', 'Classes', '3 hrs', 'Age 16+'],
@@ -24,6 +27,7 @@ export const activities: Activity[] = [
   {
     id: 'ink-painting-workshop',
     title: 'Ink Painting Workshop',
+    titleZh: '水墨畫工作坊',
     image: '/images/activities/ink-painting-workshop.jpg',
     category: 'class',
     tags: ['Free', 'Classes', '4 hrs', 'Age 18+'],
@@ -33,6 +37,7 @@ export const activities: Activity[] = [
   {
     id: 'photography-walk',
     title: 'Photography Walk',
+    titleZh: '攝影漫遊',
     image: '/images/activities/photography-walk.jpg',
     category: 'tour',
     tags: ['Free', 'Tours', '2 hrs', 'Age 14+'],
@@ -43,56 +48,68 @@ export const activities: Activity[] = [
   {
     id: 'guided-exhibition-tour',
     title: 'Guided Exhibition Tour',
+    titleZh: '展覽導覽',
     image: '/images/forms-in-motion.png',
     category: 'tour',
     tags: ['Free', 'Tours', '1.5 hrs', 'All ages'],
     description: 'Curator-led tour of current exhibitions. English and Mandarin available.',
+    descriptionZh: '由策展人帶領參觀當期展覽，提供英文與國語導覽。',
     popular: false,
   },
   {
     id: 'sculpture-workshop',
     title: 'Sculpture Workshop',
+    titleZh: '雕塑工作坊',
     image: '/images/material-extensions.png',
     category: 'class',
     tags: ['Free', 'Classes', '3 hrs', 'Age 16+'],
-    description: 'Introduction to watercolor techniques with a TFAM resident artist. Materials provided.',
+    description: 'Introduction to sculpture techniques with a TFAM resident artist. Materials provided.',
+    descriptionZh: '由北美館駐館藝術家帶領的雕塑技法入門課程，材料由主辦方提供。',
     popular: false,
   },
   // ── Additional activities for filter variety ──────────────────────────────────
   {
     id: 'lantern-festival',
     title: 'Lantern Festival Workshop',
+    titleZh: '花燈工作坊',
     image: '/images/forms-in-motion.png',
     category: 'festival',
     tags: ['Festivals', '2 hrs', 'Age 8+'],
     description: 'Craft and light your own paper lantern in this hands-on cultural workshop.',
+    descriptionZh: '親手製作並點亮專屬紙燈籠，體驗傳統文化手作課程。',
     popular: false,
   },
   {
     id: 'moon-festival',
     title: 'Moon Festival Night',
+    titleZh: '中秋夜晚會',
     image: '/images/entanglements.png',
     category: 'festival',
     tags: ['Festivals', '3 hrs', 'All ages'],
     description: 'Celebrate the Mid-Autumn Festival with lanterns, mooncakes, and live music in the museum garden.',
+    descriptionZh: '在美術館庭園歡度中秋節，賞燈、品月餅、聽現場音樂演出。',
     popular: false,
   },
   {
     id: 'family-art-tour',
     title: 'Family Art Tour',
+    titleZh: '親子藝術導覽',
     image: '/images/entanglements.png',
     category: 'tour',
     tags: ['Free', 'Tours', '1 hr', 'Age 5+'],
     description: 'A playful guided tour designed for families with young children.',
+    descriptionZh: '專為親子家庭設計的趣味導覽活動。',
     popular: false,
   },
   {
     id: 'printmaking-workshop',
     title: 'Printmaking Workshop',
+    titleZh: '版畫工作坊',
     image: '/images/your-curious-journey.png',
     category: 'class',
     tags: ['Classes', '4 hrs', 'Age 16+'],
     description: 'Create your own linocut prints with guidance from practising printmakers.',
+    descriptionZh: '在專業版畫家指導下，親手製作專屬亞麻油氈版畫。',
     popular: false,
   },
 ]

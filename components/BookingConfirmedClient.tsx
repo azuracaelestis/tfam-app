@@ -1,13 +1,15 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { type Activity } from '@/lib/activities'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
 
-function formatDate(iso: string): string {
+function formatDate(iso: string, locale: string): string {
   const [y, m, d] = iso.split('-').map(Number)
   const date = new Date(y, m - 1, d)
-  const weekday = date.toLocaleDateString('en-GB', { weekday: 'short' })
-  const month   = date.toLocaleDateString('en-GB', { month: 'long' })
-  return `${weekday}, ${d} ${month} ${y}`
+  return new Intl.DateTimeFormat(locale, {
+    weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
+  }).format(date)
 }
 
 function pad2(n: number) { return String(n).padStart(2, '0') }
@@ -84,9 +86,13 @@ export default function BookingConfirmedClient({
   slot: string
 }) {
   const router = useRouter()
+  const t = useTranslation()
+  const [lang] = useLanguage()
+  const locale = lang === 'zh' ? 'zh-TW' : 'en-US'
 
-  const slotDisplay = slot.replace('-', '–')
-  const fee = activity.tags.includes('Free') ? 'Free' : (activity.tags.find(t => t.startsWith('NT$')) ?? '—')
+  const slotDisplay   = slot.replace('-', '–')
+  const fee           = activity.tags.includes('Free') ? t.activities.tagFree : (activity.tags.find(tag => tag.startsWith('NT$')) ?? '—')
+  const activityTitle = lang === 'zh' && activity.titleZh ? activity.titleZh : activity.title
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto">
@@ -96,14 +102,14 @@ export default function BookingConfirmedClient({
         <CheckCircleIcon />
 
         {/* Title */}
-        <p className="text-[20px] font-bold text-black text-center leading-none">Booking Confirmed</p>
+        <p className="text-[20px] font-bold text-black text-center leading-none">{t.bookingConfirmed.title}</p>
 
         {/* Summary card */}
         <div className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[16px] flex flex-col gap-[8px]">
-          <SummaryRow label="Class"     value={activity.title} />
-          <SummaryRow label="Date"      value={formatDate(date)} />
-          <SummaryRow label="Time"      value={slotDisplay} />
-          <SummaryRow label="Class Fee" value={fee} />
+          <SummaryRow label={t.confirmBooking.labelClass}    value={activityTitle} />
+          <SummaryRow label={t.confirmBooking.labelDate}     value={formatDate(date, locale)} />
+          <SummaryRow label={t.confirmBooking.labelTime}     value={slotDisplay} />
+          <SummaryRow label={t.confirmBooking.labelFee}      value={fee} />
         </div>
 
         {/* Info banner */}
@@ -114,9 +120,9 @@ export default function BookingConfirmedClient({
             <circle cx="8" cy="5" r="0.8" fill="#4a90d9" />
           </svg>
           <p className="text-[13px] text-black leading-relaxed">
-            Remember to buy a museum entry ticket{' '}
-            <span className="font-bold">(NT$ 30)</span>{' '}
-            at the counter when you arrive.
+            {t.bookingConfirmed.banner}
+            <span className="font-bold">{t.bookingConfirmed.bannerBold}</span>
+            {t.bookingConfirmed.bannerEnd}
           </p>
         </div>
 
@@ -126,7 +132,7 @@ export default function BookingConfirmedClient({
           className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold active:bg-[#333] transition-colors"
         >
           <HouseIcon />
-          Back to Home
+          {t.bookingConfirmed.backHome}
         </button>
 
         {/* Add to Calendar */}
@@ -135,7 +141,7 @@ export default function BookingConfirmedClient({
           className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] border border-black bg-white text-black text-[16px] font-bold active:bg-[#f5f5f5] transition-colors"
         >
           <CalendarIcon />
-          Add to Calendar
+          {t.bookingConfirmed.addToCalendar}
         </button>
 
       </div>

@@ -13,10 +13,18 @@ import {
   getById,
   metaLine,
 } from '@/lib/exhibitions'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
 
 // ── Current card ──────────────────────────────────────────────────────────────
 
-function CurrentCard({ ex, onOpen }: { ex: Exhibition; onOpen: (id: string) => void }) {
+function translateCat(t: ReturnType<typeof useTranslation>, cat: string): string {
+  return t.notifications.categories[cat as keyof typeof t.notifications.categories] ?? cat
+}
+
+function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string) => void; lang: 'en' | 'zh' }) {
+  const t = useTranslation()
+  const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
   return (
     <div
       onClick={() => onOpen(ex.id)}
@@ -26,13 +34,15 @@ function CurrentCard({ ex, onOpen }: { ex: Exhibition; onOpen: (id: string) => v
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
       </motion.div>
       <div className="flex-1 flex flex-col gap-1 justify-center px-[18px] min-w-0">
-        <p className="text-[16px] font-semibold text-black leading-snug truncate">{ex.title}</p>
-        <p className="text-[14px] text-black leading-normal truncate">{metaLine(ex)}</p>
+        <p className="text-[16px] font-semibold text-black leading-snug truncate">{displayTitle}</p>
+        <p className="text-[14px] text-black leading-normal truncate">{metaLine(ex, lang)}</p>
         <div className="flex items-center gap-2 flex-wrap">
           {ex.categories.map(cat => (
             <div key={cat} className="flex items-center gap-2 bg-[#f2f2f2] rounded-[8px] px-2 py-1">
               <img src="/tag.svg" width={8} height={8} alt="" aria-hidden="true" className="shrink-0" />
-              <span className="text-[12px] text-black whitespace-nowrap">{cat}</span>
+              <span className="text-[12px] text-black whitespace-nowrap">
+                {translateCat(t, cat)}
+              </span>
             </div>
           ))}
         </div>
@@ -49,7 +59,9 @@ interface ComingSoonCardProps {
   onToggle: () => void
 }
 
-function ComingSoonCard({ ex, notified, onToggle }: ComingSoonCardProps) {
+function ComingSoonCard({ ex, notified, onToggle, lang }: ComingSoonCardProps & { lang: 'en' | 'zh' }) {
+  const t = useTranslation()
+  const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
   return (
     <div className="flex h-[113px] bg-white border border-border-card rounded-[16px] overflow-hidden">
       <div className="relative w-[119px] h-[113px] shrink-0 overflow-hidden rounded-l-[16px]">
@@ -57,8 +69,8 @@ function ComingSoonCard({ ex, notified, onToggle }: ComingSoonCardProps) {
       </div>
       <div className="flex-1 flex flex-col gap-2 justify-center px-[18px] min-w-0">
         <div>
-          <p className="text-[16px] font-semibold text-black leading-snug">{ex.title}</p>
-          <p className="text-[14px] text-black leading-normal">{metaLine(ex)}</p>
+          <p className="text-[16px] font-semibold text-black leading-snug">{displayTitle}</p>
+          <p className="text-[14px] text-black leading-normal">{metaLine(ex, lang, cat => translateCat(t, cat))}</p>
         </div>
         <button
           onClick={onToggle}
@@ -69,11 +81,11 @@ function ComingSoonCard({ ex, notified, onToggle }: ComingSoonCardProps) {
           }`}
         >
           {notified ? (
-            '✓ Notifying You'
+            t.whatsOn.notifying
           ) : (
             <>
               <img src="/bell-white.svg" width={13} height={13} alt="" aria-hidden="true" className="shrink-0" />
-              Notify Me
+              {t.whatsOn.notifyMe}
             </>
           )}
         </button>
@@ -84,10 +96,7 @@ function ComingSoonCard({ ex, notified, onToggle }: ComingSoonCardProps) {
 
 // ── Main screen ───────────────────────────────────────────────────────────────
 
-const TABS: { label: string; value: ExhibitionStatus }[] = [
-  { label: 'Current',     value: 'current'     },
-  { label: 'Coming Soon', value: 'coming-soon' },
-]
+const TAB_VALUES: ExhibitionStatus[] = ['current', 'coming-soon']
 
 const SNAP_SPRING = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
 const PANEL_GAP = 60
@@ -95,9 +104,16 @@ const SWIPE_OFFSET_RATIO = 0.3
 const SWIPE_VELOCITY     = 400
 
 export default function WhatsOnClient() {
+  const t = useTranslation()
+  const [lang] = useLanguage()
   const [activeTab, setActiveTab] = useState<ExhibitionStatus>('current')
   const [notified,  setNotified]  = useState<Set<string>>(new Set())
   const [openId,    setOpenId]    = useState<string | null>(null)
+
+  const TABS = [
+    { label: t.whatsOn.current,    value: 'current'     as ExhibitionStatus },
+    { label: t.whatsOn.comingSoon, value: 'coming-soon' as ExhibitionStatus },
+  ]
 
   // ── Swipe track ──
   const trackX       = useMotionValue(0)
@@ -122,18 +138,18 @@ export default function WhatsOnClient() {
       return next
     })
 
-  const countFor = (tab: typeof TABS[number]) =>
+  const countFor = (tab: { value: ExhibitionStatus }) =>
     tab.value === 'current' ? currentList.length : comingSoonList.length
 
   const snapToIndex = (index: number) => {
     const w = containerRef.current?.offsetWidth ?? panelW
     animate(trackX, -index * (w + PANEL_GAP), SNAP_SPRING)
-    setActiveTab(TABS[index].value)
+    setActiveTab(TAB_VALUES[index])
   }
 
   const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const w = containerRef.current?.offsetWidth ?? panelW
-    const currentIndex = TABS.findIndex(t => t.value === activeTab)
+    const currentIndex = TAB_VALUES.findIndex(v => v === activeTab)
     const { offset, velocity } = info
 
     let target = currentIndex
@@ -151,12 +167,12 @@ export default function WhatsOnClient() {
 
       {/* ── Header — sticky ── */}
       <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
-        <h1 className="text-[20px] font-bold text-black leading-none">What&rsquo;s On</h1>
+        <h1 className="text-[20px] font-bold text-black leading-none">{t.whatsOn.title}</h1>
       </header>
 
       {/* ── Carousel ── */}
       <div className="shrink-0 mb-[42px]">
-        <ExhibitionCarousel exhibitions={featured} onOpen={setOpenId} />
+        <ExhibitionCarousel exhibitions={featured} onOpen={setOpenId} lang={lang} />
       </div>
 
       {/* ── Tabs + swipeable track ── */}
@@ -197,7 +213,7 @@ export default function WhatsOnClient() {
               style={{ width: panelW || '100%' }}
             >
               {currentList.map(ex => (
-                <CurrentCard key={ex.id} ex={ex} onOpen={setOpenId} />
+                <CurrentCard key={ex.id} ex={ex} onOpen={setOpenId} lang={lang} />
               ))}
             </div>
 
@@ -212,6 +228,7 @@ export default function WhatsOnClient() {
                   ex={ex}
                   notified={notified.has(ex.id)}
                   onToggle={() => toggleNotify(ex.id)}
+                  lang={lang}
                 />
               ))}
             </div>

@@ -3,15 +3,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAnimate } from 'motion/react'
 import { type Activity } from '@/lib/activities'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function formatDate(iso: string): string {
+function formatDate(iso: string, locale: string): string {
   const [y, m, d] = iso.split('-').map(Number)
   const date = new Date(y, m - 1, d)
-  const weekday = date.toLocaleDateString('en-GB', { weekday: 'short' })
-  const month   = date.toLocaleDateString('en-GB', { month: 'long' })
-  return `${weekday}, ${d} ${month} ${y}`
+  return new Intl.DateTimeFormat(locale, {
+    weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
+  }).format(date)
 }
 
 function InfoIcon() {
@@ -61,6 +63,9 @@ export default function ConfirmBookingClient({
   slot: string
 }) {
   const router = useRouter()
+  const t = useTranslation()
+  const [lang] = useLanguage()
+  const locale = lang === 'zh' ? 'zh-TW' : 'en-US'
   const [name, setName]     = useState('')
   const [email, setEmail]   = useState('')
   const [emailError, setEmailError] = useState(false)
@@ -81,8 +86,9 @@ export default function ConfirmBookingClient({
   }
 
   const slotDisplay = slot.replace('-', '–')
-  const duration    = (activity.tags.find(t => t.includes('hr')) ?? '—').replace(/\bhrs\b/, 'hours').replace(/\bhr\b/, 'hour')
-  const fee         = activity.tags.includes('Free') ? 'Free' : (activity.tags.find(t => t.startsWith('NT$')) ?? '—')
+  const duration    = (activity.tags.find(tag => tag.includes('hr')) ?? '—').replace(/\bhrs\b/, 'hours').replace(/\bhr\b/, 'hour')
+  const fee         = activity.tags.includes('Free') ? t.activities.tagFree : (activity.tags.find(tag => tag.startsWith('NT$')) ?? '—')
+  const activityTitle = lang === 'zh' && activity.titleZh ? activity.titleZh : activity.title
 
   function handleSubmit() {
     if (!canSubmit) return
@@ -102,7 +108,7 @@ export default function ConfirmBookingClient({
           aria-label="Back"
         >
           <ChevronLeft />
-          <span className="text-[20px] font-bold text-black leading-none">Activities</span>
+          <span className="text-[20px] font-bold text-black leading-none">{t.confirmBooking.back}</span>
         </button>
       </header>
 
@@ -110,23 +116,23 @@ export default function ConfirmBookingClient({
       <div className="flex flex-col gap-[24px] px-[18px] pt-[48px] pb-[69px]">
 
         {/* Title */}
-        <p className="text-[20px] font-bold text-black text-center leading-none">Confirm Booking</p>
+        <p className="text-[20px] font-bold text-black text-center leading-none">{t.confirmBooking.title}</p>
 
         {/* Booking summary card */}
         <div className="bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[16px] flex flex-col gap-[8px]">
-          <SummaryRow label="Class"     value={activity.title} />
-          <SummaryRow label="Date"      value={formatDate(date)} />
-          <SummaryRow label="Time"      value={slotDisplay} />
-          <SummaryRow label="Duration"  value={duration} />
-          <SummaryRow label="Class Fee" value={fee} />
+          <SummaryRow label={t.confirmBooking.labelClass}    value={activityTitle} />
+          <SummaryRow label={t.confirmBooking.labelDate}     value={formatDate(date, locale)} />
+          <SummaryRow label={t.confirmBooking.labelTime}     value={slotDisplay} />
+          <SummaryRow label={t.confirmBooking.labelDuration} value={duration} />
+          <SummaryRow label={t.confirmBooking.labelFee}      value={fee} />
         </div>
 
         {/* Your Details */}
         <div className="flex flex-col gap-[12px]">
-          <p className="text-[16px] font-semibold text-black leading-none">Your Details</p>
+          <p className="text-[16px] font-semibold text-black leading-none">{t.confirmBooking.yourDetails}</p>
           <input
             type="text"
-            placeholder="Name"
+            placeholder={t.confirmBooking.namePlaceholder}
             value={name}
             onChange={e => setName(e.target.value)}
             className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
@@ -134,7 +140,7 @@ export default function ConfirmBookingClient({
           <input
             ref={emailScope}
             type="email"
-            placeholder="Email address"
+            placeholder={t.confirmBooking.emailPlaceholder}
             value={email}
             onChange={handleEmailChange}
             onBlur={handleEmailBlur}
@@ -146,8 +152,9 @@ export default function ConfirmBookingClient({
         <div className="bg-[#ebf6ff] rounded-[12px] px-[16px] py-[14px] flex items-start gap-[8px]">
           <InfoIcon />
           <p className="text-[13px] text-black leading-relaxed">
-            Confirmation sent your email, show it at museum gate on the day.{' '}
-            <span className="font-bold">Museum entry ticket (NT$ 30) required at the door.</span>
+            {t.confirmBooking.banner}
+            <span className="font-bold">{t.confirmBooking.bannerBold}</span>
+            {t.confirmBooking.bannerPost}
           </p>
         </div>
 
@@ -158,7 +165,7 @@ export default function ConfirmBookingClient({
           className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
         >
           <CheckIcon />
-          Confirm Booking
+          {t.confirmBooking.confirmButton}
         </button>
 
       </div>

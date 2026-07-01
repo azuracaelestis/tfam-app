@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import { type Activity } from '@/lib/activities'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
+import { translateTag } from '@/lib/translateTag'
 
 const CARD_W      = 313
 const CARD_GAP    = 18
@@ -25,8 +28,7 @@ function CalendarIconWhite() {
   )
 }
 
-function TagPill({ label }: { label: string }) {
-  const isFree = label === 'Free'
+function TagPill({ label, isFree }: { label: string; isFree?: boolean }) {
   return (
     <div className={`bg-[#f2f2f2] flex items-center justify-center px-[8px] py-[4px] rounded-[8px] shrink-0 ${isFree ? 'gap-[8px]' : ''}`}>
       {isFree && (
@@ -39,6 +41,8 @@ function TagPill({ label }: { label: string }) {
 
 export default function ActivityCarousel({ activities }: { activities: Activity[] }) {
   const router = useRouter()
+  const t = useTranslation()
+  const [lang] = useLanguage()
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX = useMotionValue(0)
 
@@ -84,9 +88,13 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
               {/* Content */}
               <div className="flex-1 flex flex-col gap-[18px] px-[24px] pt-[22px] pb-[30px]">
                 <div className="flex flex-col gap-[4px]">
-                  <h3 className="text-[20px] font-semibold text-black leading-snug line-clamp-2">{a.title}</h3>
+                  <h3 className="text-[20px] font-semibold text-black leading-snug line-clamp-2">
+                    {lang === 'zh' && a.titleZh ? a.titleZh : a.title}
+                  </h3>
                   <div className="flex gap-[4px] flex-wrap">
-                    {a.tags.map(tag => <TagPill key={tag} label={tag} />)}
+                    {a.tags.map(raw => (
+                      <TagPill key={raw} label={translateTag(raw, t)} isFree={raw === 'Free'} />
+                    ))}
                   </div>
                 </div>
                 <button
@@ -94,7 +102,7 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
                   className="mt-auto flex items-center justify-center gap-[8px] p-[8px] w-full rounded-pill bg-black active:bg-[#494848] text-white text-[16px] font-bold transition-colors duration-75"
                 >
                   <CalendarIconWhite />
-                  Book this
+                  {t.activities.bookThis}
                 </button>
               </div>
             </div>

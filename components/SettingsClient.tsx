@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/useLanguage'
+import { useTranslation } from '@/lib/useTranslation'
 
 const ABOUT_LINKS = {
   about: {
@@ -79,13 +80,14 @@ function AboutCard({
 export default function SettingsClient() {
   const router = useRouter()
   const [lang] = useLanguage()
+  const t = useTranslation()
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
       {/* Sticky header */}
       <header className="sticky top-0 z-10 bg-white px-[20px] py-[10px] flex items-end shrink-0">
-        <p className="text-[20px] font-bold text-black leading-normal">Settings</p>
+        <p className="text-[20px] font-bold text-black leading-normal">{t.settings.title}</p>
       </header>
 
       {/* Content */}
@@ -96,18 +98,18 @@ export default function SettingsClient() {
 
           {/* Preferences */}
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[20px] font-medium text-black leading-normal">Preferences</p>
+            <p className="text-[20px] font-medium text-black leading-normal">{t.settings.preferences}</p>
             <div className="flex flex-col gap-[12px]">
               <PreferenceCard
                 icon="/images/notification/icon-notification.svg"
-                title="Notifications"
-                subtitle="Exhibition alerts, class sessions, Saturday reminder"
+                title={t.settings.notifications}
+                subtitle={t.settings.notificationsSub}
                 onClick={() => router.push('/settings/notifications')}
               />
               <PreferenceCard
                 icon="/images/notification/icon-language.svg"
-                title="Language"
-                subtitle="App display language"
+                title={t.settings.language}
+                subtitle={t.settings.languageSub}
                 onClick={() => router.push('/settings/language')}
               />
             </div>
@@ -115,21 +117,21 @@ export default function SettingsClient() {
 
           {/* About */}
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[20px] font-medium text-black leading-normal">About</p>
+            <p className="text-[20px] font-medium text-black leading-normal">{t.settings.about}</p>
             <div className="flex flex-col gap-[12px]">
               <AboutCard
-                title="About Taipei Fine Arts Museum"
-                subtitle="Visit info, contact, opening hours"
+                title={t.settings.aboutMuseum}
+                subtitle={t.settings.aboutMuseumSub}
                 onClick={() => window.open(ABOUT_LINKS.about[lang], '_blank')}
               />
               <AboutCard
-                title="Privacy Policy"
-                subtitle="How your data is used"
+                title={t.settings.privacyPolicy}
+                subtitle={t.settings.privacyPolicySub}
                 onClick={() => window.open(ABOUT_LINKS.privacy[lang], '_blank')}
               />
               <AboutCard
-                title="Accessibility"
-                subtitle="Physical access, service at TFAM"
+                title={t.settings.accessibility}
+                subtitle={t.settings.accessibilitySub}
                 onClick={() => window.open(ABOUT_LINKS.accessibility[lang], '_blank')}
               />
             </div>
@@ -139,7 +141,7 @@ export default function SettingsClient() {
 
         {/* App Version */}
         <div className="flex justify-between items-center">
-          <span className="text-[16px] font-semibold text-[#767676]">App Version</span>
+          <span className="text-[16px] font-semibold text-[#767676]">{t.settings.appVersion}</span>
           <span className="text-[16px] font-semibold text-[#767676]">1.0.0</span>
         </div>
 

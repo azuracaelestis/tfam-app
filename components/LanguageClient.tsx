@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/useLanguage'
+import { useTranslation } from '@/lib/useTranslation'
 
 function ChevronLeft() {
   return (
@@ -61,6 +62,7 @@ function LanguageCard({
 export default function LanguageClient() {
   const router = useRouter()
   const [lang, setLanguage] = useLanguage()
+  const t = useTranslation()
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto">
@@ -74,7 +76,7 @@ export default function LanguageClient() {
             aria-label="Back"
           >
             <ChevronLeft />
-            <span className="text-[20px] font-bold text-black leading-normal">Language</span>
+            <span className="text-[20px] font-bold text-black leading-normal">{t.language.title}</span>
           </button>
         </div>
       </header>
@@ -85,19 +87,19 @@ export default function LanguageClient() {
 
           {/* Display Language */}
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[20px] font-medium text-black leading-normal">Display Language</p>
+            <p className="text-[20px] font-medium text-black leading-normal">{t.language.displayLanguage}</p>
             <div className="flex flex-col gap-[12px]">
               <LanguageCard
-                badge="EN"
-                title="English"
-                subtitle="All screens, labels, and content in English"
+                badge={t.language.enBadge}
+                title={t.language.enTitle}
+                subtitle={t.language.enSub}
                 selected={lang === 'en'}
                 onClick={() => setLanguage('en')}
               />
               <LanguageCard
-                badge="中文"
-                title="繁體中文"
-                subtitle="Traditional Chinese"
+                badge={t.language.zhBadge}
+                title={t.language.zhTitle}
+                subtitle={t.language.zhSub}
                 selected={lang === 'zh'}
                 onClick={() => setLanguage('zh')}
               />
@@ -109,20 +111,20 @@ export default function LanguageClient() {
             <div className="flex gap-[10px] items-start py-[4px] w-[319px]">
               <InfoIcon />
               <p className="text-[14px] font-normal text-black leading-normal">
-                Your language preferences is saved and will not change mid-session. Restart the app after switching the language.
+                {t.language.infoBanner}
               </p>
             </div>
           </div>
 
           {/* Audio Guide Language */}
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[20px] font-medium text-black leading-normal">Audio Guide Language</p>
+            <p className="text-[20px] font-medium text-black leading-normal">{t.language.audioGuideLanguage}</p>
             <div className="border border-[#d6d6d6] rounded-[16px] p-[18px] flex flex-col gap-[12px]">
               <p className="text-[16px] font-semibold text-black w-[260px] leading-normal">
-                Audio guide narration
+                {t.language.audioGuideNarration}
               </p>
               <p className="text-[13px] font-normal text-black leading-normal">
-                Curator recording are available in both English and Mandarin. Select your preferred language on the playback screen.
+                {t.language.audioGuideDesc}
               </p>
             </div>
           </div>

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useNotificationSettings, ALL_CATEGORIES, type Category } from '@/lib/useNotificationSettings'
+import { useTranslation } from '@/lib/useTranslation'
 
 function ChevronLeft() {
   return (
@@ -71,6 +72,7 @@ export default function NotificationsClient() {
   const router = useRouter()
   const [settings, update] = useNotificationSettings()
   const [pickerOpen, setPickerOpen] = useState(false)
+  const t = useTranslation()
 
   const available = ALL_CATEGORIES.filter(c => !settings.interests.includes(c as Category))
 
@@ -94,7 +96,7 @@ export default function NotificationsClient() {
           aria-label="Back"
         >
           <ChevronLeft />
-          <span className="text-[20px] font-bold text-black leading-none">Notifications</span>
+          <span className="text-[20px] font-bold text-black leading-none">{t.notifications.title}</span>
         </button>
       </header>
 
@@ -103,26 +105,26 @@ export default function NotificationsClient() {
 
         {/* Alert Types */}
         <div className="flex flex-col gap-[12px]">
-          <p className="text-[20px] font-medium text-black leading-normal">Alert Types</p>
+          <p className="text-[20px] font-medium text-black leading-normal">{t.notifications.alertTypes}</p>
           <div className="flex flex-col gap-[12px]">
             <AlertCard
-              title="Exhibition alerts"
-              subtitle="Notified when a new exhibition matching your interests opens"
+              title={t.notifications.exhibitionAlerts}
+              subtitle={t.notifications.exhibitionAlertsSub}
               value={settings.exhibitionAlerts}
               onChange={v => update({ exhibitionAlerts: v })}
             />
             <AlertCard
-              title="New activities"
-              subtitle="Notified when new dates open for activities you follow"
+              title={t.notifications.newActivities}
+              subtitle={t.notifications.newActivitiesSub}
               value={settings.newActivities}
               onChange={v => update({ newActivities: v })}
             />
             <AlertCard
-              title="Saturday reminder"
+              title={t.notifications.saturdayReminder}
               subtitle={
                 <>
-                  <p>Every Friday at 16:00</p>
-                  <p>Free entry reminder for Saturday night</p>
+                  <p>{t.notifications.saturdayReminderLine1}</p>
+                  <p>{t.notifications.saturdayReminderLine2}</p>
                 </>
               }
               value={settings.saturdayReminder}
@@ -133,10 +135,10 @@ export default function NotificationsClient() {
 
         {/* Your Interests */}
         <div className="flex flex-col gap-[12px]">
-          <p className="text-[20px] font-medium text-black leading-normal">Your Interests</p>
+          <p className="text-[20px] font-medium text-black leading-normal">{t.notifications.yourInterests}</p>
           <div className="border border-[#d6d6d6] rounded-[16px] p-[18px] flex flex-col gap-[12px]">
             <p className="text-[16px] font-semibold text-black w-[260px] leading-normal">
-              Exhibition alerts are sent based on these categories
+              {t.notifications.interestsDesc}
             </p>
             {/* Pills */}
             <div className="flex flex-col gap-[12px]">
@@ -146,7 +148,7 @@ export default function NotificationsClient() {
                     key={cat}
                     className="flex items-center gap-[9px] bg-[#f2f2f2] border border-[#d9d9d9] rounded-[32px] px-[24px] py-[8px]"
                   >
-                    <span className="text-[14px] font-normal text-black whitespace-nowrap">{cat}</span>
+                    <span className="text-[14px] font-normal text-black whitespace-nowrap">{t.notifications.categories[cat]}</span>
                     <button
                       onClick={() => removeInterest(cat as Category)}
                       className="shrink-0 active:opacity-60"
@@ -164,7 +166,7 @@ export default function NotificationsClient() {
                     className="flex items-center gap-[9px] bg-white border border-dashed border-[#d9d9d9] rounded-[32px] px-[24px] py-[8px] active:opacity-60 transition-opacity"
                   >
                     <PlusIcon />
-                    <span className="text-[14px] font-normal text-black whitespace-nowrap">Add</span>
+                    <span className="text-[14px] font-normal text-black whitespace-nowrap">{t.notifications.add}</span>
                   </button>
                 )}
               </div>
@@ -178,7 +180,7 @@ export default function NotificationsClient() {
                       onClick={() => addInterest(cat as Category)}
                       className={`w-full text-left px-[16px] py-[12px] text-[14px] font-normal text-black active:bg-[#f5f5f5] transition-colors ${i > 0 ? 'border-t border-[#ebebeb]' : ''}`}
                     >
-                      {cat}
+                      {t.notifications.categories[cat as Category]}
                     </button>
                   ))}
                 </div>
@@ -191,7 +193,7 @@ export default function NotificationsClient() {
         <div className="bg-[#ebf6ff] rounded-[16px] p-[18px] flex gap-[10px] items-start">
           <InfoIcon />
           <p className="text-[14px] font-normal text-black leading-normal">
-            Notifications require permission from your device. To change this, go to phone settings → TFAM → Notification
+            {t.notifications.permissionBanner}
           </p>
         </div>
 

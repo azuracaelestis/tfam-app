@@ -4,10 +4,12 @@ import Image from 'next/image'
 import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import { type Exhibition, metaLine } from '@/lib/exhibitions'
+import { useTranslation } from '@/lib/useTranslation'
 
 interface ExhibitionCarouselProps {
   exhibitions: Exhibition[]
   onOpen: (id: string) => void
+  lang: 'en' | 'zh'
 }
 
 const CARD_W      = 313
@@ -19,7 +21,8 @@ const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0
 const SWIPE_OFFSET   = CARD_STRIDE * 0.3   // ~98px drag → advance one card
 const SWIPE_VELOCITY = 400                  // px/s fast-flick threshold
 
-export default function ExhibitionCarousel({ exhibitions, onOpen }: ExhibitionCarouselProps) {
+export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: ExhibitionCarouselProps) {
+  const t = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX = useMotionValue(0)
 
@@ -74,14 +77,16 @@ export default function ExhibitionCarousel({ exhibitions, onOpen }: ExhibitionCa
               <div className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-4 pb-[27px] flex flex-col gap-[18px]">
                 <div className="flex flex-col gap-1">
                   <h3 className="text-[24px] font-bold text-black leading-[30px]">{ex.title}</h3>
-                  <p className="text-[14px] text-tfam-mid leading-normal">{metaLine(ex)}</p>
+                  <p className="text-[14px] text-tfam-mid leading-normal">{metaLine(ex, lang)}</p>
                 </div>
-                <p className="text-[14px] text-black leading-snug line-clamp-3">{ex.description}</p>
+                <p className="text-[14px] text-black leading-snug line-clamp-3">
+                  {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
+                </p>
                 <button
                   onClick={() => onOpen(ex.id)}
                   className="h-[38px] w-full rounded-pill bg-black active:bg-[#494848] text-white text-[16px] font-bold flex items-center justify-center transition-colors duration-75"
                 >
-                  Learn More
+                  {t.whatsOn.learnMore}
                 </button>
               </div>
             </div>

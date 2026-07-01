@@ -2,12 +2,23 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { type Activity, scheduledDates, TIME_SLOTS } from '@/lib/activities'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
 
-const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-]
+function getLocale(lang: 'en' | 'zh'): string {
+  return lang === 'zh' ? 'zh-TW' : 'en-US'
+}
+
+const EN_WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
+const ZH_WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日']
+
+function getWeekdays(lang: 'en' | 'zh'): string[] {
+  return lang === 'zh' ? ZH_WEEKDAYS : EN_WEEKDAYS
+}
+
+function getMonthHeading(year: number, month: number, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long' }).format(new Date(year, month, 1))
+}
 
 function buildCalendarGrid(year: number, month: number): (number | null)[] {
   const firstDow = new Date(year, month, 1).getDay()
@@ -56,6 +67,9 @@ export default function ChooseDateClient({
   activity: Activity
 }) {
   const router = useRouter()
+  const t = useTranslation()
+  const [lang] = useLanguage()
+  const locale = getLocale(lang)
   const now = new Date()
   const todayIso = toIso(now.getFullYear(), now.getMonth(), now.getDate())
 
@@ -125,7 +139,7 @@ export default function ChooseDateClient({
           aria-label="Back to Activities"
         >
           <ChevronLeft />
-          <span className="text-[20px] font-bold text-black leading-none">Activities</span>
+          <span className="text-[20px] font-bold text-black leading-none">{t.chooseDate.back}</span>
         </button>
       </header>
 
@@ -154,7 +168,7 @@ export default function ChooseDateClient({
               <ChevronLeft />
             </button>
             <p className="flex-1 text-[16px] font-semibold text-black text-center leading-none">
-              {MONTHS[month]} {year}
+              {getMonthHeading(year, month, locale)}
             </p>
             <button
               onClick={nextMonth}
@@ -167,21 +181,21 @@ export default function ChooseDateClient({
 
           {/* Calendar grid */}
           <div className="flex flex-col gap-[24px]">
-            {/* Weekday headers */}
-            <div className="flex justify-between">
-              {WEEKDAYS.map(d => (
-                <div key={d} className="size-[24px] flex items-center justify-center">
+            {/* Weekday headers — exactly 7 items, keyed by index */}
+            <div className="grid grid-cols-7">
+              {getWeekdays(lang).map((d, i) => (
+                <div key={i} className="flex items-center justify-center h-[24px]">
                   <span className="text-[16px] font-medium text-black leading-none">{d}</span>
                 </div>
               ))}
             </div>
 
-            {/* Date rows */}
+            {/* Date rows — grid keeps every column equal-width regardless of cell state */}
             {rows.map((row, ri) => (
-              <div key={ri} className="flex gap-[32px] items-center">
+              <div key={ri} className="grid grid-cols-7">
                 {row.map((day, ci) => {
                   if (day === null) {
-                    return <div key={ci} className="size-[24px] shrink-0" />
+                    return <div key={ci} className="h-[32px]" />
                   }
 
                   const iso = toIso(year, month, day)
@@ -193,42 +207,44 @@ export default function ChooseDateClient({
 
                   if (isSelected) {
                     return (
-                      <button
-                        key={ci}
-                        onClick={() => handleDayClick(day)}
-                        className="bg-black p-[4px] rounded-[8px] shrink-0 active:opacity-70"
-                      >
-                        <div className="size-[24px] rounded-[4px] flex items-center justify-center">
-                          <span className="text-[14px] font-bold text-white leading-none">{day}</span>
-                        </div>
-                      </button>
+                      <div key={ci} className="flex items-center justify-center h-[32px]">
+                        <button
+                          onClick={() => handleDayClick(day)}
+                          className="bg-black p-[4px] rounded-[8px] active:opacity-70"
+                        >
+                          <div className="size-[24px] rounded-[4px] flex items-center justify-center">
+                            <span className="text-[14px] font-bold text-white leading-none">{day}</span>
+                          </div>
+                        </button>
+                      </div>
                     )
                   }
 
                   if (isAvailable) {
                     return (
-                      <button
-                        key={ci}
-                        onClick={() => handleDayClick(day)}
-                        className="bg-[#f5f5f5] border border-[#d9d9d9] p-[4px] rounded-[8px] shrink-0 active:opacity-70"
-                      >
-                        <div className="size-[24px] rounded-[4px] flex items-center justify-center">
-                          <span className="text-[14px] font-bold text-black leading-none">{day}</span>
-                        </div>
-                      </button>
+                      <div key={ci} className="flex items-center justify-center h-[32px]">
+                        <button
+                          onClick={() => handleDayClick(day)}
+                          className="bg-[#f5f5f5] border border-[#d9d9d9] p-[4px] rounded-[8px] active:opacity-70"
+                        >
+                          <div className="size-[24px] rounded-[4px] flex items-center justify-center">
+                            <span className="text-[14px] font-bold text-black leading-none">{day}</span>
+                          </div>
+                        </button>
+                      </div>
                     )
                   }
 
                   if (allFull && entry) {
                     return (
-                      <div key={ci} className="size-[24px] rounded-[4px] shrink-0 flex items-center justify-center">
+                      <div key={ci} className="flex items-center justify-center h-[32px]">
                         <span className="text-[14px] font-normal text-black line-through leading-none">{day}</span>
                       </div>
                     )
                   }
 
                   return (
-                    <div key={ci} className={`size-[24px] rounded-[4px] shrink-0 flex items-center justify-center ${isPast ? 'opacity-30' : ''}`}>
+                    <div key={ci} className={`flex items-center justify-center h-[32px] ${isPast ? 'opacity-30' : ''}`}>
                       <span className="text-[14px] font-normal text-black leading-none">{day}</span>
                     </div>
                   )
@@ -241,15 +257,15 @@ export default function ChooseDateClient({
           <div className="flex items-center gap-[18px]">
             <div className="flex items-center gap-[4px]">
               <div className="bg-black size-[10px] rounded-[2px] shrink-0" />
-              <span className="text-[14px] text-black leading-none">Selected</span>
+              <span className="text-[14px] text-black leading-none">{t.chooseDate.legendSelected}</span>
             </div>
             <div className="flex items-center gap-[4px]">
               <div className="bg-[#f5f5f5] border-[0.5px] border-[#d9d9d9] size-[10px] rounded-[2px] shrink-0" />
-              <span className="text-[14px] text-black leading-none">Available</span>
+              <span className="text-[14px] text-black leading-none">{t.chooseDate.legendAvailable}</span>
             </div>
             <div className="flex items-center gap-[4px]">
               <div className="bg-[#f5f5f5] size-[10px] rounded-[2px] shrink-0" />
-              <span className="text-[14px] text-black line-through leading-none">Full</span>
+              <span className="text-[14px] text-black line-through leading-none">{t.chooseDate.legendFull}</span>
             </div>
           </div>
         </div>
@@ -257,7 +273,7 @@ export default function ChooseDateClient({
         {/* Time slot picker — shown once a date is selected */}
         {selectedDate && selectedDateEntry && (
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[16px] font-semibold text-black leading-none">Choose a time</p>
+            <p className="text-[16px] font-semibold text-black leading-none">{t.chooseDate.chooseATime}</p>
             <div className="flex gap-[8px]">
               {TIME_SLOTS.map(slot => {
                 const isFull = selectedDateEntry.fullSlots.includes(slot)
@@ -308,7 +324,7 @@ export default function ChooseDateClient({
           className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
         >
           <ClockIcon />
-          Choose a time slot
+          {t.chooseDate.chooseTimeSlot}
         </button>
       </div>
     </div>

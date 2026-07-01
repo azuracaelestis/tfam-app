@@ -1,15 +1,17 @@
 'use client'
 import { useRouter } from 'next/navigation'
-
-const CARDS = [
-  { label: 'Floor Map',                 subtitle: 'Find any gallery offline',          icon: 'floor-map.svg' },
-  { label: "What's On",                 subtitle: '6 exhibitions today',               icon: 'whats-on.svg',  href: '/whats-on' },
-  { label: 'Suggested Route',           subtitle: 'First time visitor visiting path',  icon: 'location.svg'  },
-  { label: 'Book Guided Tour or Class', subtitle: 'Slots available today',             icon: 'ticket.svg'    },
-]
+import { useTranslation } from '@/lib/useTranslation'
 
 export default function HomeCards() {
   const router = useRouter()
+  const t = useTranslation()
+
+  const CARDS = [
+    { label: t.home.floorMap,       subtitle: t.home.floorMapDesc,       icon: 'floor-map.svg' },
+    { label: t.home.whatsOn,        subtitle: t.home.whatsOnDesc,        icon: 'whats-on.svg',  href: '/whats-on' },
+    { label: t.home.suggestedRoute, subtitle: t.home.suggestedRouteDesc, icon: 'location.svg'  },
+    { label: t.home.bookGuidedTour, subtitle: t.home.bookGuidedTourDesc, icon: 'ticket.svg'    },
+  ]
 
   return (
     <div className="flex flex-col gap-3 px-[18px] py-2">

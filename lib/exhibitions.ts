@@ -3,6 +3,7 @@ export type ExhibitionStatus = 'current' | 'coming-soon'
 export interface Exhibition {
   id: string
   title: string
+  titleZh?: string
   image: string
   images: string[]         // ordered array for detail page slider
   endDate?: string         // ISO — present on current ("Until [date]")
@@ -12,6 +13,7 @@ export interface Exhibition {
   duration: number         // minutes
   categories: string[]
   description: string
+  descriptionZh?: string
   fullDescription: string  // longer text for detail page
   status: ExhibitionStatus
   featured: boolean        // true = appears in top carousel
@@ -22,18 +24,30 @@ function parseISO(iso: string): Date {
   return new Date(y, m - 1, d)  // local-time — avoids UTC midnight rollover
 }
 
-export function fmtLong(iso: string): string {
-  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(parseISO(iso))
+export function fmtLong(iso: string, locale = 'en-GB'): string {
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(parseISO(iso))
 }
 
-function fmtShort(iso: string): string {
-  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' }).format(parseISO(iso))
+function fmtShort(iso: string, locale = 'en-GB'): string {
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(parseISO(iso))
 }
 
-export function metaLine(ex: Exhibition): string {
-  return ex.status === 'current'
-    ? `Until ${fmtLong(ex.endDate!)} | ${ex.floor} | ~${ex.duration} mins`
-    : `Open ${fmtShort(ex.openDate!)} | ${ex.categories.join(' · ')}`
+export function metaLine(
+  ex: Exhibition,
+  lang: 'en' | 'zh' = 'en',
+  translateCat?: (cat: string) => string,
+): string {
+  const locale = lang === 'zh' ? 'zh-TW' : 'en-GB'
+  if (ex.status === 'current') {
+    const date = fmtLong(ex.endDate!, locale)
+    const mins = lang === 'zh' ? `~${ex.duration} 分鐘` : `~${ex.duration} mins`
+    const until = lang === 'zh' ? `至 ${date}` : `Until ${date}`
+    return `${until} | ${ex.floor} | ${mins}`
+  }
+  const date = fmtShort(ex.openDate!, locale)
+  const open = lang === 'zh' ? `${date} 開幕` : `Open ${date}`
+  const cats = translateCat ? ex.categories.map(translateCat) : ex.categories
+  return `${open} | ${cats.join(' · ')}`
 }
 
 export const exhibitions: Exhibition[] = [
@@ -52,6 +66,7 @@ export const exhibitions: Exhibition[] = [
     duration: 50,
     categories: ['Contemporary'],
     description: 'A seminal work exploring the tension between urban memory and natural form. Industrial materials layered against organic textures invite viewers to reconsider boundaries between the built and the living.',
+    descriptionZh: '旅程未必有終點，有些旅程，僅僅是關於你在途中所留意到的一切。',
     fullDescription: 'Some paths are marked. Others you make yourself. Move through this exhibition without a map — and see where curiosity leads.',
     status: 'current',
     featured: true,
@@ -70,7 +85,8 @@ export const exhibitions: Exhibition[] = [
     gallery: 'Gallery B',
     duration: 45,
     categories: ['Installation Art', 'Contemporary'],
-    description: 'An immersive photography series examining how light sculpts perception. Thirty large-format prints trace the changing quality of light across different seasons and geographies.',
+    description: 'What do we imagine when we close our eyes and think of what comes next?',
+    descriptionZh: '當我們閉上眼睛，想像接下來會發生什麼？',
     fullDescription: 'From rigid material, unexpected tenderness. These sculptures trace the moment between stillness and movement — and ask which one we choose to inhabit.',
     status: 'current',
     featured: true,
@@ -90,7 +106,8 @@ export const exhibitions: Exhibition[] = [
     duration: 45,
     categories: ['Contemporary'],
     description: 'What do we imagine when we close our eyes and think of what comes next?',
-    fullDescription: 'What do we imagine when we close our eyes and think of what comes next? These works don’t answer — they open the question wider.',
+    descriptionZh: '當我們閉上眼睛，想像接下來會發生什麼？',
+    fullDescription: "What do we imagine when we close our eyes and think of what comes next? These works don’t answer — they open the question wider.",
     status: 'current',
     featured: true,
   },
@@ -98,6 +115,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'material-extensions',
     title: 'Material Extensions',
+    titleZh: '物質延伸',
     image: '/images/material-extensions.png',
     images: [
       '/images/Material Extensions/material-extensions-1.jpg',
@@ -117,6 +135,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'surrealism',
     title: 'Surrealism',
+    titleZh: '超現實主義',
     image: '/images/surrealism.png',
     images: [
       '/images/Surrealism/surrealism-1.jpg',
@@ -136,9 +155,10 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'tfam-screening-project',
     title: 'TFAM Screening Project',
+    titleZh: '北美館放映計畫',
     image: '/images/tfam-screening-project.png',
     images: ['/images/tfam-screening-project.png'],
-    endDate: '2025-07-01',
+    endDate: '2026-07-01',
     floor: '1F',
     gallery: '',
     duration: 60,
@@ -152,6 +172,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'material-extensions-coming',
     title: 'Entanglements',
+    titleZh: '糾結',
     image: '/images/entanglements.png',
     images: ['/images/entanglements.png'],
     openDate: '2025-08-01',
@@ -167,6 +188,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'sound-of-sinking',
     title: 'The Sound of Sinking',
+    titleZh: '沉沒之聲',
     image: '/images/the-sound-of-sinking.png',
     images: ['/images/the-sound-of-sinking.png'],
     openDate: '2025-09-04',

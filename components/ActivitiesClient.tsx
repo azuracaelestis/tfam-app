@@ -3,11 +3,13 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { type Activity, type ActivityCategory, activities } from '@/lib/activities'
 import ActivityCarousel from './ActivityCarousel'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
+import { translateTag } from '@/lib/translateTag'
 
 // ── Tag pill (shared by list card) ────────────────────────────────────────────
 
-function TagPill({ label }: { label: string }) {
-  const isFree = label === 'Free'
+function TagPill({ label, isFree }: { label: string; isFree?: boolean }) {
   return (
     <div className={`bg-[#f2f2f2] flex items-center justify-center px-[8px] py-[4px] rounded-[8px] shrink-0 ${isFree ? 'gap-[8px]' : ''}`}>
       {isFree && (
@@ -30,23 +32,30 @@ function CalendarIconWhite() {
 
 // ── List card (no image) ──────────────────────────────────────────────────────
 
-function ActivityListCard({ activity: a }: { activity: Activity }) {
+function ActivityListCard({ activity: a, bookThis, lang, t }: {
+  activity: Activity
+  bookThis: string
+  lang: 'en' | 'zh'
+  t: ReturnType<typeof useTranslation>
+}) {
   const router = useRouter()
+  const title       = lang === 'zh' && a.titleZh       ? a.titleZh       : a.title
+  const description = lang === 'zh' && a.descriptionZh ? a.descriptionZh : a.description
   return (
     <div className="bg-white border border-[#d6d6d6] rounded-[16px] p-[24px] flex flex-col gap-[10px]">
       <div className="flex flex-col gap-[4px]">
-        <h3 className="text-[20px] font-semibold text-black leading-snug">{a.title}</h3>
+        <h3 className="text-[20px] font-semibold text-black leading-snug">{title}</h3>
         <div className="flex gap-[4px] flex-wrap">
-          {a.tags.map(tag => <TagPill key={tag} label={tag} />)}
+          {a.tags.map(raw => <TagPill key={raw} label={translateTag(raw, t)} isFree={raw === 'Free'} />)}
         </div>
       </div>
-      <p className="text-[15px] text-black leading-snug">{a.description}</p>
+      <p className="text-[15px] text-black leading-snug">{description}</p>
       <button
         onClick={() => router.push(`/activities/${a.id}/book`)}
         className="flex items-center justify-center gap-[8px] p-[8px] w-full rounded-pill bg-black active:bg-[#494848] text-white text-[16px] font-bold transition-colors duration-75"
       >
         <CalendarIconWhite />
-        Book this
+        {bookThis}
       </button>
     </div>
   )
@@ -54,16 +63,18 @@ function ActivityListCard({ activity: a }: { activity: Activity }) {
 
 // ── Filter config ─────────────────────────────────────────────────────────────
 
-const FILTERS: { label: string; value: 'all' | ActivityCategory }[] = [
-  { label: 'All',       value: 'all'      },
-  { label: 'Classes',   value: 'class'    },
-  { label: 'Tours',     value: 'tour'     },
-  { label: 'Festivals', value: 'festival' },
+const FILTERS: { tKey: 'filterAll' | 'filterClasses' | 'filterTours' | 'filterFestivals'; value: 'all' | ActivityCategory }[] = [
+  { tKey: 'filterAll',       value: 'all'      },
+  { tKey: 'filterClasses',   value: 'class'    },
+  { tKey: 'filterTours',     value: 'tour'     },
+  { tKey: 'filterFestivals', value: 'festival' },
 ]
 
 // ── Main screen ───────────────────────────────────────────────────────────────
 
 export default function ActivitiesClient() {
+  const t = useTranslation()
+  const [lang] = useLanguage()
   const [filter, setFilter] = useState<'all' | ActivityCategory>('all')
 
   const filtered = filter === 'all' ? activities : activities.filter(a => a.category === filter)
@@ -75,7 +86,7 @@ export default function ActivitiesClient() {
 
       {/* ── Sticky header ── */}
       <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-end pb-[10px] shrink-0">
-        <h1 className="text-[20px] font-bold text-black leading-none">Activities</h1>
+        <h1 className="text-[20px] font-bold text-black leading-none">{t.activities.title}</h1>
       </header>
 
       {/* ── Filter pills ── */}
@@ -91,7 +102,7 @@ export default function ActivitiesClient() {
                   : 'bg-white text-black border-[#d9d9d9]'
               }`}
             >
-              {f.label}
+              {t.activities[f.tKey]}
             </button>
           ))}
         </div>
@@ -100,7 +111,7 @@ export default function ActivitiesClient() {
       {/* ── Most Popular carousel ── */}
       {popular.length > 0 && (
         <section className="mt-[20px] flex flex-col gap-[18px]">
-          <h2 className="px-[18px] text-[24px] font-bold text-black leading-none">Most Popular</h2>
+          <h2 className="px-[18px] text-[24px] font-bold text-black leading-none">{t.activities.mostPopular}</h2>
           {/* key=filter forces carousel remount (reset to index 0) on filter change */}
           <ActivityCarousel key={filter} activities={popular} />
         </section>
@@ -109,9 +120,9 @@ export default function ActivitiesClient() {
       {/* ── Other Activities list ── */}
       {others.length > 0 && (
         <section className="mt-[32px] flex flex-col gap-[18px] px-[18px] pb-4">
-          <h2 className="text-[16px] font-normal text-black leading-none">Other Activities</h2>
+          <h2 className="text-[16px] font-normal text-black leading-none">{t.activities.otherActivities}</h2>
           {others.map(a => (
-            <ActivityListCard key={a.id} activity={a} />
+            <ActivityListCard key={a.id} activity={a} bookThis={t.activities.bookThis} lang={lang} t={t} />
           ))}
         </section>
       )}
@@ -119,8 +130,8 @@ export default function ActivitiesClient() {
       {/* Empty state */}
       {popular.length === 0 && others.length === 0 && (
         <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-8 mt-16">
-          <p className="text-[16px] font-semibold text-black">No activities found</p>
-          <p className="text-[14px] text-tfam-mid">Try a different filter.</p>
+          <p className="text-[16px] font-semibold text-black">{t.activities.noActivities}</p>
+          <p className="text-[14px] text-tfam-mid">{t.activities.noActivitiesSub}</p>
         </div>
       )}
 
