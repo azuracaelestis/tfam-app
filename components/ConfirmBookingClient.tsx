@@ -1,7 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAnimate } from 'motion/react'
 import { type Activity } from '@/lib/activities'
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function formatDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number)
@@ -58,9 +61,24 @@ export default function ConfirmBookingClient({
   slot: string
 }) {
   const router = useRouter()
-  const [name, setName]   = useState('')
-  const [email, setEmail] = useState('')
-  const canSubmit = name.trim().length > 0 && email.trim().length > 0
+  const [name, setName]     = useState('')
+  const [email, setEmail]   = useState('')
+  const [emailError, setEmailError] = useState(false)
+  const [emailScope, animateEmail] = useAnimate()
+  const canSubmit = name.trim().length > 0 && email.trim().length > 0 && !emailError
+
+  function handleEmailBlur() {
+    const trimmed = email.trim()
+    if (trimmed.length > 0 && !EMAIL_RE.test(trimmed)) {
+      setEmailError(true)
+      animateEmail(emailScope.current, { x: [0, -6, 6, -4, 4, 0] }, { duration: 0.35 })
+    }
+  }
+
+  function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setEmail(e.target.value)
+    if (emailError) setEmailError(false)
+  }
 
   const slotDisplay = slot.replace('-', '–')
   const duration    = (activity.tags.find(t => t.includes('hr')) ?? '—').replace(/\bhrs\b/, 'hours').replace(/\bhr\b/, 'hour')
@@ -114,11 +132,13 @@ export default function ConfirmBookingClient({
             className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
           />
           <input
+            ref={emailScope}
             type="email"
             placeholder="Email address"
             value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
+            onChange={handleEmailChange}
+            onBlur={handleEmailBlur}
+            className={`w-full bg-[#f5f5f5] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none transition-colors border ${emailError ? 'border-red-500 focus:border-red-500' : 'border-[#d6d6d6] focus:border-black'}`}
           />
         </div>
 
