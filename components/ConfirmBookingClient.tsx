@@ -89,7 +89,7 @@ export default function ConfirmBookingClient({
       </header>
 
       {/* Main content */}
-      <div className="flex flex-col gap-[24px] px-[18px] pt-[16px] pb-[69px]">
+      <div className="flex flex-col gap-[24px] px-[18px] pt-[48px] pb-[69px]">
 
         {/* Title */}
         <p className="text-[20px] font-bold text-black text-center leading-none">Confirm Booking</p>
