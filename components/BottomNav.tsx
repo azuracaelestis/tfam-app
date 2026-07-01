@@ -6,7 +6,7 @@ const ITEMS = [
   { label: "What's On",  icon: 'bottom-nav-whats-on.svg',   w: 17, h: 17, href: '/whats-on' },
   { label: 'Map',        icon: 'bottom-nav-map.svg',        w: 19, h: 17, href: null },
   { label: 'Activities', icon: 'bottom-nav-activities.svg', w: 21, h: 17, href: '/activities' },
-  { label: 'Settings',   icon: 'bottom-nav-setting.svg',    w: 17, h: 17, href: null },
+  { label: 'Settings',   icon: 'bottom-nav-setting.svg',    w: 17, h: 17, href: '/settings' },
 ]
 
 export default function BottomNav() {
@@ -15,6 +15,7 @@ export default function BottomNav() {
   const active = pathname === '/' ? 0
     : pathname.startsWith('/whats-on') ? 1
     : pathname.startsWith('/activities') ? 3
+    : pathname.startsWith('/settings') ? 4
     : -1
 
   return (
