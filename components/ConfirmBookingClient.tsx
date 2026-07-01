@@ -11,6 +11,24 @@ function formatDate(iso: string): string {
   return `${weekday}, ${d} ${month} ${y}`
 }
 
+function InfoIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0 mt-[1px]">
+      <circle cx="8" cy="8" r="7" stroke="#4a90d9" strokeWidth="1.4" />
+      <path d="M8 7v4" stroke="#4a90d9" strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="8" cy="5" r="0.8" fill="#4a90d9" />
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8l3.5 3.5L13 5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function ChevronLeft() {
   return (
     <svg width="6" height="12" viewBox="0 0 6 12" fill="none" aria-hidden="true">
@@ -22,8 +40,8 @@ function ChevronLeft() {
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-start gap-4">
-      <span className="text-[14px] text-[#888] shrink-0">{label}</span>
-      <span className="text-[14px] font-semibold text-black text-right">{value}</span>
+      <span className="text-[14px] font-semibold text-black shrink-0">{label}</span>
+      <span className="text-[14px] font-normal text-black text-right">{value}</span>
     </div>
   )
 }
@@ -105,9 +123,10 @@ export default function ConfirmBookingClient({
         </div>
 
         {/* Info banner */}
-        <div className="bg-[#ebf6ff] rounded-[12px] px-[16px] py-[14px]">
+        <div className="bg-[#ebf6ff] rounded-[12px] px-[16px] py-[14px] flex items-start gap-[8px]">
+          <InfoIcon />
           <p className="text-[13px] text-black leading-relaxed">
-            Confirmation sent to your email, show it at museum gate on the day.{' '}
+            Confirmation sent your email, show it at museum gate on the day.{' '}
             <span className="font-bold">Museum entry ticket (NT$ 30) required at the door.</span>
           </p>
         </div>
@@ -116,8 +135,9 @@ export default function ConfirmBookingClient({
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="flex items-center justify-center h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
+          className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
         >
+          <CheckIcon />
           Confirm Booking
         </button>
 
