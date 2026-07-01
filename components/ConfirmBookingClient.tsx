@@ -63,7 +63,7 @@ export default function ConfirmBookingClient({
   const canSubmit = name.trim().length > 0 && email.trim().length > 0
 
   const slotDisplay = slot.replace('-', '–')
-  const duration    = activity.tags.find(t => t.includes('hr')) ?? '—'
+  const duration    = (activity.tags.find(t => t.includes('hr')) ?? '—').replace(/\bhrs\b/, 'hours').replace(/\bhr\b/, 'hour')
   const fee         = activity.tags.includes('Free') ? 'Free' : (activity.tags.find(t => t.startsWith('NT$')) ?? '—')
 
   function handleSubmit() {
@@ -95,7 +95,7 @@ export default function ConfirmBookingClient({
         <p className="text-[20px] font-bold text-black text-center leading-none">Confirm Booking</p>
 
         {/* Booking summary card */}
-        <div className="bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[16px] flex flex-col gap-[12px]">
+        <div className="bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[16px] flex flex-col gap-[8px]">
           <SummaryRow label="Class"     value={activity.title} />
           <SummaryRow label="Date"      value={formatDate(date)} />
           <SummaryRow label="Time"      value={slotDisplay} />
