@@ -1,0 +1,127 @@
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { type Activity } from '@/lib/activities'
+
+function formatDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  const weekday = date.toLocaleDateString('en-GB', { weekday: 'short' })
+  const month   = date.toLocaleDateString('en-GB', { month: 'long' })
+  return `${weekday}, ${d} ${month} ${y}`
+}
+
+function ChevronLeft() {
+  return (
+    <svg width="6" height="12" viewBox="0 0 6 12" fill="none" aria-hidden="true">
+      <path d="M5 1L1 6l4 5" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between items-start gap-4">
+      <span className="text-[14px] text-[#888] shrink-0">{label}</span>
+      <span className="text-[14px] font-semibold text-black text-right">{value}</span>
+    </div>
+  )
+}
+
+export default function ConfirmBookingClient({
+  activityId,
+  activity,
+  date,
+  slot,
+}: {
+  activityId: string
+  activity: Activity
+  date: string
+  slot: string
+}) {
+  const router = useRouter()
+  const [name, setName]   = useState('')
+  const [email, setEmail] = useState('')
+  const canSubmit = name.trim().length > 0 && email.trim().length > 0
+
+  const slotDisplay = slot.replace('-', '–')
+  const duration    = activity.tags.find(t => t.includes('hr')) ?? '—'
+  const fee         = activity.tags.includes('Free') ? 'Free' : (activity.tags.find(t => t.startsWith('NT$')) ?? '—')
+
+  function handleSubmit() {
+    if (!canSubmit) return
+    router.push(
+      `/activities/${activityId}/book/confirmed?date=${date}&slot=${encodeURIComponent(slot)}&name=${encodeURIComponent(name.trim())}`
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col font-noto">
+
+      {/* Sticky header */}
+      <header className="sticky top-0 z-10 bg-white h-[47px] px-[18px] flex items-center shrink-0">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
+          aria-label="Back"
+        >
+          <ChevronLeft />
+          <span className="text-[20px] font-bold text-black leading-none">Activities</span>
+        </button>
+      </header>
+
+      {/* Main content */}
+      <div className="flex flex-col gap-[24px] px-[18px] pt-[16px] pb-[69px]">
+
+        {/* Title */}
+        <p className="text-[20px] font-bold text-black text-center leading-none">Confirm Booking</p>
+
+        {/* Booking summary card */}
+        <div className="bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[16px] flex flex-col gap-[12px]">
+          <SummaryRow label="Class"     value={activity.title} />
+          <SummaryRow label="Date"      value={formatDate(date)} />
+          <SummaryRow label="Time"      value={slotDisplay} />
+          <SummaryRow label="Duration"  value={duration} />
+          <SummaryRow label="Class Fee" value={fee} />
+        </div>
+
+        {/* Your Details */}
+        <div className="flex flex-col gap-[12px]">
+          <p className="text-[16px] font-semibold text-black leading-none">Your Details</p>
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
+          />
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
+          />
+        </div>
+
+        {/* Info banner */}
+        <div className="bg-[#ebf6ff] rounded-[12px] px-[16px] py-[14px]">
+          <p className="text-[13px] text-black leading-relaxed">
+            Confirmation sent to your email, show it at museum gate on the day.{' '}
+            <span className="font-bold">Museum entry ticket (NT$ 30) required at the door.</span>
+          </p>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          className="flex items-center justify-center h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
+        >
+          Confirm Booking
+        </button>
+
+      </div>
+    </div>
+  )
+}
