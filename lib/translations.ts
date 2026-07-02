@@ -34,6 +34,42 @@ const en = {
     notifying:  '✓ Notifying You',
     notifyMe:   'Notify Me',
     learnMore:  'Learn More',
+    curiousJourney: {
+      tags:        ['Contemporary'] as string[],
+      location:    '1F | Gallery A',
+      until:       '30 Aug 2026',
+      description: 'Some paths are marked. Others you make yourself. Move through this exhibition without a map — and see where curiosity leads.',
+    },
+    formsInMotion: {
+      tags:        ['Installation Art', 'Contemporary'] as string[],
+      location:    '2F | Gallery B',
+      until:       '1 Jul 2026',
+      description: 'From rigid material, unexpected tenderness. These sculptures trace the moment between stillness and movement — and ask which one we choose to inhabit.',
+    },
+    visionOfTomorrow: {
+      tags:        ['Contemporary'] as string[],
+      location:    '2F | Gallery A',
+      until:       '30 Aug 2026',
+      description: "What do we imagine when we close our eyes and think of what comes next? These works don't answer — they open the question wider.",
+    },
+    materialExtensions: {
+      tags:        ['Contemporary'] as string[],
+      location:    '2F | Gallery C',
+      until:       '30 Aug 2026',
+      description: 'Sound installations exploring how frequency and space shape human perception. Six rooms, each tuned to a different emotional resonance.',
+    },
+    surrealism: {
+      tags:        ['Contemporary'] as string[],
+      location:    '1F | Gallery A',
+      until:       '1 Jul 2026',
+      description: 'Reality, slightly tilted. These works borrow from the rational world and return something stranger — familiar enough to unsettle, strange enough to stay with you.',
+    },
+    screeningProject: {
+      tags:        ['Installation Art'] as string[],
+      location:    '1F',
+      until:       '1 Jul 2026',
+      description: "A curated programme of experimental moving-image works presented in a purpose-built screening environment within the museum's ground floor galleries.",
+    },
   },
   activities: {
     title:           'Activities',
@@ -166,6 +202,7 @@ const en = {
     back:            "What's On",
     prevImage:       'Previous image',
     nextImage:       'Next image',
+    untilPrefix:     'Until',
     showOnMap:       'Show on map',
     audioGuide:      'Audio Guide',
     gettingHere:     'Getting Here',
@@ -210,6 +247,48 @@ const zhOverrides: Partial<T> = {
     notifying:  '✓ 已設定提醒',
     notifyMe:   '提醒我',
     learnMore:  '了解更多',
+    curiousJourney: {
+      // TODO: pending official Chinese title — ex.title stays in English until museum confirms
+      tags:        ['當代藝術'],
+      location:    '1樓｜A展廳',
+      until:       '2026年8月30日',
+      description: '有些路徑清楚標示，有些則要靠自己走出。不帶地圖穿梭於這場展覽，看看好奇心會帶你到哪裡。',
+    },
+    formsInMotion: {
+      // TODO: pending official Chinese title — ex.title stays in English until museum confirms
+      tags:        ['裝置藝術', '當代藝術'],
+      location:    '2樓｜B展廳',
+      until:       '2026年7月1日',
+      description: '堅硬的材質，卻透出意想不到的柔軟。這些雕塑捕捉靜止與動態之間的瞬間，並提問：我們選擇棲身於哪一種狀態？',
+    },
+    visionOfTomorrow: {
+      // TODO: pending official Chinese title — ex.title stays in English until museum confirms
+      tags:        ['當代藝術'],
+      location:    '2樓｜A展廳',
+      until:       '2026年8月30日',
+      description: '當我們閉上眼睛，想像接下來會發生什麼，腦中浮現的是什麼？這些作品沒有給出答案，反而讓問題變得更加開闊。',
+    },
+    materialExtensions: {
+      // TODO: pending official Chinese title — ex.title stays in English until museum confirms
+      tags:        ['當代藝術'],
+      location:    '2樓｜C展廳',
+      until:       '2026年8月30日',
+      description: '聲音裝置探索頻率與空間如何形塑人類的感知。六個房間，各自調頻至不同的情感共鳴。',
+    },
+    surrealism: {
+      // TODO: pending official Chinese title — ex.title stays in English until museum confirms
+      tags:        ['當代藝術'],
+      location:    '1樓｜A展廳',
+      until:       '2026年7月1日',
+      description: '現實，微微傾斜。這些作品借用理性世界的元素，卻歸還了更陌生的東西——熟悉到令人不安，陌生到令人難以忘懷。',
+    },
+    screeningProject: {
+      // TODO: pending official Chinese title/acronym — ex.title stays in English until museum confirms
+      tags:        ['裝置藝術'],
+      location:    '1樓',
+      until:       '2026年7月1日',
+      description: '一系列精選的實驗性動態影像作品，於美術館一樓展廳中特別打造的放映空間內呈現。',
+    },
   },
   activities: {
     title:           '活動',
@@ -339,9 +418,10 @@ const zhOverrides: Partial<T> = {
     playButton: '播放語音導覽',
   },
   exhibitionDetail: {
-    back:          '展覽活動',
+    back:          '展覽資訊',
     prevImage:     '上一張',
     nextImage:     '下一張',
+    untilPrefix:   '至',
     showOnMap:     '在地圖上顯示',
     audioGuide:    '語音導覽',
     gettingHere:   '如何前往',

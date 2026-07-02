@@ -6,6 +6,8 @@ import { motion, useMotionValue, animate, AnimatePresence } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import AudioInputSheet from './AudioInputSheet'
 import { type Exhibition, fmtLong } from '@/lib/exhibitions'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
 
 const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
 const SWIPE_VELOCITY = 400
@@ -94,6 +96,7 @@ function InfoRow({ icon, label, action }: { icon: React.ReactNode; label: string
 // ── Slider (rendered only after morph completes) ───────────────────────────────
 
 function ImageSlider({ ex }: { ex: Exhibition }) {
+  const t = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX    = useMotionValue(0)
   const sliderRef = useRef<HTMLDivElement>(null)
@@ -150,7 +153,7 @@ function ImageSlider({ ex }: { ex: Exhibition }) {
         {ex.images.length > 1 && (
           <>
             <button
-              aria-label="Previous image"
+              aria-label={t.exhibitionDetail.prevImage}
               disabled={activeIndex === 0}
               onClick={() => snapTo(activeIndex - 1)}
               className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
@@ -160,7 +163,7 @@ function ImageSlider({ ex }: { ex: Exhibition }) {
               <SliderArrowLeftIcon />
             </button>
             <button
-              aria-label="Next image"
+              aria-label={t.exhibitionDetail.nextImage}
               disabled={activeIndex === ex.images.length - 1}
               onClick={() => snapTo(activeIndex + 1)}
               className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
@@ -179,7 +182,7 @@ function ImageSlider({ ex }: { ex: Exhibition }) {
             <span
               key={i}
               className={`block rounded-full transition-all duration-200 ${
-                i === activeIndex ? 'w-5 h-[6px] bg-[#9c9c9c]' : 'size-[6px] bg-border-card'
+                i === activeIndex ? 'w-5 h-[6px] bg-[#9c9c9c]' : 'size-[6px] bg-[#9c9c9c]'
               }`}
             />
           ))}
@@ -191,8 +194,12 @@ function ImageSlider({ ex }: { ex: Exhibition }) {
 
 // ── Main overlay ──────────────────────────────────────────────────────────────
 
+type ExContent = { tags: string[]; location: string; until: string; description: string }
+
 export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onClose: () => void }) {
   const router = useRouter()
+  const t = useTranslation()
+  const [lang] = useLanguage()
   const [morphComplete, setMorphComplete] = useState(false)
 
   // Audio sheet
@@ -211,7 +218,19 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
   const handlePlay   = () => router.push('/play?code=' + code)
   const handleQR     = () => router.push('/play?code=1001')
 
-  const locationLabel = ex.gallery ? `${ex.floor} | ${ex.gallery}` : ex.floor
+  const exContentMap: Record<string, ExContent> = {
+    'your-curious-journey':   t.whatsOn.curiousJourney,
+    'forms-in-motion':        t.whatsOn.formsInMotion,
+    'visions-of-tomorrow':    t.whatsOn.visionOfTomorrow,
+    'material-extensions':    t.whatsOn.materialExtensions,
+    'surrealism':             t.whatsOn.surrealism,
+    'tfam-screening-project': t.whatsOn.screeningProject,
+  }
+  const exContent: ExContent | null = exContentMap[ex.id] ?? null
+  const locationLabel = exContent ? exContent.location : (ex.gallery ? `${ex.floor} | ${ex.gallery}` : ex.floor)
+  const untilLabel = ex.endDate
+    ? `${t.exhibitionDetail.untilPrefix} ${exContent ? exContent.until : fmtLong(ex.endDate, lang === 'zh' ? 'zh-TW' : 'en-GB')}`
+    : null
 
   return (
     <motion.div
@@ -226,10 +245,10 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
         <button
           onClick={onClose}
           className="flex items-center gap-3"
-          aria-label="Back to What's On"
+          aria-label={t.exhibitionDetail.back}
         >
           <ChevronLeftIcon />
-          <span className="text-[20px] font-bold text-black leading-none">What&rsquo;s On</span>
+          <span className="text-[20px] font-bold text-black leading-none">{t.exhibitionDetail.back}</span>
         </button>
       </header>
 
@@ -265,20 +284,21 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
           <div className="flex flex-col gap-6">
 
             <div className="flex flex-col gap-2">
+              {/* TODO: replace ex.title with titleZh once official Chinese titles confirmed */}
               <h1 className="text-[24px] font-semibold text-black leading-tight">{ex.title}</h1>
               <div className="flex items-center gap-2 flex-wrap">
-                {ex.categories.map(cat => (
-                  <div key={cat} className="flex items-center gap-2 bg-[#f2f2f2] rounded-[8px] px-2 py-1">
+                {(exContent ? exContent.tags : ex.categories).map((tag, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-[#f2f2f2] rounded-[8px] px-2 py-1">
                     <img src="/tag.svg" width={8} height={8} alt="" aria-hidden="true" className="shrink-0" />
-                    <span className="text-[12px] text-black whitespace-nowrap">{cat}</span>
+                    <span className="text-[12px] text-black whitespace-nowrap">{tag}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="flex flex-col gap-1">
-              {ex.endDate && (
-                <InfoRow icon={<CalendarIcon />} label={`Until ${fmtLong(ex.endDate)}`} />
+              {untilLabel && (
+                <InfoRow icon={<CalendarIcon />} label={untilLabel} />
               )}
               <InfoRow
                 icon={<MapPinIcon />}
@@ -286,17 +306,17 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
                 action={
                   <button className="flex items-center gap-2 shrink-0">
                     <span className="text-[15px] font-normal text-black underline leading-none whitespace-nowrap">
-                      Show on map
+                      {t.exhibitionDetail.showOnMap}
                     </span>
                     <ChevronRightSmallIcon />
                   </button>
                 }
               />
-              <InfoRow icon={<ClockIcon />} label={`~${ex.duration} mins to explore`} />
+              <InfoRow icon={<ClockIcon />} label={t.exhibitionDetail.minsToExplore.replace('__DURATION__', String(ex.duration))} />
             </div>
           </div>
 
-          <p className="text-[15px] text-black leading-snug">{ex.fullDescription}</p>
+          <p className="text-[15px] text-black leading-snug">{exContent ? exContent.description : ex.fullDescription}</p>
         </div>
 
         <div className="flex items-center justify-between">
@@ -305,14 +325,14 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
             className="h-[48px] w-[178px] rounded-pill border border-black text-black text-[16px] font-bold flex items-center justify-center gap-2 active:bg-[#f5f5f5] transition-colors duration-75"
           >
             <HeadphoneIcon />
-            Audio Guide
+            {t.exhibitionDetail.audioGuide}
           </button>
           <button
             onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Taipei+Fine+Arts+Museum', '_blank')}
             className="h-[48px] w-[178px] rounded-pill bg-black text-white text-[16px] font-bold flex items-center justify-center gap-2 active:bg-[#494848] transition-colors duration-75"
           >
             <img src="/getting-there.svg" width={16} height={16} alt="" aria-hidden="true" />
-            Getting Here
+            {t.exhibitionDetail.gettingHere}
           </button>
         </div>
 
