@@ -5,7 +5,7 @@ import { useTranslation } from '@/lib/useTranslation'
 const ITEMS = [
   { key: 'home',       icon: 'bottom-nav-home.svg',       w: 16, h: 17, href: '/' },
   { key: 'whatsOn',    icon: 'bottom-nav-whats-on.svg',   w: 17, h: 17, href: '/whats-on' },
-  { key: 'map',        icon: 'bottom-nav-map.svg',        w: 19, h: 17, href: null },
+  { key: 'map',        icon: 'bottom-nav-map.svg',        w: 19, h: 17, href: '/map' },
   { key: 'activities', icon: 'bottom-nav-activities.svg', w: 21, h: 17, href: '/activities' },
   { key: 'settings',   icon: 'bottom-nav-setting.svg',    w: 17, h: 17, href: '/settings' },
 ] as const
@@ -16,6 +16,7 @@ export default function BottomNav() {
   const t = useTranslation()
   const active = pathname === '/' ? 0
     : pathname.startsWith('/whats-on') ? 1
+    : pathname.startsWith('/map') ? 2
     : pathname.startsWith('/activities') ? 3
     : pathname.startsWith('/settings') ? 4
     : -1
@@ -54,27 +55,15 @@ export default function BottomNav() {
           </>
         )
 
-        if (item.href) {
-          return (
-            <button
-              key={item.key}
-              onClick={() => router.push(item.href!)}
-              className="relative flex-1 h-full flex flex-col items-center justify-center gap-2 py-2.5"
-              aria-current={isActive ? 'page' : undefined}
-            >
-              {inner}
-            </button>
-          )
-        }
-
         return (
-          <div
+          <button
             key={item.key}
+            onClick={() => router.push(item.href)}
             className="relative flex-1 h-full flex flex-col items-center justify-center gap-2 py-2.5"
-            aria-hidden="true"
+            aria-current={isActive ? 'page' : undefined}
           >
             {inner}
-          </div>
+          </button>
         )
       })}
     </nav>

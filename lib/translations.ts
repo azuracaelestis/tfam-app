@@ -208,6 +208,9 @@ const en = {
     gettingHere:     'Getting Here',
     minsToExplore:   '~__DURATION__ mins to explore',
   },
+  map: {
+    title: 'Map',
+  },
 }
 
 // `T` is the canonical shape — zh must match exactly.
