@@ -24,7 +24,7 @@ function DeleteIcon() {
 
 export default function Numpad({ onDigit, onDelete }: NumpadProps) {
   const keyClass =
-    'flex-1 h-[60px] rounded-2xl bg-white border border-[#d9d9d9] text-black text-[24px] font-semibold flex items-center justify-center active:bg-gray-100 transition-colors'
+    'flex-1 h-[60px] rounded-card bg-white border border-hairline text-black text-[24px] font-semibold flex items-center justify-center active:bg-gray-100 transition-colors'
 
   return (
     <div className="flex flex-col gap-[14px]">
@@ -57,7 +57,7 @@ export default function Numpad({ onDigit, onDelete }: NumpadProps) {
         </motion.button>
         <motion.button
           onClick={onDelete}
-          className="flex-1 h-[60px] rounded-2xl bg-white border border-[#d9d9d9] flex items-center justify-center active:bg-gray-100 transition-colors"
+          className="flex-1 h-[60px] rounded-card bg-white border border-hairline flex items-center justify-center active:bg-gray-100 transition-colors"
           aria-label="Delete digit"
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.15 }}

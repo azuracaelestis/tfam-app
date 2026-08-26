@@ -8,7 +8,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* SF Pro on Apple devices (the only way to get real San Francisco in a browser —
+     Apple doesn't license SF Pro for web-font embedding), falling back to the
+     bundled Noto Sans everywhere else so zh copy keeps rendering consistently. */
+  --font-app: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', var(--font-noto-sans), 'Noto Sans', system-ui, sans-serif;
+  --font-sans: var(--font-app);
   --font-mono: var(--font-geist-mono);
 
   /* Brand */
@@ -27,20 +31,73 @@
   --color-gray-4: #bdbdbd;           /* mid-tone gray — Figma variable "Gray 4" */
 
   /* Typography */
-  --font-noto: var(--font-noto-sans), 'Noto Sans', sans-serif;
+  --font-noto: var(--font-app);      /* kept as an alias — `font-noto` is used app-wide as the base font utility */
   --text-2xs: 0.625rem;              /* 10px — bottom-nav labels, audio timestamps */
-  --text-hero: 2rem;                 /* 32px — homepage welcome heading */
+
+  /* Type scale — each `text-*` utility below also sets its paired line-height
+     and font-weight (Tailwind v4 resolves --text-<name>--line-height /
+     --font-weight together), so one class applies the full style. */
+  --text-display-xl: 2.25rem;              /* 36pt — Arrival hero */
+  --text-display-xl--line-height: 2.75rem; /* 44pt */
+  --text-display-xl--font-weight: 700;     /* Bold */
+
+  --text-title-l: 2rem;                    /* 32pt — page title, e.g. What's On */
+  --text-title-l--line-height: 2.5rem;     /* 40pt */
+  --text-title-l--font-weight: 700;        /* Bold */
+
+  --text-title-m: 1.75rem;                 /* 28pt — exhibition title */
+  --text-title-m--line-height: 2.25rem;    /* 36pt */
+  --text-title-m--font-weight: 600;        /* Semibold */
+
+  --text-heading-l: 1.25rem;               /* 20pt — section headings */
+  --text-heading-l--line-height: 1.75rem;  /* 28pt */
+  --text-heading-l--font-weight: 600;      /* Semibold */
+
+  --text-heading-m: 1rem;                  /* 16pt — card titles */
+  --text-heading-m--line-height: 1.5rem;   /* 24pt */
+  --text-heading-m--font-weight: 600;      /* Semibold */
+
+  --text-body-l: 1rem;                     /* 16pt — main reading text */
+  --text-body-l--line-height: 1.5rem;      /* 24pt */
+  --text-body-l--font-weight: 400;         /* Regular */
+
+  --text-body-m: 1rem;                     /* 16pt — secondary descriptions */
+  --text-body-m--line-height: 1.25rem;     /* 20pt (spec gives a 20–24pt range; using the tighter end for short secondary copy) */
+  --text-body-m--font-weight: 400;         /* Regular */
+
+  --text-label-l: 1rem;                    /* 16pt — buttons / primary controls */
+  --text-label-l--line-height: 1.5rem;     /* 24pt */
+  --text-label-l--font-weight: 600;        /* Semibold */
+
+  --text-label-m: 0.875rem;                /* 14pt — metadata */
+  --text-label-m--line-height: 1.25rem;    /* 20pt */
+  --text-label-m--font-weight: 400;        /* Regular */
+
+  --text-label-s: 0.75rem;                 /* 12pt — very secondary labels */
+  --text-label-s--line-height: 1rem;       /* 16pt */
+  --text-label-s--font-weight: 500;        /* Medium */
+
+  --text-nav-label: 0.75rem;               /* 12pt — bottom navigation */
+  --text-nav-label--line-height: 1rem;     /* 16pt */
+  --text-nav-label--font-weight: 500;      /* Medium */
 
   /* Border radius */
   --radius-nav: 1.25rem;             /* 20px — inactive bottom-nav items */
   --radius-nav-active: 2.25rem;      /* 36px — active bottom-nav tab */
   --radius-pill: 5rem;               /* 80px — primary CTA button */
+
+  /* Brand v2 — extracted from Figma "Arrival Onboarding" (node 185:55) */
+  --color-ink: #0a0a0a;              /* primary text, CTA/button fill */
+  --color-ink-secondary: #4f4f4f;    /* body / secondary copy */
+  --color-hairline: #dddddd;         /* card & input borders */
+  --color-canvas: #fafafa;           /* section background beneath white cards */
+  --radius-card: 0.5rem;             /* 8px — menu/info cards */
 }
 
 body {
   background: #ffffff;
   color: #111111;
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-app);
 }
 
 /* Range input base reset — visual track is rendered in JS */

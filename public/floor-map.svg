@@ -1,5 +1,7 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M6.66675 13.1818V32.5757L15.1516 27.7273L24.8486 32.5757L33.3334 27.7273V8.33331L24.8486 13.1818L15.1516 8.33331L6.66675 13.1818Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M15.1516 8.33331V27.7273" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M24.8484 13.1818V32.5757" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="18.875" height="17.25" viewBox="0 0 18.875 17.25" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Button Icon">
+<path id="Vector" d="M0.5 3.75V16.75L6.1875 13.5L12.6875 16.75L18.375 13.5V0.5L12.6875 3.75L6.1875 0.5L0.5 3.75Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M6.1875 0.5V13.5" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M12.6875 3.75001V16.75" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
 </svg>

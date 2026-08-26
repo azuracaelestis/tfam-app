@@ -1,59 +1,50 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/lib/useTranslation'
+import ChevronRightIcon from './icons/ChevronRightIcon'
 
 export default function HomeCards() {
   const router = useRouter()
   const t = useTranslation()
 
-  const CARDS = [
-    { label: t.home.floorMap,       subtitle: t.home.floorMapDesc,       icon: 'floor-map.svg' },
-    { label: t.home.whatsOn,        subtitle: t.home.whatsOnDesc,        icon: 'whats-on.svg',  href: '/whats-on' },
-    { label: t.home.suggestedRoute, subtitle: t.home.suggestedRouteDesc, icon: 'location.svg'  },
-    { label: t.home.bookGuidedTour, subtitle: t.home.bookGuidedTourDesc, icon: 'ticket.svg'    },
+  const GRID_ITEMS = [
+    { label: t.home.floorMap, icon: 'floor-map.svg', href: '/map' },
+    { label: t.home.whatsOn, icon: 'whats-on.svg', href: '/whats-on' },
   ]
 
+  const item = (label: string, icon: string, href?: string) => {
+    const inner = (
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-3 min-w-0">
+          <img src={`/${icon}`} width={20} height={20} alt="" aria-hidden="true" className="shrink-0" />
+          <span className="text-heading-m text-ink truncate">{label}</span>
+        </div>
+        <ChevronRightIcon size={24} className="text-ink shrink-0" />
+      </div>
+    )
+
+    const className = 'bg-white border border-hairline rounded-card h-[44px] px-3 flex items-center w-full'
+
+    return href ? (
+      <button key={label} onClick={() => router.push(href)} className={className}>
+        {inner}
+      </button>
+    ) : (
+      <div key={label} className={className}>
+        {inner}
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col gap-3 px-[18px] py-2">
-      {CARDS.map((card) => {
-        const inner = (
-          <div className="flex items-center gap-6 w-full">
-            <img
-              src={`/${card.icon}`}
-              width={40}
-              height={40}
-              alt=""
-              aria-hidden="true"
-              className="shrink-0"
-            />
-            <div className="flex flex-col leading-normal text-black min-w-0">
-              <span className="text-base font-bold truncate">{card.label}</span>
-              <span className="text-sm font-normal text-tfam-mid truncate">{card.subtitle}</span>
-            </div>
-          </div>
-        )
-
-        if (card.href) {
-          return (
-            <button
-              key={card.label}
-              onClick={() => router.push(card.href!)}
-              className="bg-white border border-border-card rounded-2xl h-[80px] px-10 py-5 flex items-center text-left w-full"
-            >
-              {inner}
-            </button>
-          )
-        }
-
-        return (
-          <div
-            key={card.label}
-            className="bg-white border border-border-card rounded-2xl h-[80px] px-10 py-5 flex items-center"
-          >
-            {inner}
-          </div>
-        )
-      })}
+    <div className="flex flex-col gap-2 px-5 py-3 bg-canvas">
+      <h2 className="text-heading-l text-ink">{t.home.exploreMuseum}</h2>
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-3">
+          {GRID_ITEMS.map((c) => item(c.label, c.icon, c.href))}
+        </div>
+        {item(t.home.suggestedRoute, 'location.svg')}
+      </div>
     </div>
   )
 }

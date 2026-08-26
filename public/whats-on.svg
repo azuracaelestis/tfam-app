@@ -1,5 +1,7 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M30.3702 6.66669H9.62947C7.99307 6.66669 6.6665 7.99325 6.6665 9.62965V30.3704C6.6665 32.0068 7.99307 33.3334 9.62947 33.3334H30.3702C32.0066 33.3334 33.3332 32.0068 33.3332 30.3704V9.62965C33.3332 7.99325 32.0066 6.66669 30.3702 6.66669Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M14.8148 17.037C16.0421 17.037 17.037 16.0421 17.037 14.8148C17.037 13.5875 16.0421 12.5926 14.8148 12.5926C13.5875 12.5926 12.5925 13.5875 12.5925 14.8148C12.5925 16.0421 13.5875 17.037 14.8148 17.037Z" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M33.3331 24.4445L25.9257 17.037L9.62939 33.3333" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="18.5" height="18.5001" viewBox="0 0 18.5 18.5001" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Button Icon Subcontainer">
+<path id="Vector" d="M16.0556 0.5H2.44444C1.37056 0.5 0.5 1.37056 0.5 2.44444V16.0556C0.5 17.1294 1.37056 18 2.44444 18H16.0556C17.1294 18 18 17.1294 18 16.0556V2.44444C18 1.37056 17.1294 0.5 16.0556 0.5Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M5.84717 7.3057C6.65259 7.3057 7.30551 6.65278 7.30551 5.84736C7.30551 5.04195 6.65259 4.38903 5.84717 4.38903C5.04176 4.38903 4.38884 5.04195 4.38884 5.84736C4.38884 6.65278 5.04176 7.3057 5.84717 7.3057Z" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M18 12.1668L13.1388 7.30568L2.4444 18.0001" stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
 </svg>

@@ -2,14 +2,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import HomeFeaturedExhibition from './HomeFeaturedExhibition'
 import HomeCards from './HomeCards'
+import HomePlanVisit from './HomePlanVisit'
 import AudioInputSheet from './AudioInputSheet'
 import { useTranslation } from '@/lib/useTranslation'
-import { useLanguage } from '@/lib/useLanguage'
 
 export default function HomeClient() {
   const t = useTranslation()
-  const [lang] = useLanguage()
   const router = useRouter()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [code, setCode] = useState('')
@@ -23,13 +23,19 @@ export default function HomeClient() {
   const handleQR = () => router.push('/play?code=1001')
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
+    <div className="min-h-screen bg-canvas flex flex-col font-noto pb-[69px]">
 
       {/* ── Top bar: TFAM mark left / "You're here" right ── */}
-      <header className="h-[60px] px-5 flex items-center justify-between shrink-0">
-        <img src="/tfam-logo.png" width={56} height={38} alt="TFAM" />
+      <header className="h-[60px] px-5 flex items-center justify-between shrink-0 bg-white">
+        <img
+          src="/Taipei_Fine_Arts_Museum_logo.svg"
+          width={188}
+          height={28}
+          alt="Taipei Fine Arts Museum"
+          className="w-[188px] h-[28px]"
+        />
 
-        <div className="flex items-center gap-1.5 text-sm text-black">
+        <div className="flex items-center gap-1.5 text-sm text-ink">
           <svg width="10" height="13" viewBox="0 0 10 13" fill="currentColor" aria-hidden="true">
             <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8C10 2.24 7.76 0 5 0zm0 6.5C4.17 6.5 3.5 5.83 3.5 5S4.17 3.5 5 3.5 6.5 4.17 6.5 5 5.83 6.5 5 6.5z" />
           </svg>
@@ -37,38 +43,43 @@ export default function HomeClient() {
         </div>
       </header>
 
-      {/* ── Hero: welcome card with museum photo background ── */}
-      <section className="relative shrink-0 w-full h-[299px] overflow-hidden">
-        <Image src="/hero-gallery.png" fill className="object-cover" alt="" priority />
-        <div className="absolute inset-0 bg-white/30" />
-
-        {/* Content — centered vertically with 64px top/bottom breathing room */}
-        <div className="absolute inset-0 flex flex-col justify-center gap-5 px-5 py-16">
-          <div className="flex flex-col gap-2 text-black">
-            <p className="text-base font-normal">{t.home.welcome}</p>
-            <h2
-              className="font-bold leading-[1.1] max-w-[284px]"
-              style={{ fontSize: lang === 'zh' ? '29px' : '2rem' }}
-            >
-              {t.home.heroHeading}
-            </h2>
-            <p className="text-sm font-normal text-black/70">
-              {t.home.heroSubtitle}
-            </p>
-          </div>
-
-          <button
-            onClick={() => setSheetOpen(true)}
-            className="flex items-center justify-center gap-1.5 w-full h-[56px] rounded-pill bg-black text-white text-base font-bold"
-          >
-            <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
-            {t.home.startAudioGuide}
-          </button>
-        </div>
+      {/* ── Hero: full-bleed museum photo, fading into the canvas below ── */}
+      <section className="relative shrink-0 w-[402px] h-[241px] overflow-hidden">
+        <Image src="/homepage2.png" width={402} height={241} className="w-[402px] h-[241px] object-cover" alt="" preload />
+        <div
+          className="absolute inset-0"
+          style={{ backgroundImage: 'linear-gradient(177deg, rgba(255,255,255,0) 60%, var(--color-canvas) 78%)' }}
+        />
       </section>
 
-      {/* ── Tap cards ── */}
+      {/* ── Welcome copy + primary CTA — normal flow below the photo ── */}
+      <section className="relative flex flex-col gap-3 px-5 py-3 bg-canvas -mt-8">
+        <div className="flex flex-col gap-2 text-ink">
+          <h2 className="text-[32px] leading-[2.5rem] font-semibold max-w-[284px]">
+            {t.home.heroHeading}
+          </h2>
+          <p className="text-body-l text-ink-secondary">
+            {t.home.heroSubtitle}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setSheetOpen(true)}
+          className="flex items-center justify-center gap-1.5 w-full h-[48px] rounded-pill bg-ink text-white text-label-l"
+        >
+          <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
+          {t.home.startAudioGuide}
+        </button>
+      </section>
+
+      {/* ── Today at the Museum ── */}
+      <HomeFeaturedExhibition />
+
+      {/* ── Explore the Museum ── */}
       <HomeCards />
+
+      {/* ── Plan Your Visit ── */}
+      <HomePlanVisit />
 
       {/* ── Audio input sheet (logic unchanged) ── */}
       <AudioInputSheet
