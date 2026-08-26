@@ -29,10 +29,10 @@ export default function HomeClient() {
       <header className="h-[60px] px-5 flex items-center justify-between shrink-0 bg-white">
         <img
           src="/Taipei_Fine_Arts_Museum_logo.svg"
-          width={188}
-          height={28}
+          width={160}
+          height={24}
           alt="Taipei Fine Arts Museum"
-          className="w-[188px] h-[28px]"
+          className="w-[160px] h-[24px]"
         />
 
         <div className="flex items-center gap-1.5 text-sm text-ink">

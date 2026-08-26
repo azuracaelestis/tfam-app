@@ -32,11 +32,13 @@ const en = {
   },
   whatsOn: {
     title:      "What's On",
+    subtitle:   'Current exhibitions and events happening today.',
     current:    'Current',
     comingSoon: 'Coming Soon',
-    notifying:  '✓ Notifying You',
+    notifying:  'Notifying You',
     notifyMe:   'Notify Me',
     learnMore:  'Learn More',
+    explore:    'Explore',
     curiousJourney: {
       tags:        ['Contemporary'] as string[],
       location:    '1F | Gallery A',
@@ -251,11 +253,13 @@ const zhOverrides: Partial<T> = {
   },
   whatsOn: {
     title:      '展覽資訊',
+    subtitle:   '今日正在展出的展覽與活動。',
     current:    '目前展出',
     comingSoon: '即將展出',
-    notifying:  '✓ 已設定提醒',
+    notifying:  '已設定提醒',
     notifyMe:   '提醒我',
     learnMore:  '了解更多',
+    explore:    '探索',
     curiousJourney: {
       // TODO: pending official Chinese title — ex.title stays in English until museum confirms
       tags:        ['當代藝術'],

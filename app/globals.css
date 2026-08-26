@@ -86,10 +86,22 @@
   --radius-nav-active: 2.25rem;      /* 36px — active bottom-nav tab */
   --radius-pill: 5rem;               /* 80px — primary CTA button */
 
+  /* Design system color tokens */
+  --color-bg-primary: #ffffff;       /* bg/primary — main page background */
+  --color-text-primary: #0a0a0a;     /* text/primary — main headings and strong labels */
+  --color-text-secondary: #4f4f4f;   /* text/secondary — supporting body copy */
+  --color-text-tertiary: #777777;    /* text/tertiary — secondary metadata */
+  --color-action-primary: #0a0a0a;   /* action/primary — primary button background */
+  --color-action-on-primary: #ffffff; /* action/on-primary — text and icons on primary button */
+  --color-surface-default: #ffffff;  /* surface/default — cards and panels */
+  --color-border-default: #dddddd;   /* border/default — card borders and dividers */
+  --color-icon-primary: #0a0a0a;     /* icon/primary — main icons */
+  --color-icon-secondary: #606060;   /* icon/secondary — secondary icons / lighter utility icon tone */
+
   /* Brand v2 — extracted from Figma "Arrival Onboarding" (node 185:55) */
-  --color-ink: #0a0a0a;              /* primary text, CTA/button fill */
-  --color-ink-secondary: #4f4f4f;    /* body / secondary copy */
-  --color-hairline: #dddddd;         /* card & input borders */
+  --color-ink: var(--color-text-primary);      /* alias — kept so existing `text-ink`/`bg-ink`/`border-ink` usage keeps working */
+  --color-ink-secondary: var(--color-text-secondary); /* alias — kept so existing `text-ink-secondary` usage keeps working */
+  --color-hairline: var(--color-border-default);      /* alias — kept so existing `border-hairline` usage keeps working */
   --color-canvas: #fafafa;           /* section background beneath white cards */
   --radius-card: 0.5rem;             /* 8px — menu/info cards */
 }

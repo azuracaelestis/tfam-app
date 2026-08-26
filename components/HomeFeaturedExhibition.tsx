@@ -41,7 +41,7 @@ export default function HomeFeaturedExhibition() {
         className="bg-white border border-hairline rounded-card p-3 flex gap-3 items-center text-left w-full"
       >
         <div className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
-          <Image src="/forms-in-motion-3.png" alt={ex.title} fill sizes="121px" className="object-cover" />
+          <Image src={ex.image} alt={ex.title} fill sizes="121px" className="object-cover" />
         </div>
         <div className="flex flex-col gap-2 min-w-0">
           <div className="flex flex-col">

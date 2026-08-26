@@ -5,6 +5,7 @@ import { motion, useMotionValue, animate, AnimatePresence } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import ExhibitionCarousel from './ExhibitionCarousel'
 import ExhibitionOverlay from './ExhibitionOverlay'
+import ChevronRightIcon from './icons/ChevronRightIcon'
 import {
   type Exhibition,
   type ExhibitionStatus,
@@ -28,14 +29,14 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
   return (
     <div
       onClick={() => onOpen(ex.id)}
-      className="flex h-[113px] bg-white active:bg-[#EEEEEE] border border-border-card rounded-[16px] overflow-hidden transition-colors duration-75 cursor-pointer"
+      className="w-[361px] flex items-stretch gap-[9px] bg-white active:bg-[#EEEEEE] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
     >
-      <motion.div layoutId={`ex-img-${ex.id}`} className="relative w-[119px] h-[113px] shrink-0 overflow-hidden rounded-l-[16px]">
+      <motion.div layoutId={`ex-img-${ex.id}`} className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
       </motion.div>
-      <div className="flex-1 flex flex-col gap-1 justify-center px-[18px] min-w-0">
-        <p className="text-[16px] font-semibold text-black leading-snug truncate">{displayTitle}</p>
-        <p className="text-[14px] text-black leading-normal truncate">{metaLine(ex, lang)}</p>
+      <div className="flex-1 min-w-0 flex flex-col gap-1 justify-center py-3">
+        <p className="text-base font-semibold text-black leading-snug truncate">{displayTitle}</p>
+        <p className="text-xs text-ink-secondary leading-normal whitespace-nowrap">{metaLine(ex, lang)}</p>
         <div className="flex items-center gap-2 flex-wrap">
           {ex.categories.map(cat => (
             <div key={cat} className="flex items-center gap-2 bg-[#f2f2f2] rounded-[8px] px-2 py-1">
@@ -47,6 +48,7 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
           ))}
         </div>
       </div>
+      <ChevronRightIcon size={24} className="text-ink shrink-0 self-center" />
     </div>
   )
 }
@@ -63,31 +65,25 @@ function ComingSoonCard({ ex, notified, onToggle, lang }: ComingSoonCardProps & 
   const t = useTranslation()
   const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
   return (
-    <div className="flex h-[113px] bg-white border border-border-card rounded-[16px] overflow-hidden">
-      <div className="relative w-[119px] h-[113px] shrink-0 overflow-hidden rounded-l-[16px]">
+    <div className="flex h-[130px] gap-4 bg-white border border-hairline rounded-card overflow-hidden pr-5">
+      <div className="relative w-[148px] h-[130px] shrink-0 overflow-hidden rounded-card">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
       </div>
-      <div className="flex-1 flex flex-col gap-2 justify-center px-[18px] min-w-0">
-        <div>
-          <p className="text-[16px] font-semibold text-black leading-snug">{displayTitle}</p>
-          <p className="text-[14px] text-black leading-normal">{metaLine(ex, lang, cat => translateCat(t, cat))}</p>
+      <div className="flex-1 flex flex-col gap-3 justify-center min-w-0 py-3">
+        <div className="flex flex-col gap-1">
+          <p className="text-base font-semibold text-black leading-snug truncate">{displayTitle}</p>
+          <p className="text-xs text-ink-secondary leading-normal truncate">{metaLine(ex, lang, cat => translateCat(t, cat))}</p>
         </div>
         <button
           onClick={onToggle}
-          className={`h-[28px] w-full rounded-pill flex items-center justify-center gap-[6px] text-[14px] font-bold transition-colors ${
+          className={`h-[44px] w-full rounded-pill flex items-center justify-center gap-2 text-sm font-semibold text-black transition-colors ${
             notified
-              ? 'bg-tfam-light text-tfam-mid border border-[#BEBEBE]'
-              : 'bg-black text-white'
+              ? 'bg-[#F4F4F4] border border-[#DDDDDD]'
+              : 'bg-white border border-black'
           }`}
         >
-          {notified ? (
-            t.whatsOn.notifying
-          ) : (
-            <>
-              <img src="/bell-white.svg" width={13} height={13} alt="" aria-hidden="true" className="shrink-0" />
-              {t.whatsOn.notifyMe}
-            </>
-          )}
+          <img src="/bell-black.svg" width={13} height={14} alt="" aria-hidden="true" className="shrink-0" />
+          {notified ? t.whatsOn.notifying : t.whatsOn.notifyMe}
         </button>
       </div>
     </div>
@@ -165,28 +161,27 @@ export default function WhatsOnClient() {
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
-      {/* ── Header — sticky ── */}
-      <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
-        <h1 className="text-[20px] font-bold text-black leading-none">{t.whatsOn.title}</h1>
+      {/* ── Header ── */}
+      <header className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0">
+        <h1 className="text-[32px] font-semibold text-black leading-normal">{t.whatsOn.title}</h1>
+        <p className="text-sm text-ink-secondary">{t.whatsOn.subtitle}</p>
       </header>
 
       {/* ── Carousel ── */}
-      <div className="shrink-0 mb-[42px]">
+      <div className="shrink-0 mb-[22px]">
         <ExhibitionCarousel exhibitions={featured} onOpen={setOpenId} lang={lang} />
       </div>
 
       {/* ── Tabs + swipeable track ── */}
-      <div className="flex-1 flex flex-col px-4 gap-3">
+      <div className="flex-1 flex flex-col px-4 gap-[18px]">
 
-        <div className="bg-tfam-light rounded-[32px] p-[7px] flex gap-2">
+        <div className="bg-icon-bg rounded-pill p-1 flex gap-1">
           {TABS.map((tab, i) => (
             <button
               key={tab.value}
               onClick={() => snapToIndex(i)}
-              className={`flex-1 h-[47px] rounded-[32px] flex items-center justify-center gap-2 transition-colors border font-bold text-[16px] ${
-                activeTab === tab.value
-                  ? 'bg-[rgba(26,26,26,0.85)] text-white border-border-input'
-                  : 'text-black border-border-input bg-transparent'
+              className={`w-[178.5px] h-[44px] shrink-0 rounded-pill flex items-center justify-center gap-2 transition-colors font-bold text-[16px] text-black outline-none focus:outline-none focus-visible:outline-none ${
+                activeTab === tab.value ? 'bg-white' : 'bg-transparent'
               }`}
             >
               {tab.label}
@@ -209,7 +204,7 @@ export default function WhatsOnClient() {
           >
             {/* Panel 0 — Current */}
             <div
-              className="flex flex-col gap-3 pb-4 shrink-0"
+              className="flex flex-col gap-2 pb-4 shrink-0"
               style={{ width: panelW || '100%' }}
             >
               {currentList.map(ex => (
@@ -219,7 +214,7 @@ export default function WhatsOnClient() {
 
             {/* Panel 1 — Coming Soon */}
             <div
-              className="flex flex-col gap-3 pb-4 shrink-0"
+              className="flex flex-col gap-2 pb-4 shrink-0"
               style={{ width: panelW || '100%' }}
             >
               {comingSoonList.map(ex => (

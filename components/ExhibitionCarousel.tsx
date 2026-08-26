@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState, useLayoutEffect } from 'react'
 import Image from 'next/image'
 import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import { type Exhibition, metaLine } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
+import ChevronRightIcon from './icons/ChevronRightIcon'
 
 interface ExhibitionCarouselProps {
   exhibitions: Exhibition[]
@@ -12,22 +13,34 @@ interface ExhibitionCarouselProps {
   lang: 'en' | 'zh'
 }
 
-const CARD_W      = 313
-const CARD_GAP    = 15
-const CARD_STRIDE = CARD_W + CARD_GAP   // 328 — translateX per card step
-const LEFT_INSET  = 31.5                // CSS padding-left on the track
+const CARD_W      = 262
+const CARD_GAP    = 8
+const CARD_STRIDE = CARD_W + CARD_GAP   // 270 — translateX per card step
+const LEFT_INSET  = 20                  // CSS padding-left on the track
+const RIGHT_INSET = 20                  // CSS padding-right on the track — mirrors LEFT_INSET
 
 const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
-const SWIPE_OFFSET   = CARD_STRIDE * 0.3   // ~98px drag → advance one card
+const SWIPE_OFFSET   = CARD_STRIDE * 0.3   // ~81px drag → advance one card
 const SWIPE_VELOCITY = 400                  // px/s fast-flick threshold
 
 export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: ExhibitionCarouselProps) {
   const t = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX = useMotionValue(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerW, setContainerW] = useState(0)
+
+  useLayoutEffect(() => {
+    if (containerRef.current) setContainerW(containerRef.current.offsetWidth)
+  }, [])
+
+  const trackContentWidth = LEFT_INSET + exhibitions.length * CARD_W + (exhibitions.length - 1) * CARD_GAP + RIGHT_INSET
+  const maxScroll = Math.max(trackContentWidth - containerW, 0)
+
+  const targetFor = (index: number) => -Math.min(index * CARD_STRIDE, maxScroll)
 
   const snapToCard = (index: number) => {
-    animate(trackX, -index * CARD_STRIDE, SNAP_SPRING)
+    animate(trackX, targetFor(index), SNAP_SPRING)
     setActiveIndex(index)
   }
 
@@ -45,52 +58,56 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
   }
 
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4">
       {/* Clipping container */}
-      <div className="overflow-hidden">
+      <div ref={containerRef} className="overflow-hidden">
         <motion.div
-          className="flex gap-[15px]"
-          style={{ x: trackX, paddingLeft: LEFT_INSET }}
+          className="flex gap-2"
+          style={{ x: trackX, paddingLeft: LEFT_INSET, paddingRight: RIGHT_INSET }}
           drag="x"
-          dragConstraints={{ left: -(exhibitions.length - 1) * CARD_STRIDE, right: 0 }}
+          dragConstraints={{ left: -maxScroll, right: 0 }}
           dragElastic={0.05}
           dragMomentum={false}
           onDragEnd={handleDragEnd}
         >
-          {exhibitions.map((ex, i) => (
-            <div
-              key={ex.id}
-              className="relative w-[313px] h-[390px] shrink-0 rounded-[16px] overflow-hidden border border-border-card bg-tfam-light"
-            >
-              {/* Shared-element image layer */}
-              <motion.div layoutId={`ex-img-${ex.id}`} className="absolute inset-0 overflow-hidden">
-                <Image
-                  src={ex.image}
-                  alt={ex.title}
-                  fill
-                  className="object-cover"
-                  priority={i === 0}
-                />
-              </motion.div>
+          {exhibitions.map((ex, i) => {
+            const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
+            return (
+              <div
+                key={ex.id}
+                onClick={() => onOpen(ex.id)}
+                className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
+              >
+                {/* Shared-element image layer */}
+                <motion.div layoutId={`ex-img-${ex.id}`} className="relative w-full h-[158px] overflow-hidden">
+                  <Image
+                    src={ex.image}
+                    alt={ex.title}
+                    fill
+                    className="object-cover"
+                    priority={i === 0}
+                  />
+                </motion.div>
 
-              {/* White content overlay — bottom 57.5% of card (~224px) */}
-              <div className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-4 pb-[27px] flex flex-col gap-[18px]">
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-[24px] font-bold text-black leading-[30px]">{ex.title}</h3>
-                  <p className="text-[14px] text-tfam-mid leading-normal">{metaLine(ex, lang)}</p>
+                <div className="flex flex-col gap-4 p-3">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-[20px] font-semibold text-black leading-normal">{displayTitle}</h3>
+                    <p className="text-xs text-ink-secondary leading-normal">{metaLine(ex, lang)}</p>
+                  </div>
+                  <p className="text-xs font-normal text-black leading-[14px] h-[42px] line-clamp-3">
+                    {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
+                  </p>
+                  <button
+                    onClick={() => onOpen(ex.id)}
+                    className="flex items-center gap-0.5 text-sm font-semibold text-black"
+                  >
+                    {t.whatsOn.explore}
+                    <ChevronRightIcon size={17} />
+                  </button>
                 </div>
-                <p className="text-[14px] text-black leading-snug line-clamp-3">
-                  {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
-                </p>
-                <button
-                  onClick={() => onOpen(ex.id)}
-                  className="h-[38px] w-full rounded-pill bg-black active:bg-[#494848] text-white text-[16px] font-bold flex items-center justify-center transition-colors duration-75"
-                >
-                  {t.whatsOn.learnMore}
-                </button>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </motion.div>
       </div>
 
