@@ -175,12 +175,12 @@ export default function WhatsOnClient() {
       {/* ── Tabs + swipeable track ── */}
       <div className="flex-1 flex flex-col px-4 gap-[18px]">
 
-        <div className="bg-icon-bg rounded-pill p-1 flex gap-1">
+        <div className="bg-icon-bg rounded-pill p-1 flex gap-1 overflow-hidden">
           {TABS.map((tab, i) => (
             <button
               key={tab.value}
               onClick={() => snapToIndex(i)}
-              className={`w-[178.5px] h-[44px] shrink-0 rounded-pill flex items-center justify-center gap-2 transition-colors font-bold text-[16px] text-black outline-none focus:outline-none focus-visible:outline-none ${
+              className={`flex-1 min-w-0 h-[44px] rounded-pill flex items-center justify-center gap-2 transition-colors font-bold text-[16px] text-black outline-none focus:outline-none focus-visible:outline-none ${
                 activeTab === tab.value ? 'bg-white' : 'bg-transparent'
               }`}
             >

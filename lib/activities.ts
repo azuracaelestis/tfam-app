@@ -13,26 +13,59 @@ export interface Activity {
 }
 
 export const activities: Activity[] = [
-  // ── Popular (carousel) — 3 cards matching Figma's 3 pagination dots ─────────
+  // ── Popular (carousel) — matching Figma's "Featured This Week" exactly ──────
   {
     id: 'watercolor-basics',
-    title: 'Watercolor Basics',
+    title: 'Water Color Basic',
     titleZh: '水彩基礎課程',
-    image: '/images/activities/watercolor-basics.jpg',
+    image: '/images/activities/water-color-basic.png',
     category: 'class',
-    tags: ['Free', 'Classes', '3 hrs', 'Age 16+'],
-    description: 'Learn watercolour fundamentals with a TFAM resident artist. All materials provided.',
+    tags: ['Free', 'Classes', '2 hrs', 'Age 12+'],
+    description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
+    popular: true,
+  },
+  {
+    id: 'curator-led',
+    title: 'Curator-Led',
+    titleZh: '策展人導覽',
+    image: '/images/activities/curator-led.png',
+    category: 'tour',
+    tags: ['Free', 'Tours', '3 hrs', 'Age 18+'],
+    description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
     popular: true,
   },
   {
     id: 'ink-painting-workshop',
     title: 'Ink Painting Workshop',
     titleZh: '水墨畫工作坊',
-    image: '/images/activities/ink-painting-workshop.jpg',
+    image: '/images/activities/ink-painting-workshop.png',
     category: 'class',
-    tags: ['Free', 'Classes', '4 hrs', 'Age 18+'],
-    description: 'An intensive introduction to traditional ink painting techniques. Materials provided.',
+    tags: ['Free', 'Classes', '4 hrs', 'Age 16+'],
+    description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
     popular: true,
+  },
+  // ── Other Activities (list) — matching Figma exactly ─────────────────────────
+  {
+    id: 'guided-exhibition-tour',
+    title: 'Guided Exhibition Tour',
+    titleZh: '展覽導覽',
+    image: '/images/activities/guided-exhibition-tour.png',
+    category: 'tour',
+    tags: ['Free', 'Tours', '2 hrs', 'Age 12+'],
+    description: 'Curator-led tour of current exhibitions. English and Mandarin available.',
+    descriptionZh: '由策展人帶領參觀當期展覽，提供英文與國語導覽。',
+    popular: false,
+  },
+  {
+    id: 'sculpture-workshop',
+    title: 'Sculpture Workshop',
+    titleZh: '雕塑工作坊',
+    image: '/images/activities/sculpture-workshop.png',
+    category: 'class',
+    tags: ['Free', 'Classes', '2 hrs', 'Age 16+'],
+    description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
+    descriptionZh: '學習基礎水彩技法，由北美館駐館藝術家親自指導。',
+    popular: false,
   },
   {
     id: 'photography-walk',
@@ -42,29 +75,6 @@ export const activities: Activity[] = [
     category: 'tour',
     tags: ['Free', 'Tours', '2 hrs', 'Age 14+'],
     description: "Explore the museum and surrounding streets through a photographer's eye.",
-    popular: true,
-  },
-  // ── Other Activities (list) — matching Figma exactly ─────────────────────────
-  {
-    id: 'guided-exhibition-tour',
-    title: 'Guided Exhibition Tour',
-    titleZh: '展覽導覽',
-    image: '/images/forms-in-motion.png',
-    category: 'tour',
-    tags: ['Free', 'Tours', '1.5 hrs', 'All ages'],
-    description: 'Curator-led tour of current exhibitions. English and Mandarin available.',
-    descriptionZh: '由策展人帶領參觀當期展覽，提供英文與國語導覽。',
-    popular: false,
-  },
-  {
-    id: 'sculpture-workshop',
-    title: 'Sculpture Workshop',
-    titleZh: '雕塑工作坊',
-    image: '/images/material-extensions.png',
-    category: 'class',
-    tags: ['Free', 'Classes', '3 hrs', 'Age 16+'],
-    description: 'Introduction to sculpture techniques with a TFAM resident artist. Materials provided.',
-    descriptionZh: '由北美館駐館藝術家帶領的雕塑技法入門課程，材料由主辦方提供。',
     popular: false,
   },
   // ── Additional activities for filter variety ──────────────────────────────────
@@ -116,6 +126,12 @@ export const activities: Activity[] = [
 
 export const getActivityById = (id: string): Activity | undefined =>
   activities.find(a => a.id === id)
+
+export const getDurationTag = (a: Activity): string | undefined =>
+  a.tags.find(tag => /^\d+(?:\.\d+)? hrs?$/.test(tag))
+
+export const getAgeTag = (a: Activity): string | undefined =>
+  a.tags.find(tag => /^Age \d+\+$/.test(tag) || tag === 'All ages')
 
 export interface ScheduledDate {
   date: string        // ISO "YYYY-MM-DD"

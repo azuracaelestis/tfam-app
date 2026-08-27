@@ -21,7 +21,7 @@ export default function HomeFeaturedExhibition() {
 
   if (!ex) return null
 
-  const meta = `${ex.floor} ${ex.gallery} • ${t.exhibitionDetail.untilPrefix} ${untilDate(ex.endDate!, lang)}`
+  const meta = `${ex.floor} ${ex.gallery} • ${t.home.untilPrefix} ${untilDate(ex.endDate!, lang)}`
 
   return (
     <div className="flex flex-col gap-2 px-5 py-3 bg-canvas">

@@ -1,36 +1,16 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { type Activity, type ActivityCategory, activities } from '@/lib/activities'
+import Image from 'next/image'
+import { type Activity, type ActivityCategory, activities, getDurationTag, getAgeTag } from '@/lib/activities'
 import ActivityCarousel from './ActivityCarousel'
+import ActivityMeta from './ActivityMeta'
+import ChevronRightIcon from './icons/ChevronRightIcon'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
 import { translateTag } from '@/lib/translateTag'
 
-// ── Tag pill (shared by list card) ────────────────────────────────────────────
-
-function TagPill({ label, isFree }: { label: string; isFree?: boolean }) {
-  return (
-    <div className={`bg-[#f2f2f2] flex items-center justify-center px-[8px] py-[4px] rounded-[8px] shrink-0 ${isFree ? 'gap-[8px]' : ''}`}>
-      {isFree && (
-        <img src="/tag.svg" width={8} height={8} alt="" aria-hidden="true" className="shrink-0" />
-      )}
-      <span className="text-[12px] text-black whitespace-nowrap">{label}</span>
-    </div>
-  )
-}
-
-function CalendarIconWhite() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <rect x="1" y="3" width="14" height="11" rx="1.5" stroke="white" strokeWidth="1.4" />
-      <path d="M1 7h14" stroke="white" strokeWidth="1.4" />
-      <path d="M5 1v4M11 1v4" stroke="white" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-// ── List card (no image) ──────────────────────────────────────────────────────
+// ── List card ──────────────────────────────────────────────────────────────────
 
 function ActivityListCard({ activity: a, bookThis, lang, t }: {
   activity: Activity
@@ -41,22 +21,30 @@ function ActivityListCard({ activity: a, bookThis, lang, t }: {
   const router = useRouter()
   const title       = lang === 'zh' && a.titleZh       ? a.titleZh       : a.title
   const description = lang === 'zh' && a.descriptionZh ? a.descriptionZh : a.description
+  const durationTag = getDurationTag(a)
+  const ageTag      = getAgeTag(a)
   return (
-    <div className="bg-white border border-[#d6d6d6] rounded-[16px] p-[24px] flex flex-col gap-[10px]">
-      <div className="flex flex-col gap-[4px]">
-        <h3 className="text-[20px] font-semibold text-black leading-snug">{title}</h3>
-        <div className="flex gap-[4px] flex-wrap">
-          {a.tags.map(raw => <TagPill key={raw} label={translateTag(raw, t)} isFree={raw === 'Free'} />)}
+    <div
+      onClick={() => router.push(`/activities/${a.id}/book`)}
+      className="w-full flex items-stretch gap-4 bg-white active:bg-[#f5f5f5] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
+    >
+      <div className="relative w-[126px] min-h-[120px] shrink-0 overflow-hidden rounded-card">
+        <Image src={a.image} alt={a.title} fill sizes="126px" className="object-cover" />
+      </div>
+      <div className="flex-1 min-w-0 flex flex-col gap-4 justify-center py-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-base font-semibold text-black leading-snug">{title}</h3>
+          <ActivityMeta
+            duration={durationTag ? translateTag(durationTag, t) : undefined}
+            age={ageTag ? translateTag(ageTag, t) : undefined}
+          />
+          <p className="text-xs text-black leading-4 h-11 line-clamp-3">{description}</p>
+        </div>
+        <div className="flex items-center gap-0.5 text-sm font-semibold text-black">
+          {bookThis}
+          <ChevronRightIcon size={17} />
         </div>
       </div>
-      <p className="text-[15px] text-black leading-snug">{description}</p>
-      <button
-        onClick={() => router.push(`/activities/${a.id}/book`)}
-        className="flex items-center justify-center gap-[8px] p-[8px] w-full rounded-pill bg-black active:bg-[#494848] text-white text-[16px] font-bold transition-colors duration-75"
-      >
-        <CalendarIconWhite />
-        {bookThis}
-      </button>
     </div>
   )
 }
@@ -78,28 +66,37 @@ export default function ActivitiesClient() {
   const [filter, setFilter] = useState<'all' | ActivityCategory>('all')
 
   const filtered = filter === 'all' ? activities : activities.filter(a => a.category === filter)
-  const popular  = filtered.filter(a => a.popular)
+  const popular  = activities.filter(a => a.popular)
   const others   = filtered.filter(a => !a.popular)
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
-      {/* ── Sticky header ── */}
-      <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-end pb-[10px] shrink-0">
-        <h1 className="text-[20px] font-bold text-black leading-none">{t.activities.title}</h1>
+      {/* ── Header ── */}
+      <header className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0">
+        <h1 className="text-[32px] font-semibold text-black leading-normal">{t.activities.title}</h1>
+        <p className="text-sm text-ink-secondary">{t.activities.subtitle}</p>
       </header>
 
+      {/* ── Featured This Week carousel ── */}
+      {popular.length > 0 && (
+        <section className="pt-6 pb-8 flex flex-col gap-3">
+          <h2 className="px-5 text-heading-l text-black">{t.activities.mostPopular}</h2>
+          <ActivityCarousel activities={popular} />
+        </section>
+      )}
+
+      <div className="h-px w-full bg-hairline" />
+
       {/* ── Filter pills ── */}
-      <div className="px-[18px] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex gap-[8px] pb-1">
+      <div className="px-5 pt-8 pb-2">
+        <div className="bg-icon-bg rounded-pill p-1 flex gap-1 overflow-hidden">
           {FILTERS.map(f => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`px-[32px] py-[10px] rounded-[32px] border text-[14px] font-medium whitespace-nowrap transition-colors duration-100 ${
-                filter === f.value
-                  ? 'bg-[rgba(26,26,26,0.85)] text-white border-transparent'
-                  : 'bg-white text-black border-[#d9d9d9]'
+              className={`flex-1 min-w-0 h-[40px] rounded-pill flex items-center justify-center transition-colors duration-100 text-xs font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none ${
+                filter === f.value ? 'bg-white' : 'bg-transparent'
               }`}
             >
               {t.activities[f.tKey]}
@@ -108,27 +105,17 @@ export default function ActivitiesClient() {
         </div>
       </div>
 
-      {/* ── Most Popular carousel ── */}
-      {popular.length > 0 && (
-        <section className="mt-[20px] flex flex-col gap-[18px]">
-          <h2 className="px-[18px] text-[24px] font-bold text-black leading-none">{t.activities.mostPopular}</h2>
-          {/* key=filter forces carousel remount (reset to index 0) on filter change */}
-          <ActivityCarousel key={filter} activities={popular} />
-        </section>
-      )}
-
-      {/* ── Other Activities list ── */}
+      {/* ── Activity list ── */}
       {others.length > 0 && (
-        <section className="mt-[32px] flex flex-col gap-[18px] px-[18px] pb-4">
-          <h2 className="text-[16px] font-normal text-black leading-none">{t.activities.otherActivities}</h2>
+        <section className="flex flex-col gap-2 p-5">
           {others.map(a => (
             <ActivityListCard key={a.id} activity={a} bookThis={t.activities.bookThis} lang={lang} t={t} />
           ))}
         </section>
       )}
 
-      {/* Empty state */}
-      {popular.length === 0 && others.length === 0 && (
+      {/* Empty state — the featured carousel is unfiltered, so this only reflects the filtered list */}
+      {others.length === 0 && (
         <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-8 mt-16">
           <p className="text-[16px] font-semibold text-black">{t.activities.noActivities}</p>
           <p className="text-[14px] text-tfam-mid">{t.activities.noActivitiesSub}</p>
