@@ -78,8 +78,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                 onClick={() => onOpen(ex.id)}
                 className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
               >
-                {/* Shared-element image layer */}
-                <motion.div layoutId={`ex-img-${ex.id}`} className="relative w-full h-[158px] overflow-hidden">
+                <div className="relative w-full h-[158px] overflow-hidden">
                   <Image
                     src={ex.image}
                     alt={ex.title}
@@ -87,7 +86,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                     className="object-cover"
                     priority={i === 0}
                   />
-                </motion.div>
+                </div>
 
                 <div className="flex flex-col gap-4 p-3">
                   <div className="flex flex-col gap-1">

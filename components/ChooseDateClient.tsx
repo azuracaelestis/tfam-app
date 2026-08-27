@@ -51,10 +51,16 @@ function ChevronLeft({ color = 'black' }: { color?: string }) {
   )
 }
 
-function ChevronRight() {
+function MonthNavChevron({ direction }: { direction: 'left' | 'right' }) {
   return (
-    <svg width="6" height="12" viewBox="0 0 6 12" fill="none" aria-hidden="true">
-      <path d="M1 1l4 5-4 5" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true">
+      <path
+        d={direction === 'left' ? 'M7 2L3 6l4 4' : 'M3 2l4 4-4 4'}
+        stroke="black"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }
@@ -144,10 +150,10 @@ export default function ChooseDateClient({
       </header>
 
       {/* Main content */}
-      <div className="flex flex-col gap-[20px] px-[18px] pt-[16px]">
+      <div className="flex flex-col gap-[36px] px-[18px] pt-[16px]">
 
         {/* Activity summary card */}
-        <div className="bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[12px] flex flex-col gap-[4px]">
+        <div className="bg-[#ececec] border border-[#ddd] rounded-[8px] px-[24px] py-[12px] flex flex-col gap-[4px]">
           <p className="text-[20px] font-semibold text-black leading-snug">{activity.title}</p>
           <p className="text-[15px] font-normal text-black leading-snug">
             {activity.tags.join(' · ')}
@@ -162,20 +168,20 @@ export default function ChooseDateClient({
             <button
               onClick={prevMonth}
               disabled={isCurrentMonth}
-              className="size-[32px] flex items-center justify-center rounded-full active:bg-[#f0f0f0] disabled:opacity-20 transition-opacity"
-              aria-label="Previous month"
+              className="size-[32px] shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] disabled:opacity-20 transition-colors"
+              aria-label={t.chooseDate.prevMonth}
             >
-              <ChevronLeft />
+              <MonthNavChevron direction="left" />
             </button>
             <p className="flex-1 text-[16px] font-semibold text-black text-center leading-none">
               {getMonthHeading(year, month, locale)}
             </p>
             <button
               onClick={nextMonth}
-              className="size-[32px] flex items-center justify-center rounded-full active:bg-[#f0f0f0] transition-opacity"
-              aria-label="Next month"
+              className="size-[32px] shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] transition-colors"
+              aria-label={t.chooseDate.nextMonth}
             >
-              <ChevronRight />
+              <MonthNavChevron direction="right" />
             </button>
           </div>
 
@@ -225,7 +231,7 @@ export default function ChooseDateClient({
                       <div key={ci} className="flex items-center justify-center h-[32px]">
                         <button
                           onClick={() => handleDayClick(day)}
-                          className="bg-[#f5f5f5] border border-[#d9d9d9] p-[4px] rounded-[8px] active:opacity-70"
+                          className="bg-[#ececec] border border-[#ddd] p-[4px] rounded-[8px] active:opacity-70"
                         >
                           <div className="size-[24px] rounded-[4px] flex items-center justify-center">
                             <span className="text-[14px] font-bold text-black leading-none">{day}</span>
@@ -260,7 +266,7 @@ export default function ChooseDateClient({
               <span className="text-[14px] text-black leading-none">{t.chooseDate.legendSelected}</span>
             </div>
             <div className="flex items-center gap-[4px]">
-              <div className="bg-[#f5f5f5] border-[0.5px] border-[#d9d9d9] size-[10px] rounded-[2px] shrink-0" />
+              <div className="bg-[#f5f5f5] border-[0.5px] border-[#ececec] size-[10px] rounded-[2px] shrink-0" />
               <span className="text-[14px] text-black leading-none">{t.chooseDate.legendAvailable}</span>
             </div>
             <div className="flex items-center gap-[4px]">

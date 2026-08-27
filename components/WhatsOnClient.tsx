@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useState, useLayoutEffect } from 'react'
 import Image from 'next/image'
-import { motion, useMotionValue, animate, AnimatePresence } from 'motion/react'
+import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import ExhibitionCarousel from './ExhibitionCarousel'
 import ExhibitionOverlay from './ExhibitionOverlay'
@@ -23,6 +23,14 @@ function translateCat(t: ReturnType<typeof useTranslation>, cat: string): string
   return t.notifications.categories[cat as keyof typeof t.notifications.categories] ?? cat
 }
 
+function CheckIcon() {
+  return (
+    <svg width="14" height="11" viewBox="0 0 14 11" fill="none" aria-hidden="true">
+      <path d="M1 5.5L5 9.5L13 1.5" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string) => void; lang: 'en' | 'zh' }) {
   const t = useTranslation()
   const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
@@ -31,9 +39,9 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
       onClick={() => onOpen(ex.id)}
       className="w-[361px] flex items-stretch gap-[9px] bg-white active:bg-[#EEEEEE] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
     >
-      <motion.div layoutId={`ex-img-${ex.id}`} className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
+      <div className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
-      </motion.div>
+      </div>
       <div className="flex-1 min-w-0 flex flex-col gap-1 justify-center py-3">
         <p className="text-base font-semibold text-black leading-snug truncate">{displayTitle}</p>
         <p className="text-xs text-ink-secondary leading-normal whitespace-nowrap">{metaLine(ex, lang)}</p>
@@ -76,14 +84,17 @@ function ComingSoonCard({ ex, notified, onToggle, lang }: ComingSoonCardProps & 
         </div>
         <button
           onClick={onToggle}
-          className={`h-[44px] w-full rounded-pill flex items-center justify-center gap-2 text-sm font-semibold text-black transition-colors ${
+          className={`h-[44px] w-full rounded-pill flex items-center justify-center gap-2 text-sm font-semibold transition-colors ${
             notified
-              ? 'bg-[#F4F4F4] border border-[#DDDDDD]'
-              : 'bg-white border border-black'
+              ? 'bg-[#F4F4F4] border border-[#DDDDDD] text-[#4F4F4F]'
+              : 'bg-white border border-black text-black'
           }`}
         >
-          <img src="/bell-black.svg" width={13} height={14} alt="" aria-hidden="true" className="shrink-0" />
-          {notified ? t.whatsOn.notifying : t.whatsOn.notifyMe}
+          {notified
+            ? <CheckIcon />
+            : <img src="/bell-black.svg" width={13} height={14} alt="" aria-hidden="true" className="shrink-0" />
+          }
+          {t.whatsOn.notifyMe}
         </button>
       </div>
     </div>
@@ -233,14 +244,12 @@ export default function WhatsOnClient() {
       </div>
 
       {/* ── Overlay ── */}
-      <AnimatePresence>
-        {openId !== null && (() => {
-          const ex = getById(openId)
-          return ex ? (
-            <ExhibitionOverlay key={openId} ex={ex} onClose={() => setOpenId(null)} />
-          ) : null
-        })()}
-      </AnimatePresence>
+      {openId !== null && (() => {
+        const ex = getById(openId)
+        return ex ? (
+          <ExhibitionOverlay key={openId} ex={ex} onClose={() => setOpenId(null)} />
+        ) : null
+      })()}
 
     </div>
   )
