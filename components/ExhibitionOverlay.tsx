@@ -1,12 +1,15 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'motion/react'
 import AudioInputSheet from './AudioInputSheet'
 import ExhibitionImageSlider from './ExhibitionImageSlider'
 import ExhibitionDetailContent from './ExhibitionDetailContent'
-import { type Exhibition } from '@/lib/exhibitions'
+import { getById } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
+import { LIFT } from '@/lib/motion'
+import type { Origin } from '@/contexts/ExhibitionOverlayContext'
 
 function ChevronLeftIcon() {
   return (
@@ -16,18 +19,25 @@ function ChevronLeftIcon() {
   )
 }
 
-export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onClose: () => void }) {
+// Content below the hero fades in a beat after the hero lands — reads as the
+// room assembling around the image rather than everything snapping in at once.
+const CONTENT_ENTER = { duration: LIFT.duration, ease: LIFT.ease, delay: 0.07 }
+const CONTENT_EXIT = { duration: LIFT.duration }
+
+export default function ExhibitionOverlay({ id, origin, onClose }: { id: string; origin: Origin; onClose: () => void }) {
   const router = useRouter()
   const t = useTranslation()
   const [lang] = useLanguage()
+  const ex = getById(id)
 
   const [sheetOpen, setSheetOpen] = useState(false)
   const [code, setCode] = useState('')
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [])
+  if (!ex) return null
+
+  // Map has no thumbnail to lift from, so it gets no layoutId — the hero
+  // falls back cleanly to the panel-only fade/rise entrance.
+  const heroLayoutId = origin === 'map' ? undefined : `hero-${origin}-${id}`
 
   const handleDigit  = (d: string) => setCode(prev => prev.length < 4 ? prev + d : prev)
   const handleDelete = () => setCode(prev => prev.slice(0, -1))
@@ -37,9 +47,20 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
   const handleSeeOnMap = () => window.open('https://www.google.com/maps/search/?api=1&query=Taipei+Fine+Arts+Museum', '_blank')
 
   return (
-    <div className="fixed inset-0 z-30 bg-white overflow-y-auto pb-[69px] font-noto">
+    <motion.div
+      className="fixed inset-0 z-30 bg-white overflow-y-auto pb-[69px] font-noto"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 12 }}
+      transition={LIFT}
+    >
       {/* ── Header ── */}
-      <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
+      <motion.header
+        className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: CONTENT_ENTER }}
+        exit={{ opacity: 0, transition: CONTENT_EXIT }}
+      >
         <button
           onClick={onClose}
           className="flex items-center gap-3"
@@ -48,16 +69,22 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
           <ChevronLeftIcon />
           <span className="text-[20px] font-bold text-black leading-none">{t.exhibitionDetail.back}</span>
         </button>
-      </header>
+      </motion.header>
 
-      <ExhibitionImageSlider images={ex.images} alt={ex.title} />
+      <ExhibitionImageSlider images={ex.images} alt={ex.title} heroLayoutId={heroLayoutId} />
 
-      <ExhibitionDetailContent
-        ex={ex}
-        lang={lang}
-        onStartAudio={() => setSheetOpen(true)}
-        onSeeOnMap={handleSeeOnMap}
-      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: CONTENT_ENTER }}
+        exit={{ opacity: 0, transition: CONTENT_EXIT }}
+      >
+        <ExhibitionDetailContent
+          ex={ex}
+          lang={lang}
+          onStartAudio={() => setSheetOpen(true)}
+          onSeeOnMap={handleSeeOnMap}
+        />
+      </motion.div>
 
       <AudioInputSheet
         open={sheetOpen}
@@ -68,6 +95,6 @@ export default function ExhibitionOverlay({ ex, onClose }: { ex: Exhibition; onC
         onPlay={handlePlay}
         onQR={handleQR}
       />
-    </div>
+    </motion.div>
   )
 }

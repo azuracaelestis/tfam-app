@@ -4,6 +4,7 @@ import { MotionConfig } from "motion/react";
 import "./globals.css";
 import PageTransitionWrapper from "@/components/PageTransitionWrapper";
 import BottomNav from "@/components/BottomNav";
+import { ExhibitionOverlayProvider } from "@/contexts/ExhibitionOverlayContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
           <MotionConfig reducedMotion="user">
-            <PageTransitionWrapper>{children}</PageTransitionWrapper>
+            <ExhibitionOverlayProvider>
+              <PageTransitionWrapper>{children}</PageTransitionWrapper>
+            </ExhibitionOverlayProvider>
             <BottomNav />
           </MotionConfig>
         </body>

@@ -6,6 +6,7 @@ import type { PanInfo } from 'motion/react'
 import { type Exhibition, metaLine } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import ChevronRightIcon from './icons/ChevronRightIcon'
+import { LIFT } from '@/lib/motion'
 
 interface ExhibitionCarouselProps {
   exhibitions: Exhibition[]
@@ -78,7 +79,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                 onClick={() => onOpen(ex.id)}
                 className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
               >
-                <div className="relative w-full h-[158px] overflow-hidden">
+                <motion.div layoutId={`hero-carousel-${ex.id}`} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
                   <Image
                     src={ex.image}
                     alt={ex.title}
@@ -86,7 +87,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                     className="object-cover"
                     priority={i === 0}
                   />
-                </div>
+                </motion.div>
 
                 <div className="flex flex-col gap-4 p-3">
                   <div className="flex flex-col gap-1">

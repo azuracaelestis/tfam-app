@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { FLOORS, AMENITY_LABELS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
+import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
 import BottomNav from './BottomNav'
 
 // ── Floor Switcher ────────────────────────────────────────────────────────────
@@ -292,7 +292,7 @@ function FloorPlan({
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function MapClient() {
-  const router = useRouter()
+  const { open } = useExhibitionOverlay()
   const [activeFloorId, setActiveFloorId] = useState<string>('1F')
   const [activeAmenity, setActiveAmenity] = useState<AmenityType | null>(null)
   const [showRoute, setShowRoute] = useState(true)
@@ -306,7 +306,7 @@ export default function MapClient() {
   }
 
   const handleRoomTap = (exhibitionId: string) => {
-    router.push('/whats-on/' + exhibitionId + '?from=map')
+    open(exhibitionId, 'map')
   }
 
   const showRouteBanner = activeFloorId === '1F' && !!floor.suggestedRoute && showRoute

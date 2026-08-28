@@ -1,9 +1,12 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { motion } from 'motion/react'
 import { getById } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
+import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
+import { LIFT } from '@/lib/motion'
 import ChevronRightIcon from './icons/ChevronRightIcon'
 
 function untilDate(iso: string, lang: 'en' | 'zh') {
@@ -17,6 +20,7 @@ export default function HomeFeaturedExhibition() {
   const router = useRouter()
   const t = useTranslation()
   const [lang] = useLanguage()
+  const { open } = useExhibitionOverlay()
   const ex = getById('forms-in-motion')
 
   if (!ex) return null
@@ -37,12 +41,12 @@ export default function HomeFeaturedExhibition() {
       </div>
 
       <button
-        onClick={() => router.push(`/whats-on/${ex.id}`)}
+        onClick={() => open(ex.id, 'home')}
         className="bg-white border border-hairline rounded-card p-3 flex gap-3 items-center text-left w-full"
       >
-        <div className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
+        <motion.div layoutId={`hero-home-${ex.id}`} transition={LIFT} className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
           <Image src={ex.image} alt={ex.title} fill sizes="121px" className="object-cover" />
-        </div>
+        </motion.div>
         <div className="flex flex-col gap-2 min-w-0">
           <div className="flex flex-col">
             <span className="text-heading-m text-ink truncate">{ex.title}</span>

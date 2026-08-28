@@ -4,18 +4,18 @@ import Image from 'next/image'
 import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import ExhibitionCarousel from './ExhibitionCarousel'
-import ExhibitionOverlay from './ExhibitionOverlay'
 import ChevronRightIcon from './icons/ChevronRightIcon'
 import {
   type Exhibition,
   type ExhibitionStatus,
   getFeatured,
   getByStatus,
-  getById,
   metaLine,
 } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
+import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
+import { LIFT } from '@/lib/motion'
 
 // ── Current card ──────────────────────────────────────────────────────────────
 
@@ -39,9 +39,9 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
       onClick={() => onOpen(ex.id)}
       className="w-[361px] flex items-stretch gap-[9px] bg-white active:bg-[#EEEEEE] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
     >
-      <div className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
+      <motion.div layoutId={`hero-whats-on-${ex.id}`} transition={LIFT} className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
-      </div>
+      </motion.div>
       <div className="flex-1 min-w-0 flex flex-col gap-1 justify-center py-3">
         <p className="text-base font-semibold text-black leading-snug truncate">{displayTitle}</p>
         <p className="text-xs text-ink-secondary leading-normal whitespace-nowrap">{metaLine(ex, lang)}</p>
@@ -113,9 +113,9 @@ const SWIPE_VELOCITY     = 400
 export default function WhatsOnClient() {
   const t = useTranslation()
   const [lang] = useLanguage()
+  const { open } = useExhibitionOverlay()
   const [activeTab, setActiveTab] = useState<ExhibitionStatus>('current')
   const [notified,  setNotified]  = useState<Set<string>>(new Set())
-  const [openId,    setOpenId]    = useState<string | null>(null)
 
   const TABS = [
     { label: t.whatsOn.current,    value: 'current'     as ExhibitionStatus },
@@ -180,7 +180,7 @@ export default function WhatsOnClient() {
 
       {/* ── Carousel ── */}
       <div className="shrink-0 mb-[32px]">
-        <ExhibitionCarousel exhibitions={featured} onOpen={setOpenId} lang={lang} />
+        <ExhibitionCarousel exhibitions={featured} onOpen={(id) => open(id, 'carousel')} lang={lang} />
       </div>
 
       {/* ── Tabs + swipeable track ── */}
@@ -219,7 +219,7 @@ export default function WhatsOnClient() {
               style={{ width: panelW || '100%' }}
             >
               {currentList.map(ex => (
-                <CurrentCard key={ex.id} ex={ex} onOpen={setOpenId} lang={lang} />
+                <CurrentCard key={ex.id} ex={ex} onOpen={(id) => open(id, 'whats-on')} lang={lang} />
               ))}
             </div>
 
@@ -242,14 +242,6 @@ export default function WhatsOnClient() {
         </div>
 
       </div>
-
-      {/* ── Overlay ── */}
-      {openId !== null && (() => {
-        const ex = getById(openId)
-        return ex ? (
-          <ExhibitionOverlay key={openId} ex={ex} onClose={() => setOpenId(null)} />
-        ) : null
-      })()}
 
     </div>
   )

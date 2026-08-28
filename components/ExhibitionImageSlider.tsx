@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { motion, useMotionValue, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import { useTranslation } from '@/lib/useTranslation'
+import { LIFT } from '@/lib/motion'
 
 const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
 const SWIPE_VELOCITY = 400
@@ -24,7 +25,15 @@ function SliderArrowRightIcon() {
   )
 }
 
-export default function ExhibitionImageSlider({ images, alt }: { images: string[]; alt: string }) {
+export default function ExhibitionImageSlider({
+  images,
+  alt,
+  heroLayoutId,
+}: {
+  images: string[]
+  alt: string
+  heroLayoutId?: string
+}) {
   const t = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX    = useMotionValue(0)
@@ -73,7 +82,13 @@ export default function ExhibitionImageSlider({ images, alt }: { images: string[
           >
             {images.map((src, i) => (
               <div key={i} className="relative shrink-0 h-full" style={{ width: sliderW || '100%' }}>
-                <Image src={src} alt={alt} fill className="object-cover" priority={i === 0} />
+                {i === 0 && heroLayoutId ? (
+                  <motion.div layoutId={heroLayoutId} className="relative w-full h-full" transition={LIFT}>
+                    <Image src={src} alt={alt} fill className="object-cover" priority />
+                  </motion.div>
+                ) : (
+                  <Image src={src} alt={alt} fill className="object-cover" priority={i === 0} />
+                )}
               </div>
             ))}
           </motion.div>
