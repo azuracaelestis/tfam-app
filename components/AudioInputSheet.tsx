@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
+import { motion } from 'motion/react'
 import Numpad from './Numpad'
+import { SHEET, MODE } from '@/lib/motion'
 
 interface AudioInputSheetProps {
   code: string
@@ -35,6 +37,15 @@ function CloseButton({ onClick, className = '' }: { onClick: () => void; classNa
   )
 }
 
+// Component-local timing — mirrors the CONTENT_ENTER/CONTENT_EXIT pattern in
+// ExhibitionOverlay.tsx. The backdrop fades on its own, faster, 240ms curve —
+// NOT the SHEET token, which only times the panel (and the parent recede,
+// owned by this component's two consumers). The sheet's own content settles
+// in a beat after the panel arrives, same principle as R1's content-delay fade.
+const SCRIM_TRANSITION = { duration: 0.24, ease: 'easeOut' } as const
+const CONTENT_ENTER = { duration: 0.22, ease: 'easeOut', delay: 0.12 } as const
+const CONTENT_EXIT = { duration: 0.22, ease: 'easeOut' } as const
+
 export default function AudioInputSheet({
   code,
   onDigit,
@@ -53,26 +64,38 @@ export default function AudioInputSheet({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col justify-end overflow-hidden transition-all duration-300 ${
+      className={`fixed inset-0 z-50 flex flex-col justify-end overflow-hidden ${
         open ? 'pointer-events-auto' : 'pointer-events-none'
       }`}
     >
       {/* Backdrop */}
-      <div
-        className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-          open ? 'opacity-50' : 'opacity-0'
-        }`}
+      <motion.div
+        className="absolute inset-0 bg-black"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: open ? 0.5 : 0, transition: SCRIM_TRANSITION }}
         onClick={handleClose}
       />
 
-      {/* Sheet panel */}
-      <div
-        className={`relative bg-white rounded-t-[32px] pt-6 pb-8 px-5 flex flex-col gap-6 font-noto transition-transform duration-300 ${
-          open ? 'translate-y-0' : 'translate-y-full'
-        }`}
+      {/* Sheet panel — always mounted, animate reacts to `open` (no
+          AnimatePresence) so this stays a plain animate-prop toggle. */}
+      <motion.div
+        className="relative bg-white rounded-t-[32px] pt-6 pb-8 px-5 flex flex-col gap-6 font-noto"
+        initial={{ y: '100%' }}
+        animate={{ y: open ? 0 : '100%', transition: SHEET }}
       >
         <CloseButton onClick={handleClose} className="self-end" />
 
+        {/* Content assembles a beat after the panel — mode-switching (qr <->
+            manual) doesn't touch `open`, so it can't retrigger this. */}
+        <motion.div
+          className="flex flex-col gap-6"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{
+            opacity: open ? 1 : 0,
+            y: open ? 0 : 8,
+            transition: open ? CONTENT_ENTER : CONTENT_EXIT,
+          }}
+        >
         {mode === 'qr' ? (
           <>
             {/* Header: icon + title + subtitle */}
@@ -88,8 +111,15 @@ export default function AudioInputSheet({
               </div>
             </div>
 
-            {/* QR viewfinder */}
-            <button
+            {/* QR viewfinder — R5: this button becomes the player (mode-player
+                layoutId, shared with the manual Play pill and inline QR icon
+                below, and with PlayClient's own root). Only one of qr/manual
+                is ever mounted, and only one AudioInputSheet is ever open at
+                once, so a single constant id is safe — no origin-namespacing
+                needed the way R1's hero-${origin}-${id} required. */}
+            <motion.button
+              layoutId="mode-player"
+              transition={MODE}
               onClick={onQR}
               aria-label="Scan QR code"
               className="relative bg-icon-bg rounded-[8px] size-[362px] mx-auto shrink-0"
@@ -106,7 +136,7 @@ export default function AudioInputSheet({
               <p className="absolute left-[70px] top-[226px] text-sm text-ink whitespace-nowrap">
                 Point your camera at the QR code
               </p>
-            </button>
+            </motion.button>
 
             {/* Enter code manually */}
             <div className="flex flex-col gap-3 items-center w-full">
@@ -146,23 +176,29 @@ export default function AudioInputSheet({
                   </span>
                 ))}
               </div>
-              <button onClick={onQR} className="shrink-0 ml-2 p-1" aria-label="Scan QR code">
+              {/* Same mode-player treatment as the QR viewfinder above — its
+                  shape makes for a more dramatic size change into the player,
+                  which is expected, not a bug (same principle as R1-b's
+                  crop-shift note). */}
+              <motion.button layoutId="mode-player" transition={MODE} onClick={onQR} className="shrink-0 ml-2 p-1" aria-label="Scan QR code">
                 <img src="/scan-icon-small.svg" alt="" className="w-5 h-5" />
-              </button>
+              </motion.button>
             </div>
 
             {/* Numpad */}
             <Numpad onDigit={onDigit} onDelete={onDelete} />
 
             {/* Play button */}
-            <button
+            <motion.button
+              layoutId="mode-player"
+              transition={MODE}
               onClick={onPlay}
               disabled={code.length !== 4}
               className="w-full h-12 rounded-pill bg-black text-white text-label-l flex items-center justify-center gap-2 disabled:opacity-40 transition-opacity"
             >
               <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
               Play audio guide
-            </button>
+            </motion.button>
 
             <button
               onClick={() => setMode('qr')}
@@ -172,7 +208,8 @@ export default function AudioInputSheet({
             </button>
           </>
         )}
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }

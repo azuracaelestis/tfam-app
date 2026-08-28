@@ -80,9 +80,16 @@ export default function ExhibitionImageSlider({
             dragMomentum={false}
             onDragEnd={handleDragEnd}
           >
+            {/* The shared element only exists while slide 0 is the slide on
+                screen. Once the visitor swipes away, slide 0 is translated off
+                to the left with the track, and letting it keep the layoutId
+                makes the closing lift start from that off-screen box — the hero
+                flings ~550px left before curving back to the row. Swiping away
+                breaks the identity link by hand, so the exit correctly degrades
+                to the panel-only fade, exactly as the Map origin does. */}
             {images.map((src, i) => (
               <div key={i} className="relative shrink-0 h-full" style={{ width: sliderW || '100%' }}>
-                {i === 0 && heroLayoutId ? (
+                {i === 0 && heroLayoutId && activeIndex === 0 ? (
                   <motion.div layoutId={heroLayoutId} className="relative w-full h-full" transition={LIFT}>
                     <Image src={src} alt={alt} fill className="object-cover" priority />
                   </motion.div>

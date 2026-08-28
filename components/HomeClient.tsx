@@ -2,11 +2,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { motion } from 'motion/react'
 import HomeFeaturedExhibition from './HomeFeaturedExhibition'
 import HomeCards from './HomeCards'
 import HomePlanVisit from './HomePlanVisit'
 import AudioInputSheet from './AudioInputSheet'
 import { useTranslation } from '@/lib/useTranslation'
+import { SHEET } from '@/lib/motion'
 
 export default function HomeClient() {
   const t = useTranslation()
@@ -24,6 +26,26 @@ export default function HomeClient() {
 
   return (
     <div className="min-h-screen bg-canvas flex flex-col font-noto pb-[69px]">
+
+      {/* R4: while AudioInputSheet is open, the page recedes behind it —
+          this is what separates "on top of" from "instead of". AudioInputSheet
+          itself doesn't own the page, so this wrapper (everything except the
+          sheet) carries the effect. overflow-clip (not overflow-hidden) makes
+          the border-radius actually clip without establishing a scroll
+          container — matters in ExhibitionOverlay's version of this same
+          wrapper, which contains a sticky header; kept consistent here too.
+          Top-center origin keeps the shrink reading as the page settling back
+          rather than zooming from its center. */}
+      <motion.div
+        className="flex flex-col overflow-clip"
+        animate={{
+          scale: sheetOpen ? 0.94 : 1,
+          y: sheetOpen ? 12 : 0,
+          borderRadius: sheetOpen ? 14 : 0,
+        }}
+        transition={SHEET}
+        style={{ transformOrigin: 'top center' }}
+      >
 
       {/* ── Top bar: TFAM mark left / "You're here" right ── */}
       <header className="h-[60px] px-5 flex items-center justify-between shrink-0 bg-white">
@@ -80,6 +102,8 @@ export default function HomeClient() {
 
       {/* ── Plan Your Visit ── */}
       <HomePlanVisit />
+
+      </motion.div>
 
       {/* ── Audio input sheet (logic unchanged) ── */}
       <AudioInputSheet

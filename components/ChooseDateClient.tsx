@@ -1,9 +1,12 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { motion } from 'motion/react'
 import { type Activity, scheduledDates, TIME_SLOTS } from '@/lib/activities'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
+import { LIFT } from '@/lib/motion'
 
 function getLocale(lang: 'en' | 'zh'): string {
   return lang === 'zh' ? 'zh-TW' : 'en-US'
@@ -65,18 +68,35 @@ function MonthNavChevron({ direction }: { direction: 'left' | 'right' }) {
   )
 }
 
+// Local to this component, not a global token — mirrors the exact pattern in
+// ExhibitionOverlay.tsx (CONTENT_ENTER/CONTENT_EXIT): content near the shared
+// element fades in a beat after it settles, rather than snapping in at once.
+const CONTENT_ENTER = { duration: LIFT.duration, ease: LIFT.ease, delay: 0.07 }
+const CONTENT_EXIT = { duration: LIFT.duration }
+
 export default function ChooseDateClient({
   activityId,
   activity,
+  from,
 }: {
   activityId: string
   activity: Activity
+  from?: string
 }) {
   const router = useRouter()
   const t = useTranslation()
   const [lang] = useLanguage()
   const locale = getLocale(lang)
   const now = new Date()
+
+  // No `from`, or a value that isn't list/carousel (direct deep link, a
+  // shared URL, a bookmark): no layoutId. The chip falls back cleanly to
+  // appearing in place — the same graceful degradation Map already uses for
+  // the R1 exhibition overlay when there's no thumbnail to lift from.
+  const chipLayoutId =
+    from === 'list' ? `chip-list-${activityId}`
+    : from === 'carousel' ? `chip-carousel-${activityId}`
+    : undefined
 
   // Prefer true back-navigation so the transition mirrors however this
   // screen was entered; only fall back to a literal push when there's no
@@ -164,15 +184,34 @@ export default function ChooseDateClient({
       <div className="flex flex-col gap-[36px] px-5 pt-[16px]">
 
         {/* Activity summary card */}
-        <div className="bg-[#ececec] border border-[#ddd] rounded-[8px] px-[24px] py-[12px] flex flex-col gap-[4px]">
-          <p className="text-[20px] font-semibold text-black leading-snug">{activity.title}</p>
-          <p className="text-[15px] font-normal text-black leading-snug">
-            {activity.tags.join(' · ')}
-          </p>
+        <div className="bg-[#ececec] border border-[#ddd] rounded-[8px] px-[24px] py-[12px] flex items-center gap-4">
+          <motion.div
+            layoutId={chipLayoutId}
+            transition={LIFT}
+            className="relative size-[56px] shrink-0 rounded-card overflow-hidden"
+          >
+            <Image src={activity.image} alt={activity.title} fill sizes="56px" className="object-cover" />
+          </motion.div>
+          <motion.div
+            className="flex flex-col gap-[4px] min-w-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: CONTENT_ENTER }}
+            exit={{ opacity: 0, transition: CONTENT_EXIT }}
+          >
+            <p className="text-[20px] font-semibold text-black leading-snug">{activity.title}</p>
+            <p className="text-[15px] font-normal text-black leading-snug">
+              {activity.tags.join(' · ')}
+            </p>
+          </motion.div>
         </div>
 
         {/* Calendar */}
-        <div className="flex flex-col gap-[24px]">
+        <motion.div
+          className="flex flex-col gap-[24px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: CONTENT_ENTER }}
+          exit={{ opacity: 0, transition: CONTENT_EXIT }}
+        >
 
           {/* Calendar header */}
           <div className="flex items-center gap-[29px]">
@@ -285,7 +324,7 @@ export default function ChooseDateClient({
               <span className="text-[14px] text-black line-through leading-none">{t.chooseDate.legendFull}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Time slot picker — shown once a date is selected */}
         {selectedDate && selectedDateEntry && (
@@ -334,15 +373,23 @@ export default function ChooseDateClient({
           </div>
         )}
 
-        {/* CTA button */}
-        <button
-          onClick={handleCTA}
-          disabled={!selectedDate || !selectedSlot}
-          className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
+        {/* CTA button — the fade lives on a wrapper, not the button itself:
+            Framer would otherwise own `opacity` via inline style permanently,
+            clobbering the button's own disabled:opacity-40 utility class. */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: CONTENT_ENTER }}
+          exit={{ opacity: 0, transition: CONTENT_EXIT }}
         >
-          <ClockIcon />
-          {t.chooseDate.chooseTimeSlot}
-        </button>
+          <button
+            onClick={handleCTA}
+            disabled={!selectedDate || !selectedSlot}
+            className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
+          >
+            <ClockIcon />
+            {t.chooseDate.chooseTimeSlot}
+          </button>
+        </motion.div>
       </div>
     </div>
   )

@@ -39,10 +39,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
           <MotionConfig reducedMotion="user">
+            {/* BottomNav must be a descendant of the Provider — it consumes
+                useExhibitionOverlay() to close the overlay before navigating
+                away (see BottomNav.tsx). DOM order relative to the overlay
+                (rendered internally by the Provider, after these children)
+                doesn't matter for stacking: BottomNav's z-40 beats the
+                overlay's z-30 regardless. */}
             <ExhibitionOverlayProvider>
               <PageTransitionWrapper>{children}</PageTransitionWrapper>
+              <BottomNav />
             </ExhibitionOverlayProvider>
-            <BottomNav />
           </MotionConfig>
         </body>
     </html>

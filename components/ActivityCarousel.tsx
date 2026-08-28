@@ -10,6 +10,7 @@ import { useLanguage } from '@/lib/useLanguage'
 import { translateTag } from '@/lib/translateTag'
 import ActivityMeta from './ActivityMeta'
 import ChevronRightIcon from './icons/ChevronRightIcon'
+import { LIFT } from '@/lib/motion'
 
 const CARD_W      = 262
 const CARD_GAP    = 8
@@ -63,12 +64,12 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
             return (
               <div
                 key={a.id}
-                onClick={() => router.push(`/activities/${a.id}/book`)}
+                onClick={() => router.push(`/activities/${a.id}/book?from=carousel`)}
                 className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
               >
-                <div className="relative w-full h-[158px] overflow-hidden">
+                <motion.div layoutId={`chip-carousel-${a.id}`} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
                   <Image src={a.image} alt={a.title} fill sizes="262px" className="object-cover" priority={i === 0} />
-                </div>
+                </motion.div>
                 <div className="flex flex-col gap-4 p-3">
                   <div className="flex flex-col gap-1">
                     <h3 className="text-base font-semibold text-black leading-normal">{displayTitle}</h3>

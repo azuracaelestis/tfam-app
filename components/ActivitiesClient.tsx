@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'motion/react'
 import { type Activity, type ActivityCategory, activities, getDurationTag, getAgeTag } from '@/lib/activities'
 import ActivityCarousel from './ActivityCarousel'
 import ActivityMeta from './ActivityMeta'
@@ -9,6 +10,7 @@ import ChevronRightIcon from './icons/ChevronRightIcon'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
 import { translateTag } from '@/lib/translateTag'
+import { STATE, LIFT } from '@/lib/motion'
 
 // ── List card ──────────────────────────────────────────────────────────────────
 
@@ -25,12 +27,12 @@ function ActivityListCard({ activity: a, bookThis, lang, t }: {
   const ageTag      = getAgeTag(a)
   return (
     <div
-      onClick={() => router.push(`/activities/${a.id}/book`)}
+      onClick={() => router.push(`/activities/${a.id}/book?from=list`)}
       className="w-full flex items-stretch gap-4 bg-white active:bg-[#f5f5f5] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
     >
-      <div className="relative w-[126px] min-h-[120px] shrink-0 overflow-hidden rounded-card">
+      <motion.div layoutId={`chip-list-${a.id}`} transition={LIFT} className="relative w-[126px] min-h-[120px] shrink-0 overflow-hidden rounded-card">
         <Image src={a.image} alt={a.title} fill sizes="126px" className="object-cover" />
-      </div>
+      </motion.div>
       <div className="flex-1 min-w-0 flex flex-col gap-4 justify-center py-4">
         <div className="flex flex-col gap-1">
           <h3 className="text-base font-semibold text-black leading-snug">{title}</h3>
@@ -93,32 +95,55 @@ export default function ActivitiesClient() {
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`flex-1 min-w-0 h-[40px] rounded-pill flex items-center justify-center transition-colors duration-100 text-sm font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none ${
-                filter === f.value ? 'bg-white' : 'bg-transparent'
-              }`}
+              className="relative flex-1 min-w-0 h-[40px] rounded-pill flex items-center justify-center text-sm font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none"
             >
-              {t.activities[f.tKey]}
+              {filter === f.value && (
+                <motion.div
+                  layoutId="activities-filter-pill"
+                  className="absolute inset-0 rounded-pill bg-white"
+                  transition={STATE}
+                />
+              )}
+              <span className="relative z-10">{t.activities[f.tKey]}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── Activity list ── */}
-      {others.length > 0 && (
-        <section className="flex flex-col gap-2 px-5 pb-5 pt-[18px]">
-          {others.map(a => (
-            <ActivityListCard key={a.id} activity={a} bookThis={t.activities.bookThis} lang={lang} t={t} />
-          ))}
-        </section>
-      )}
-
-      {/* Empty state — the featured carousel is unfiltered, so this only reflects the filtered list */}
-      {others.length === 0 && (
-        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-8 mt-16">
-          <p className="text-[16px] font-semibold text-black">{t.activities.noActivities}</p>
-          <p className="text-[14px] text-tfam-mid">{t.activities.noActivitiesSub}</p>
-        </div>
-      )}
+      {/* ── Activity list — true R6 cross-fade; height animates via `layout`
+          so a filter with a different result count never snaps the page.
+          `relative` anchors mode="popLayout"'s absolute-positioned exit. ── */}
+      <motion.div layout transition={STATE} className="relative flex-1 flex flex-col">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {others.length > 0 ? (
+            <motion.section
+              key={filter}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={STATE}
+              className="flex flex-col gap-2 px-5 pb-5 pt-[18px]"
+            >
+              {others.map(a => (
+                <ActivityListCard key={a.id} activity={a} bookThis={t.activities.bookThis} lang={lang} t={t} />
+              ))}
+            </motion.section>
+          ) : (
+            // Empty state — the featured carousel is unfiltered, so this only reflects the filtered list
+            <motion.div
+              key={filter}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={STATE}
+              className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-8 mt-16"
+            >
+              <p className="text-[16px] font-semibold text-black">{t.activities.noActivities}</p>
+              <p className="text-[14px] text-tfam-mid">{t.activities.noActivitiesSub}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
     </div>
   )

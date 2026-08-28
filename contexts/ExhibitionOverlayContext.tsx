@@ -37,8 +37,15 @@ export function ExhibitionOverlayProvider({ children }: { children: ReactNode })
   // open overlay, so close() knows whether there's an entry to consume and
   // the push effect below never double-pushes for one open/close cycle.
   const pushedRef = useRef(false)
+  // Bumped on every open(). Captured by the push effect below and checked by
+  // its popstate handler — history.back() resolves asynchronously, so if a
+  // close() is immediately followed by a new open() before that resolves,
+  // the eventual popstate belongs to the CLOSED instance, not the new one.
+  // Without this guard it would fire anyway and clear the new open's state.
+  const tokenRef = useRef(0)
 
   const open = useCallback((id: string, origin: Origin) => {
+    tokenRef.current += 1
     setCurrent({ id, origin })
   }, [])
 
@@ -58,9 +65,11 @@ export function ExhibitionOverlayProvider({ children }: { children: ReactNode })
   // popstate while it's open as a close.
   useEffect(() => {
     if (!current) return
+    const token = tokenRef.current
     window.history.pushState(null, '', window.location.href)
     pushedRef.current = true
     const onPopState = () => {
+      if (tokenRef.current !== token) return // stale — belongs to an overlay instance that's already been superseded
       pushedRef.current = false
       setCurrent(null)
     }
@@ -71,10 +80,11 @@ export function ExhibitionOverlayProvider({ children }: { children: ReactNode })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current !== null])
 
-  // The overlay must never strand itself on top of an unrelated screen:
-  // BottomNav is z-40 and stays tappable while it's open, so a tab switch has
-  // to close it. The route itself already changed via the router, so this
-  // just clears our state without touching history.
+  // Safety net for any navigation that bypasses BottomNav's pre-emptive
+  // close (see BottomNav.tsx) — those close the overlay BEFORE navigating
+  // so close() can consume its own history entry first. This just clears
+  // state for whatever slips through, without touching history: the entry
+  // it would orphan is harmless (same URL, already behind the new page).
   useEffect(() => {
     pushedRef.current = false
     setCurrent(null)

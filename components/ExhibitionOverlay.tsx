@@ -8,7 +8,7 @@ import ExhibitionDetailContent from './ExhibitionDetailContent'
 import { getById } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
-import { LIFT } from '@/lib/motion'
+import { LIFT, SHEET } from '@/lib/motion'
 import type { Origin } from '@/contexts/ExhibitionOverlayContext'
 
 function ChevronLeftIcon() {
@@ -54,6 +54,27 @@ export default function ExhibitionOverlay({ id, origin, onClose }: { id: string;
       exit={{ opacity: 0, y: 12 }}
       transition={LIFT}
     >
+      {/* R4: while AudioInputSheet is open, the overlay's own content recedes
+          behind it — AudioInputSheet doesn't own the page it sits over, so
+          this wrapper (everything except the sheet) carries the effect. A
+          nested motion.div, not the outer panel above: that one already has
+          its own R1 mount/unmount transform+transition, and mixing the two
+          concerns onto one element would fight over a single `transition`.
+          `overflow-clip`, not `overflow-hidden`: hidden establishes a scroll
+          container, which would become the sticky header's containing block
+          below and break its stick-to-top-on-scroll (verified — it did).
+          clip still clips the border-radius during the scale without that
+          side effect. */}
+      <motion.div
+        className="flex flex-col overflow-clip"
+        animate={{
+          scale: sheetOpen ? 0.94 : 1,
+          y: sheetOpen ? 12 : 0,
+          borderRadius: sheetOpen ? 14 : 0,
+        }}
+        transition={SHEET}
+        style={{ transformOrigin: 'top center' }}
+      >
       {/* ── Header ── */}
       <motion.header
         className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0"
@@ -84,6 +105,8 @@ export default function ExhibitionOverlay({ id, origin, onClose }: { id: string;
           onStartAudio={() => setSheetOpen(true)}
           onSeeOnMap={handleSeeOnMap}
         />
+      </motion.div>
+
       </motion.div>
 
       <AudioInputSheet

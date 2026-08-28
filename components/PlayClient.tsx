@@ -1,10 +1,11 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'motion/react'
 import { getArtworkByCode, getNextArtwork, type Language } from '@/lib/artworks'
 import { useMockAudio } from '@/hooks/useMockAudio'
 import { useOnTransitionComplete } from './PageTransitionWrapper'
-import { DEEPER } from '@/lib/motion'
+import { MODE } from '@/lib/motion'
 import { useTranslation } from '@/lib/useTranslation'
 import AudioControls from './AudioControls'
 import ProgressBar from './ProgressBar'
@@ -73,6 +74,14 @@ function FastForwardIcon() {
   )
 }
 
+// Local to this component, not a global token — mirrors the exact
+// CONTENT_ENTER/CONTENT_EXIT pattern already used this session
+// (ExhibitionOverlay.tsx, ChooseDateClient.tsx, AudioInputSheet.tsx):
+// content assembles a beat after the shared element (here, the whole
+// container) finishes its own animation, rather than snapping in at once.
+const CONTENT_ENTER = { duration: MODE.duration, ease: MODE.ease, delay: 0.1 }
+const CONTENT_EXIT = { duration: MODE.duration }
+
 export default function PlayClient({ code }: { code: string }) {
   const router = useRouter()
   const t = useTranslation()
@@ -82,6 +91,19 @@ export default function PlayClient({ code }: { code: string }) {
   const nextArtwork = artwork ? getNextArtwork(artwork.code) : undefined
 
   const { isPlaying, currentTime, duration, play, pause, seek, replay, skipForward } = useMockAudio()
+
+  // Prefer true back-navigation so the transition mirrors however this
+  // screen was entered (the layoutId match on the way back needs the
+  // ORIGINAL page actually mounted, not a literal push to Home) — same fix
+  // as ExhibitionDetailClient and ChooseDateClient earlier this session.
+  // Only fall back to the literal push for a direct deep link.
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+    } else {
+      router.push('/')
+    }
+  }
 
   // Start audio after the slide-in animation completes.
   // audioStartedRef ensures exactly one play() call between the two paths below.
@@ -97,9 +119,10 @@ export default function PlayClient({ code }: { code: string }) {
   // Fallback: AnimatePresence initial={false} skips animation on direct URL
   // navigation, so onAnimationComplete never fires. Start shortly after the
   // slide-in transition would have completed in that case. /play is only ever
-  // entered via a DEEPER or BACK navigation (both timed off DEEPER), so that's
-  // the duration to key off — never PEER's, and never a retyped literal.
-  const AUDIO_FALLBACK_MS = DEEPER.duration * 1000 + 50
+  // entered via 'mode' (R5, 620ms) now — it used to be a plain DEEPER push
+  // before the audio guide got its own dedicated transition — so MODE is the
+  // duration to key off — never PEER's/DEEPER's, and never a retyped literal.
+  const AUDIO_FALLBACK_MS = MODE.duration * 1000 + 50
   useEffect(() => {
     const id = setTimeout(() => {
       if (!artwork || audioStartedRef.current) return
@@ -130,12 +153,23 @@ export default function PlayClient({ code }: { code: string }) {
   const nextLocale = nextArtwork?.locales[lang]
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
+    // R5: this root IS the shared element — the button becomes the player.
+    // Matches the "grows... to fill the screen" language literally: the
+    // layoutId lives on the page's outermost container, not a sub-region.
+    <motion.div layoutId="mode-player" transition={MODE} className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
+
+      {/* Content assembles a beat after the container finishes expanding. */}
+      <motion.div
+        className="flex flex-col flex-1"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: CONTENT_ENTER }}
+        exit={{ opacity: 0, transition: CONTENT_EXIT }}
+      >
 
       {/* ── Top bar: back chevron + "Audio Guide" title ── */}
       <header className="h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
-          onClick={() => router.push('/')}
+          onClick={handleBack}
           className="flex items-center gap-3"
           aria-label={t.play.backToHome}
         >
@@ -229,6 +263,7 @@ export default function PlayClient({ code }: { code: string }) {
         </div>
       )}
 
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

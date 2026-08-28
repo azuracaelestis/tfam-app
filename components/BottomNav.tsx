@@ -1,6 +1,8 @@
 'use client'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/useTranslation'
+import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
 
 const ITEMS = [
   { key: 'home',       icon: 'bottom-nav-home.svg',       w: 16, h: 17, href: '/' },
@@ -14,6 +16,31 @@ export default function BottomNav() {
   const pathname = usePathname()
   const router = useRouter()
   const t = useTranslation()
+  const { current, close } = useExhibitionOverlay()
+  // Set when a tab is tapped while the overlay is open: close() consumes its
+  // own history entry via history.back(), which resolves asynchronously, so
+  // the actual navigation waits for that to finish rather than racing it —
+  // a same-tick close()-then-push would leave the two history writes
+  // interleaved in an undefined order.
+  const pendingHrefRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (current === null && pendingHrefRef.current) {
+      const href = pendingHrefRef.current
+      pendingHrefRef.current = null
+      router.push(href)
+    }
+  }, [current, router])
+
+  const handleTap = (href: string) => {
+    if (current) {
+      pendingHrefRef.current = href
+      close()
+    } else {
+      router.push(href)
+    }
+  }
+
   const active = pathname === '/' ? 0
     : pathname.startsWith('/whats-on') ? 1
     : pathname.startsWith('/map') ? 2
@@ -58,7 +85,7 @@ export default function BottomNav() {
         return (
           <button
             key={item.key}
-            onClick={() => router.push(item.href)}
+            onClick={() => handleTap(item.href)}
             className="relative flex-1 h-full flex flex-col items-center justify-center gap-2 py-2.5"
             aria-current={isActive ? 'page' : undefined}
           >

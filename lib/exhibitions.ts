@@ -94,11 +94,11 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'forms-in-motion',
     title: 'Forms in Motion',
-    image: '/forms-in-motion-3.png',
+    image: '/Whats On/forms in motion/forms-in-motion-3.png',
     images: [
-      '/images/Forms in Motion/forms-in-motion-1.jpg',
-      '/images/Forms in Motion/forms-in-motion-2.jpg',
-      '/images/Forms in Motion/forms-in-motion-3.jpg',
+      '/Whats On/forms in motion/forms-in-motion-3.png',
+      '/Whats On/forms in motion/forms-in-motion-4.png',
+      '/Whats On/forms in motion/forms-in-motion-5.png',
     ],
     endDate: '2026-07-01',
     floor: '2F',

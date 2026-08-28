@@ -1,7 +1,7 @@
 'use client'
 import { useRef, useState, useLayoutEffect } from 'react'
 import Image from 'next/image'
-import { motion, useMotionValue, animate } from 'motion/react'
+import { motion, useMotionValue, useTransform, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
 import ExhibitionCarousel from './ExhibitionCarousel'
 import ChevronRightIcon from './icons/ChevronRightIcon'
@@ -133,6 +133,26 @@ export default function WhatsOnClient() {
     }
   }, [])
 
+  // ── Pill: a pure readout of trackX, never animated on its own — see
+  // Task 1 note in WhatsOnClient's tab markup for why. ──
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const [tabOffsets, setTabOffsets] = useState<number[]>([0, 0])
+  const [tabWidth, setTabWidth] = useState(0)
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      setTabOffsets(tabRefs.current.map(el => el?.offsetLeft ?? 0))
+      setTabWidth(tabRefs.current[0]?.offsetWidth ?? 0)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  // Same two rest positions the track itself snaps to (see snapToIndex) —
+  // dragging or snapping trackX moves this in lockstep, for free.
+  const pillX = useTransform(trackX, [0, -(panelW + PANEL_GAP)], [tabOffsets[0] ?? 0, tabOffsets[1] ?? 0])
+
   // ── Data ──
   const featured       = getFeatured()
   const currentList    = getByStatus('current').filter(e => !e.featured)
@@ -150,7 +170,13 @@ export default function WhatsOnClient() {
 
   const snapToIndex = (index: number) => {
     const w = containerRef.current?.offsetWidth ?? panelW
-    animate(trackX, -index * (w + PANEL_GAP), SNAP_SPRING)
+    // A manual animate() call on a raw MotionValue doesn't consult
+    // MotionConfig's reducedMotion setting (that's a component-level
+    // mechanism) — so without this, reduced-motion users would still get
+    // the full spring. This branch only skips the animation; SNAP_SPRING
+    // itself, and everyone else's drag feel, is untouched.
+    const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    animate(trackX, -index * (w + PANEL_GAP), reduced ? { duration: 0 } : SNAP_SPRING)
     setActiveTab(TAB_VALUES[index])
   }
 
@@ -186,14 +212,21 @@ export default function WhatsOnClient() {
       {/* ── Tabs + swipeable track ── */}
       <div className="flex-1 flex flex-col px-4 gap-[18px]">
 
-        <div className="bg-icon-bg rounded-pill p-1 flex gap-1 overflow-hidden">
+        <div className="relative bg-icon-bg rounded-pill p-1 flex gap-1 overflow-hidden">
+          {/* The pill's x is a READOUT of trackX (see pillX above), not its
+              own animation — dragging the panels moves it continuously, and
+              tapping a tab or releasing a drag resolve through the same
+              snapToIndex/SNAP_SPRING, so the two can never desync. */}
+          <motion.div
+            className="absolute top-1 bottom-1 left-0 rounded-pill bg-white"
+            style={{ x: pillX, width: tabWidth }}
+          />
           {TABS.map((tab, i) => (
             <button
               key={tab.value}
+              ref={el => { tabRefs.current[i] = el }}
               onClick={() => snapToIndex(i)}
-              className={`flex-1 min-w-0 h-[44px] rounded-pill flex items-center justify-center gap-2 transition-colors font-bold text-[16px] text-black outline-none focus:outline-none focus-visible:outline-none ${
-                activeTab === tab.value ? 'bg-white' : 'bg-transparent'
-              }`}
+              className="relative z-10 flex-1 min-w-0 h-[44px] rounded-pill flex items-center justify-center gap-2 font-bold text-[16px] text-black outline-none focus:outline-none focus-visible:outline-none"
             >
               {tab.label}
               <span className="bg-[#ececec] rounded-full min-w-[29px] h-[27px] flex items-center justify-center text-[14px] font-bold text-black px-1">

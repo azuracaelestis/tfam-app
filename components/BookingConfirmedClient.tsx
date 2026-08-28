@@ -113,7 +113,7 @@ export default function BookingConfirmedClient({
         </div>
 
         {/* Info banner */}
-        <div className="w-full bg-[#ebf6ff] rounded-[12px] px-[16px] py-[14px] flex items-start gap-[8px]">
+        <div className="w-full bg-[#ebf6ff] rounded-[8px] px-[16px] py-[14px] flex items-start gap-[8px]">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0 mt-[1px]">
             <circle cx="8" cy="8" r="7" stroke="#4a90d9" strokeWidth="1.4" />
             <path d="M8 7v4" stroke="#4a90d9" strokeWidth="1.4" strokeLinecap="round" />
@@ -126,23 +126,26 @@ export default function BookingConfirmedClient({
           </p>
         </div>
 
-        {/* Back to Home */}
-        <button
-          onClick={() => router.push('/')}
-          className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold active:bg-[#333] transition-colors"
-        >
-          <HouseIcon />
-          {t.bookingConfirmed.backHome}
-        </button>
+        {/* CTA buttons — 42px from the info banner above, 12px between them */}
+        <div className="w-full flex flex-col gap-[12px] mt-[18px]">
+          {/* Back to Home */}
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold active:bg-[#333] transition-colors"
+          >
+            <HouseIcon />
+            {t.bookingConfirmed.backHome}
+          </button>
 
-        {/* Add to Calendar */}
-        <button
-          onClick={() => downloadIcs(activity, date, slot)}
-          className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] border border-black bg-white text-black text-[16px] font-bold active:bg-[#f5f5f5] transition-colors"
-        >
-          <CalendarIcon />
-          {t.bookingConfirmed.addToCalendar}
-        </button>
+          {/* Add to Calendar */}
+          <button
+            onClick={() => downloadIcs(activity, date, slot)}
+            className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] border border-black bg-white text-black text-[16px] font-bold active:bg-[#f5f5f5] transition-colors"
+          >
+            <CalendarIcon />
+            {t.bookingConfirmed.addToCalendar}
+          </button>
+        </div>
 
       </div>
     </div>
