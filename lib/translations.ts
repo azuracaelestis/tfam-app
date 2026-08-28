@@ -100,7 +100,6 @@ const en = {
   },
   settings: {
     title:               'Settings',
-    subtitle:            'Manage your preferences and app settings.',
     preferences:         'Preferences',
     notifications:       'Notifications',
     notificationsSub:    'Exhibition alerts, class sessions, Saturday reminder',
@@ -287,7 +286,6 @@ const zhOverrides: Partial<T> = {
   },
   settings: {
     title:            '設定',
-    subtitle:         '管理您的偏好設定與應用程式設定。',
     preferences:      '偏好設定',
     notifications:    '通知',
     notificationsSub: '展覽提醒、課程場次、週六提醒',

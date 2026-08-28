@@ -167,7 +167,7 @@ export default function PlayClient({ code }: { code: string }) {
       </div>
 
       {/* ── Progress bar + transport controls ── */}
-      <div className="flex flex-col gap-[18px] py-[12px] shrink-0">
+      <div className="flex flex-col gap-[18px] pt-[12px] shrink-0">
         <ProgressBar currentTime={currentTime} duration={duration} onSeek={seek} />
         <AudioControls
           isPlaying={isPlaying}
@@ -178,7 +178,7 @@ export default function PlayClient({ code }: { code: string }) {
       </div>
 
       {/* ── Transcript Preview ── */}
-      <div className="px-5 pb-3 shrink-0">
+      <div className="px-5 pt-8 shrink-0">
         <div className="bg-white border border-[#ddd] rounded-[8px] px-3 py-5 flex gap-4">
           <FileTextIcon />
           <div className="flex flex-col gap-6 flex-1 min-w-0">
@@ -203,7 +203,7 @@ export default function PlayClient({ code }: { code: string }) {
 
       {/* ── Next Artwork card ── */}
       {nextArtwork && nextLocale && (
-        <div className="px-5 pb-3 shrink-0">
+        <div className="px-5 pt-8 pb-3 shrink-0">
           <button
             onClick={() => router.push('/play?code=' + nextArtwork.code)}
             className="w-full bg-white border border-[#d6d6d6] rounded-[8px] px-5 py-3 flex items-center justify-between gap-4"

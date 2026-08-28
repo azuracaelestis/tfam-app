@@ -19,7 +19,7 @@ export interface Artwork {
 export const artworks: Artwork[] = [
   {
     code: '1001',
-    imageUrl: '/ground-noise.png',
+    imageUrl: '/ground-noise-2.png',
     audioSrc: '/audio-sample.mp3',
     section: 'Visions of Tomorrow',
     gallery: '2F Gallery A',

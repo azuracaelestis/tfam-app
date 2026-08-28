@@ -89,7 +89,7 @@ export default function NotificationsClient() {
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
       {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-center shrink-0">
+      <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
@@ -101,12 +101,12 @@ export default function NotificationsClient() {
       </header>
 
       {/* Content */}
-      <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[69px]">
+      <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[101px]">
 
         {/* Alert Types */}
         <div className="flex flex-col gap-[12px]">
           <p className="text-heading-l text-ink">{t.notifications.alertTypes}</p>
-          <div className="flex flex-col gap-[12px]">
+          <div className="flex flex-col gap-[8px]">
             <AlertCard
               title={t.notifications.exhibitionAlerts}
               subtitle={t.notifications.exhibitionAlertsSub}

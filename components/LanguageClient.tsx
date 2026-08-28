@@ -45,12 +45,12 @@ function LanguageCard({
   return (
     <button
       onClick={onClick}
-      className="w-full flex gap-[24px] items-center bg-white border border-hairline rounded-card p-[18px] active:opacity-70 transition-opacity"
+      className="w-full flex gap-[18px] items-center bg-white border border-hairline rounded-card p-[18px] active:opacity-70 transition-opacity"
     >
       <div className="bg-[#d6d6d6] p-[10px] rounded-[32px] shrink-0 flex items-center justify-center">
         <span className="text-[16px] font-semibold text-black whitespace-nowrap leading-normal">{badge}</span>
       </div>
-      <div className="flex flex-col gap-[4px] w-[207px] text-left shrink-0">
+      <div className="flex flex-col gap-[4px] text-left min-w-0 flex-1">
         <span className="text-[16px] font-semibold text-black leading-normal">{title}</span>
         <span className="text-[13px] font-normal text-black leading-normal">{subtitle}</span>
       </div>
@@ -68,7 +68,7 @@ export default function LanguageClient() {
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
       {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white px-5 py-[10px] flex items-end shrink-0">
+      <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <div className="flex gap-[12px] items-center w-full">
           <button
             onClick={() => router.back()}
@@ -88,7 +88,7 @@ export default function LanguageClient() {
           {/* Display Language */}
           <div className="flex flex-col gap-[12px]">
             <p className="text-heading-l text-ink">{t.language.displayLanguage}</p>
-            <div className="flex flex-col gap-[12px]">
+            <div className="flex flex-col gap-[8px]">
               <LanguageCard
                 badge={t.language.enBadge}
                 title={t.language.enTitle}
@@ -108,16 +108,16 @@ export default function LanguageClient() {
 
           {/* Info banner */}
           <div className="bg-[#ebf6ff] rounded-card p-[18px]">
-            <div className="flex gap-[10px] items-start py-[4px] w-[319px]">
+            <div className="flex gap-[10px] items-start py-[4px] w-full">
               <InfoIcon />
-              <p className="text-[14px] font-normal text-black leading-normal">
+              <p className="flex-1 min-w-0 text-[14px] font-normal text-black leading-normal">
                 {t.language.infoBanner}
               </p>
             </div>
           </div>
 
           {/* Audio Guide Language */}
-          <div className="flex flex-col gap-[12px]">
+          <div className="flex flex-col gap-[12px] mt-2">
             <p className="text-heading-l text-ink">{t.language.audioGuideLanguage}</p>
             <div className="border border-hairline rounded-card p-[18px] flex flex-col gap-[12px]">
               <p className="text-[16px] font-semibold text-black w-[260px] leading-normal">

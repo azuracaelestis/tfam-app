@@ -77,7 +77,7 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
                       age={ageTag ? translateTag(ageTag, t) : undefined}
                     />
                   </div>
-                  <p className="text-xs font-normal text-black leading-[14px] h-[42px] line-clamp-3">
+                  <p className="text-sm font-normal text-black leading-[18px] h-[54px] line-clamp-3">
                     {description}
                   </p>
                   <div className="flex items-center gap-0.5 text-sm font-semibold text-black">

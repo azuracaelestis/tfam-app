@@ -38,7 +38,7 @@ function ActivityListCard({ activity: a, bookThis, lang, t }: {
             duration={durationTag ? translateTag(durationTag, t) : undefined}
             age={ageTag ? translateTag(ageTag, t) : undefined}
           />
-          <p className="text-xs text-black leading-4 h-11 line-clamp-3">{description}</p>
+          <p className="text-xs text-black leading-4 h-12 line-clamp-3">{description}</p>
         </div>
         <div className="flex items-center gap-0.5 text-sm font-semibold text-black">
           {bookThis}

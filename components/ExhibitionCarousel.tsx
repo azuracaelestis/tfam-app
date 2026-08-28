@@ -93,7 +93,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                     <h3 className="text-[20px] font-semibold text-black leading-normal">{displayTitle}</h3>
                     <p className="text-xs text-ink-secondary leading-normal">{metaLine(ex, lang)}</p>
                   </div>
-                  <p className="text-xs font-normal text-black leading-[14px] h-[42px] line-clamp-3">
+                  <p className="text-sm font-normal text-black leading-[18px] h-[54px] line-clamp-3">
                     {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
                   </p>
                   <button

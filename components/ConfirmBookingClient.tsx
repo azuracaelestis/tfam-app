@@ -101,7 +101,7 @@ export default function ConfirmBookingClient({
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
       {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-center shrink-0">
+      <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
