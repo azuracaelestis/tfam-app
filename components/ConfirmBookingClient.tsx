@@ -101,7 +101,7 @@ export default function ConfirmBookingClient({
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
       {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white h-[47px] px-[18px] flex items-center shrink-0">
+      <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-center shrink-0">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
@@ -113,7 +113,7 @@ export default function ConfirmBookingClient({
       </header>
 
       {/* Main content */}
-      <div className="flex flex-col gap-[24px] px-[18px] pt-[48px] pb-[69px]">
+      <div className="flex flex-col gap-[24px] px-5 pt-[48px] pb-[69px]">
 
         {/* Title */}
         <p className="text-[20px] font-bold text-black text-center leading-none">{t.confirmBooking.title}</p>

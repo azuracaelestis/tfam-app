@@ -40,7 +40,7 @@ function PreferenceCard({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between gap-[85px] bg-white border border-[#d6d6d6] rounded-[16px] p-[18px] active:opacity-70 transition-opacity"
+      className="w-full flex items-center justify-between gap-[85px] bg-white border border-hairline rounded-card p-[18px] active:opacity-70 transition-opacity"
     >
       <div className="flex items-start gap-[18px] shrink-0">
         <img src={icon} width={33} height={33} alt="" aria-hidden="true" className="shrink-0" />
@@ -66,7 +66,7 @@ function AboutCard({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between gap-[85px] bg-white border border-[#d6d6d6] rounded-[16px] p-[18px] active:opacity-70 transition-opacity"
+      className="w-full flex items-center justify-between gap-[85px] bg-white border border-hairline rounded-card p-[18px] active:opacity-70 transition-opacity"
     >
       <div className="flex flex-col gap-[4px] text-left">
         <span className="text-[16px] font-semibold text-black leading-normal">{title}</span>
@@ -85,20 +85,21 @@ export default function SettingsClient() {
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
-      {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white px-[20px] py-[10px] flex items-end shrink-0">
-        <p className="text-[20px] font-bold text-black leading-normal">{t.settings.title}</p>
+      {/* Header */}
+      <header className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0">
+        <h1 className="text-[32px] font-semibold text-black leading-normal">{t.settings.title}</h1>
+        <p className="text-sm text-ink-secondary">{t.settings.subtitle}</p>
       </header>
 
       {/* Content */}
-      <div className="flex flex-col gap-[24px] px-[16px] pt-[16px] pb-[69px]">
+      <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[69px]">
 
         {/* Preferences + About */}
         <div className="flex flex-col gap-[28px]">
 
           {/* Preferences */}
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[20px] font-medium text-black leading-normal">{t.settings.preferences}</p>
+            <p className="text-heading-l text-ink">{t.settings.preferences}</p>
             <div className="flex flex-col gap-[12px]">
               <PreferenceCard
                 icon="/images/notification/icon-notification.svg"
@@ -117,7 +118,7 @@ export default function SettingsClient() {
 
           {/* About */}
           <div className="flex flex-col gap-[12px]">
-            <p className="text-[20px] font-medium text-black leading-normal">{t.settings.about}</p>
+            <p className="text-heading-l text-ink">{t.settings.about}</p>
             <div className="flex flex-col gap-[12px]">
               <AboutCard
                 title={t.settings.aboutMuseum}
@@ -141,8 +142,8 @@ export default function SettingsClient() {
 
         {/* App Version */}
         <div className="flex justify-between items-center">
-          <span className="text-[16px] font-semibold text-[#767676]">{t.settings.appVersion}</span>
-          <span className="text-[16px] font-semibold text-[#767676]">1.0.0</span>
+          <span className="text-[16px] font-semibold text-ink-secondary">{t.settings.appVersion}</span>
+          <span className="text-[16px] font-semibold text-ink-secondary">1.0.0</span>
         </div>
 
       </div>

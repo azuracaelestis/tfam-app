@@ -100,6 +100,7 @@ const en = {
   },
   settings: {
     title:               'Settings',
+    subtitle:            'Manage your preferences and app settings.',
     preferences:         'Preferences',
     notifications:       'Notifications',
     notificationsSub:    'Exhibition alerts, class sessions, Saturday reminder',
@@ -158,6 +159,9 @@ const en = {
     artworkNotFoundDetail:"Code \"__CODE__\" doesn't match any artwork in this guide.",
     infoBanner:          'Audio continues when screen locks, keep it in your pocket',
     nextArtwork:         'Next Artwork',
+    transcriptPreview:   'Transcript Preview',
+    readFullTranscript:  'Read full transcript',
+    hideTranscript:      'Hide transcript',
   },
   audioInput: {
     close:      'Close',
@@ -283,6 +287,7 @@ const zhOverrides: Partial<T> = {
   },
   settings: {
     title:            '設定',
+    subtitle:         '管理您的偏好設定與應用程式設定。',
     preferences:      '偏好設定',
     notifications:    '通知',
     notificationsSub: '展覽提醒、課程場次、週六提醒',
@@ -341,6 +346,9 @@ const zhOverrides: Partial<T> = {
     artworkNotFoundDetail:'代碼「__CODE__」與本導覽中的任何作品不符。',
     infoBanner:           '螢幕鎖定時音訊仍會繼續，請放入口袋。',
     nextArtwork:          '下一件作品',
+    transcriptPreview:    '逐字稿預覽',
+    readFullTranscript:   '閱讀完整逐字稿',
+    hideTranscript:       '隱藏逐字稿',
   },
   audioInput: {
     close:      '關閉',

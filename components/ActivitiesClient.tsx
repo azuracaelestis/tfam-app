@@ -73,29 +73,27 @@ export default function ActivitiesClient() {
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
       {/* ── Header ── */}
-      <header className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0">
+      <header className="bg-white px-5 pt-3 pb-0 flex flex-col gap-1 shrink-0">
         <h1 className="text-[32px] font-semibold text-black leading-normal">{t.activities.title}</h1>
         <p className="text-sm text-ink-secondary">{t.activities.subtitle}</p>
       </header>
 
       {/* ── Featured This Week carousel ── */}
       {popular.length > 0 && (
-        <section className="pt-6 pb-8 flex flex-col gap-3">
+        <section className="pt-6 mb-[32px] flex flex-col gap-3">
           <h2 className="px-5 text-heading-l text-black">{t.activities.mostPopular}</h2>
           <ActivityCarousel activities={popular} />
         </section>
       )}
 
-      <div className="h-px w-full bg-hairline" />
-
       {/* ── Filter pills ── */}
-      <div className="px-5 pt-8 pb-2">
-        <div className="bg-icon-bg rounded-pill p-1 flex gap-1 overflow-hidden">
+      <div className="px-5">
+        <div className="bg-icon-bg rounded-pill p-1 flex overflow-hidden">
           {FILTERS.map(f => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`flex-1 min-w-0 h-[40px] rounded-pill flex items-center justify-center transition-colors duration-100 text-xs font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none ${
+              className={`flex-1 min-w-0 h-[40px] rounded-pill flex items-center justify-center transition-colors duration-100 text-sm font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none ${
                 filter === f.value ? 'bg-white' : 'bg-transparent'
               }`}
             >
@@ -107,7 +105,7 @@ export default function ActivitiesClient() {
 
       {/* ── Activity list ── */}
       {others.length > 0 && (
-        <section className="flex flex-col gap-2 p-5">
+        <section className="flex flex-col gap-2 px-5 pb-5 pt-[18px]">
           {others.map(a => (
             <ActivityListCard key={a.id} activity={a} bookThis={t.activities.bookThis} lang={lang} t={t} />
           ))}

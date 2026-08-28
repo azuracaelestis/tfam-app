@@ -9,6 +9,10 @@ export interface Artwork {
   code: string
   imageUrl: string
   audioSrc: string
+  section: string
+  gallery: string
+  artist: string
+  year: string
   locales: Record<Language, ArtworkLocale>
 }
 
@@ -17,6 +21,10 @@ export const artworks: Artwork[] = [
     code: '1001',
     imageUrl: '/ground-noise.png',
     audioSrc: '/audio-sample.mp3',
+    section: 'Visions of Tomorrow',
+    gallery: '2F Gallery A',
+    artist: 'Céline Clanet',
+    year: '2023',
     locales: {
       en: {
         title: 'Ground Noise',
@@ -34,6 +42,10 @@ export const artworks: Artwork[] = [
     code: '2043',
     imageUrl: '/images/artwork-2.svg',
     audioSrc: '/audio/guide.wav',
+    section: 'Entanglements',
+    gallery: '3F Gallery B',
+    artist: 'Céline Clanet',
+    year: '2023',
     locales: {
       en: {
         title: 'Passage Through Light',
@@ -51,4 +63,10 @@ export const artworks: Artwork[] = [
 
 export function getArtworkByCode(code: string): Artwork | undefined {
   return artworks.find((a) => a.code === code)
+}
+
+export function getNextArtwork(code: string): Artwork | undefined {
+  const i = artworks.findIndex((a) => a.code === code)
+  if (i === -1) return undefined
+  return artworks[(i + 1) % artworks.length]
 }

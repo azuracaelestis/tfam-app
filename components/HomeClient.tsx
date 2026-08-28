@@ -53,7 +53,7 @@ export default function HomeClient() {
       </section>
 
       {/* ── Welcome copy + primary CTA — normal flow below the photo ── */}
-      <section className="relative flex flex-col gap-3 px-5 py-3 bg-canvas -mt-8">
+      <section className="relative flex flex-col gap-3 px-5 pt-3 pb-4 bg-canvas -mt-8">
         <div className="flex flex-col gap-2 text-ink">
           <h2 className="text-[32px] leading-[2.5rem] font-semibold max-w-[284px]">
             {t.home.heroHeading}

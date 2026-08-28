@@ -37,7 +37,7 @@ export default function HomeCards() {
   }
 
   return (
-    <div className="flex flex-col gap-2 px-5 py-3 bg-canvas">
+    <div className="flex flex-col gap-2 px-5 py-4 bg-canvas">
       <h2 className="text-heading-l text-ink">{t.home.exploreMuseum}</h2>
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">

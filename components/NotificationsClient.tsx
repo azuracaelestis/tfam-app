@@ -58,7 +58,7 @@ function AlertCard({ title, subtitle, value, onChange }: {
   onChange: (v: boolean) => void
 }) {
   return (
-    <div className="w-full flex items-center justify-between bg-white border border-[#d6d6d6] rounded-[16px] p-[18px]">
+    <div className="w-full flex items-center justify-between bg-white border border-hairline rounded-card p-[18px]">
       <div className="flex flex-col gap-[4px] w-[207px]">
         <span className="text-[16px] font-semibold text-black leading-normal">{title}</span>
         <div className="text-[13px] font-normal text-black leading-normal">{subtitle}</div>
@@ -89,7 +89,7 @@ export default function NotificationsClient() {
     <div className="min-h-screen bg-white flex flex-col font-noto">
 
       {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white h-[47px] px-[18px] flex items-center shrink-0">
+      <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-center shrink-0">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
@@ -101,11 +101,11 @@ export default function NotificationsClient() {
       </header>
 
       {/* Content */}
-      <div className="flex flex-col gap-[24px] px-[15px] pt-[16px] pb-[69px]">
+      <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[69px]">
 
         {/* Alert Types */}
         <div className="flex flex-col gap-[12px]">
-          <p className="text-[20px] font-medium text-black leading-normal">{t.notifications.alertTypes}</p>
+          <p className="text-heading-l text-ink">{t.notifications.alertTypes}</p>
           <div className="flex flex-col gap-[12px]">
             <AlertCard
               title={t.notifications.exhibitionAlerts}
@@ -135,8 +135,8 @@ export default function NotificationsClient() {
 
         {/* Your Interests */}
         <div className="flex flex-col gap-[12px]">
-          <p className="text-[20px] font-medium text-black leading-normal">{t.notifications.yourInterests}</p>
-          <div className="border border-[#d6d6d6] rounded-[16px] p-[18px] flex flex-col gap-[12px]">
+          <p className="text-heading-l text-ink">{t.notifications.yourInterests}</p>
+          <div className="border border-hairline rounded-card p-[18px] flex flex-col gap-[12px]">
             <p className="text-[16px] font-semibold text-black w-[260px] leading-normal">
               {t.notifications.interestsDesc}
             </p>
@@ -173,7 +173,7 @@ export default function NotificationsClient() {
 
               {/* Inline picker */}
               {pickerOpen && available.length > 0 && (
-                <div className="border border-[#d6d6d6] rounded-[12px] overflow-hidden">
+                <div className="border border-hairline rounded-card overflow-hidden">
                   {available.map((cat, i) => (
                     <button
                       key={cat}
@@ -190,7 +190,7 @@ export default function NotificationsClient() {
         </div>
 
         {/* Info banner */}
-        <div className="bg-[#ebf6ff] rounded-[16px] p-[18px] flex gap-[10px] items-start">
+        <div className="bg-[#ebf6ff] rounded-card p-[18px] flex gap-[10px] items-start">
           <InfoIcon />
           <p className="text-[14px] font-normal text-black leading-normal">
             {t.notifications.permissionBanner}

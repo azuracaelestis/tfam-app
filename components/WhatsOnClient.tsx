@@ -179,7 +179,7 @@ export default function WhatsOnClient() {
       </header>
 
       {/* ── Carousel ── */}
-      <div className="shrink-0 mb-[22px]">
+      <div className="shrink-0 mb-[32px]">
         <ExhibitionCarousel exhibitions={featured} onOpen={setOpenId} lang={lang} />
       </div>
 

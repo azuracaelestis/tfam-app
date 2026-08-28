@@ -24,7 +24,7 @@ export default function HomeFeaturedExhibition() {
   const meta = `${ex.floor} ${ex.gallery} • ${t.home.untilPrefix} ${untilDate(ex.endDate!, lang)}`
 
   return (
-    <div className="flex flex-col gap-2 px-5 py-3 bg-canvas">
+    <div className="flex flex-col gap-2 px-5 py-4 bg-canvas">
       <div className="flex items-center justify-between">
         <h2 className="text-heading-l text-ink">{t.home.todayAtMuseum}</h2>
         <button
@@ -49,7 +49,7 @@ export default function HomeFeaturedExhibition() {
             <span className="text-label-m text-ink-secondary truncate tracking-[-0.322px]">{meta}</span>
           </div>
           <p className="text-label-m text-ink-secondary line-clamp-2">
-            {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
+            {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : 'Exploring transformation in contemporary art.'}
           </p>
         </div>
       </button>

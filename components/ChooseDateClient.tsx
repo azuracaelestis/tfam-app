@@ -138,7 +138,7 @@ export default function ChooseDateClient({
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
       {/* Sticky header */}
-      <header className="sticky top-0 z-10 bg-white h-[47px] px-[18px] flex items-center shrink-0">
+      <header className="sticky top-0 z-10 bg-white h-[47px] px-5 flex items-center shrink-0">
         <button
           onClick={() => router.push('/activities')}
           className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
@@ -150,7 +150,7 @@ export default function ChooseDateClient({
       </header>
 
       {/* Main content */}
-      <div className="flex flex-col gap-[36px] px-[18px] pt-[16px]">
+      <div className="flex flex-col gap-[36px] px-5 pt-[16px]">
 
         {/* Activity summary card */}
         <div className="bg-[#ececec] border border-[#ddd] rounded-[8px] px-[24px] py-[12px] flex flex-col gap-[4px]">
