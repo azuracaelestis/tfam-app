@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'motion/react'
 import AudioInputSheet from './AudioInputSheet'
 import ExhibitionImageSlider from './ExhibitionImageSlider'
 import ExhibitionDetailContent from './ExhibitionDetailContent'
@@ -17,7 +16,7 @@ function ChevronLeftIcon() {
   )
 }
 
-export default function ExhibitionDetailClient({ ex, fromCard }: { ex: Exhibition; fromCard: boolean }) {
+export default function ExhibitionDetailClient({ ex }: { ex: Exhibition }) {
   const router = useRouter()
   const t = useTranslation()
   const [lang] = useLanguage()
@@ -33,13 +32,24 @@ export default function ExhibitionDetailClient({ ex, fromCard }: { ex: Exhibitio
   const handleQR     = () => router.push('/play?code=1001')
   const handleSeeOnMap = () => window.open('https://www.google.com/maps/search/?api=1&query=Taipei+Fine+Arts+Museum', '_blank')
 
+  // Prefer true back-navigation so the transition mirrors however this
+  // screen was entered; only fall back to a literal push when there's no
+  // in-app history to go back to (e.g. a direct deep link).
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+    } else {
+      router.push('/whats-on')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
-          onClick={() => router.push('/whats-on')}
+          onClick={handleBack}
           className="flex items-center gap-3"
           aria-label={t.exhibitionDetail.back}
         >
@@ -48,13 +58,8 @@ export default function ExhibitionDetailClient({ ex, fromCard }: { ex: Exhibitio
         </button>
       </header>
 
-      {/* ── Content — zoom-in only when arriving from a card tap ── */}
-      <motion.div
-        initial={fromCard ? { opacity: 0, scale: 0.90 } : false}
-        animate={fromCard ? { opacity: 1, scale: 1 } : undefined}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-        className="flex flex-col flex-1"
-      >
+      {/* ── Content ── */}
+      <div className="flex flex-col flex-1">
         <ExhibitionImageSlider images={ex.images} alt={ex.title} />
         <ExhibitionDetailContent
           ex={ex}
@@ -62,7 +67,7 @@ export default function ExhibitionDetailClient({ ex, fromCard }: { ex: Exhibitio
           onStartAudio={() => setSheetOpen(true)}
           onSeeOnMap={handleSeeOnMap}
         />
-      </motion.div>
+      </div>
 
       {/* ── Audio sheet — identical wiring to HomeClient ── */}
       <AudioInputSheet

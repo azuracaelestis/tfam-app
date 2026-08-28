@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
+import { MotionConfig } from "motion/react";
 import "./globals.css";
 import PageTransitionWrapper from "@/components/PageTransitionWrapper";
 import BottomNav from "@/components/BottomNav";
@@ -36,8 +37,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${notoSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-          <PageTransitionWrapper>{children}</PageTransitionWrapper>
-          <BottomNav />
+          <MotionConfig reducedMotion="user">
+            <PageTransitionWrapper>{children}</PageTransitionWrapper>
+            <BottomNav />
+          </MotionConfig>
         </body>
     </html>
   );

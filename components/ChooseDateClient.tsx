@@ -77,6 +77,17 @@ export default function ChooseDateClient({
   const [lang] = useLanguage()
   const locale = getLocale(lang)
   const now = new Date()
+
+  // Prefer true back-navigation so the transition mirrors however this
+  // screen was entered; only fall back to a literal push when there's no
+  // in-app history to go back to (e.g. a direct deep link).
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+    } else {
+      router.push('/activities')
+    }
+  }
   const todayIso = toIso(now.getFullYear(), now.getMonth(), now.getDate())
 
   const activitySchedule = scheduledDates[activityId] ?? []
@@ -140,7 +151,7 @@ export default function ChooseDateClient({
       {/* Sticky header */}
       <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
-          onClick={() => router.push('/activities')}
+          onClick={handleBack}
           className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
           aria-label="Back to Activities"
         >

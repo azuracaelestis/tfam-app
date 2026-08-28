@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { getArtworkByCode, getNextArtwork, type Language } from '@/lib/artworks'
 import { useMockAudio } from '@/hooks/useMockAudio'
 import { useOnTransitionComplete } from './PageTransitionWrapper'
+import { DEEPER } from '@/lib/motion'
 import { useTranslation } from '@/lib/useTranslation'
 import AudioControls from './AudioControls'
 import ProgressBar from './ProgressBar'
@@ -94,13 +95,17 @@ export default function PlayClient({ code }: { code: string }) {
   })
 
   // Fallback: AnimatePresence initial={false} skips animation on direct URL
-  // navigation, so onAnimationComplete never fires. Start after 400ms in that case.
+  // navigation, so onAnimationComplete never fires. Start shortly after the
+  // slide-in transition would have completed in that case. /play is only ever
+  // entered via a DEEPER or BACK navigation (both timed off DEEPER), so that's
+  // the duration to key off — never PEER's, and never a retyped literal.
+  const AUDIO_FALLBACK_MS = DEEPER.duration * 1000 + 50
   useEffect(() => {
     const id = setTimeout(() => {
       if (!artwork || audioStartedRef.current) return
       audioStartedRef.current = true
       play()
-    }, 400)
+    }, AUDIO_FALLBACK_MS)
     return () => clearTimeout(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
