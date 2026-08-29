@@ -134,3 +134,98 @@ input[type="range"] {
     animation-delay:    0s !important;
   }
 }
+
+/* ============================================================
+   TFAM splash -> Home handoff (components/SplashScreen.tsx)
+
+   Live prototype: `data-splash="pending"` is set on <html> by a
+   beforeInteractive script (app/layout.tsx) before hydration, on every
+   load. The solid-black cover below keys off that attribute alone, with no
+   JS involvement, so a slow script can never flash Home underneath.
+   ============================================================ */
+html[data-splash="pending"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.tfam-splash-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000;
+  transition: background-color 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tfam-splash-root.splash-lifting {
+  background: #fff;
+}
+.tfam-splash-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* the settled mark, handed off from the canvas so the sink is pure CSS */
+.tfam-splash-sunk {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.tfam-splash-sunk.on {
+  opacity: 1;
+}
+.tfam-splash-sunk.anim {
+  transition:
+    transform 0.58s cubic-bezier(0.32, 0, 0.24, 1),
+    opacity 0.46s cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ============================================================
+   HOME ENTRANCE -- element by element.
+   Rows are tagged `.splash-rise` by the sections that use them; --i is
+   assigned at runtime (SplashScreen.tsx) from actual DOM order, never
+   hand-written here. The opacity:0 default only applies while
+   data-splash="pending" is present (every load, in this prototype) — if
+   that attribute is ever absent, rows render at full opacity immediately
+   with zero JS involvement.
+   ============================================================ */
+.splash-rise {
+  opacity: 1;
+  transform: none;
+}
+html[data-splash="pending"] .splash-rise {
+  opacity: 0;
+  transform: translateY(14px);
+}
+html[data-splash="pending"].splash-entering .splash-rise {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.34s cubic-bezier(0.2, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.25, 1);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-splash="pending"] .splash-rise {
+    opacity: 1;
+    transform: none;
+  }
+  html[data-splash="pending"].splash-entering .splash-rise {
+    transition: none;
+    transition-delay: 0s;
+  }
+  .tfam-splash-sunk.anim {
+    transition: opacity 0.2s linear;
+  }
+}

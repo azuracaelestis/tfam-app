@@ -48,7 +48,7 @@ export default function HomeClient() {
       >
 
       {/* ── Top bar: TFAM mark left / "You're here" right ── */}
-      <header className="h-[60px] px-5 flex items-center justify-between shrink-0 bg-white">
+      <header className="splash-rise h-[60px] px-5 flex items-center justify-between shrink-0 bg-white">
         <img
           src="/Taipei_Fine_Arts_Museum_logo.svg"
           width={160}
@@ -66,7 +66,7 @@ export default function HomeClient() {
       </header>
 
       {/* ── Hero: full-bleed museum photo, fading into the canvas below ── */}
-      <section className="relative shrink-0 w-[402px] h-[241px] overflow-hidden">
+      <section className="splash-rise relative shrink-0 w-[402px] h-[241px] overflow-hidden">
         <Image src="/homepage2.png" width={402} height={241} className="w-[402px] h-[241px] object-cover" alt="" preload />
         <div
           className="absolute inset-0"
@@ -77,17 +77,17 @@ export default function HomeClient() {
       {/* ── Welcome copy + primary CTA — normal flow below the photo ── */}
       <section className="relative flex flex-col gap-3 px-5 pt-3 pb-4 bg-canvas -mt-8">
         <div className="flex flex-col gap-2 text-ink">
-          <h2 className="text-[32px] leading-[2.5rem] font-semibold max-w-[284px]">
+          <h2 className="splash-rise text-[32px] leading-[2.5rem] font-semibold max-w-[284px]">
             {t.home.heroHeading}
           </h2>
-          <p className="text-body-l text-ink-secondary">
+          <p className="splash-rise text-body-l text-ink-secondary">
             {t.home.heroSubtitle}
           </p>
         </div>
 
         <button
           onClick={() => setSheetOpen(true)}
-          className="flex items-center justify-center gap-1.5 w-full h-[48px] rounded-pill bg-ink text-white text-label-l"
+          className="splash-rise flex items-center justify-center gap-1.5 w-full h-[48px] rounded-pill bg-ink text-white text-label-l"
         >
           <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
           {t.home.startAudioGuide}

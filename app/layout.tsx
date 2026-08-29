@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import { MotionConfig } from "motion/react";
+import Script from "next/script";
 import "./globals.css";
 import PageTransitionWrapper from "@/components/PageTransitionWrapper";
 import BottomNav from "@/components/BottomNav";
+import SplashScreen from "@/components/SplashScreen";
 import { ExhibitionOverlayProvider } from "@/contexts/ExhibitionOverlayContext";
 
 const geistSans = Geist({
@@ -35,9 +37,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // The splash-gate script (below) sets data-splash="pending" on this
+      // element before hydration, intentionally diverging from the
+      // server-rendered markup — the same documented exception React's
+      // suppressHydrationWarning exists for (theme-flash-prevention scripts
+      // use this exact pattern).
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${notoSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+          {/* Live prototype: the splash plays on every load, no persisted
+              "seen" flag. This still has to run pre-hydration, so the
+              solid-black CSS cover (app/globals.css) or a flash of visible
+              Home is never a race. */}
+          <Script id="splash-gate" strategy="beforeInteractive">
+            {`document.documentElement.setAttribute('data-splash','pending');`}
+          </Script>
+          <SplashScreen />
           <MotionConfig reducedMotion="user">
             {/* BottomNav must be a descendant of the Provider — it consumes
                 useExhibitionOverlay() to close the overlay before navigating

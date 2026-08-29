@@ -29,7 +29,7 @@ export default function HomeFeaturedExhibition() {
 
   return (
     <div className="flex flex-col gap-2 px-5 py-4 bg-canvas">
-      <div className="flex items-center justify-between">
+      <div className="splash-rise flex items-center justify-between">
         <h2 className="text-heading-l text-ink">{t.home.todayAtMuseum}</h2>
         <button
           onClick={() => router.push('/whats-on')}
@@ -42,7 +42,7 @@ export default function HomeFeaturedExhibition() {
 
       <button
         onClick={() => open(ex.id, 'home')}
-        className="bg-white border border-hairline rounded-card p-3 flex gap-3 items-center text-left w-full"
+        className="splash-rise bg-white border border-hairline rounded-card p-3 flex gap-3 items-center text-left w-full"
       >
         <motion.div layoutId={`hero-home-${ex.id}`} transition={LIFT} className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
           <Image src={ex.image} alt={ex.title} fill sizes="121px" className="object-cover" />

@@ -50,7 +50,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 h-[69px] bg-white border-t border-border-card flex items-center justify-between px-3 z-40"
+      className="splash-rise fixed bottom-0 left-0 right-0 h-[69px] bg-white border-t border-border-card flex items-center justify-between px-3 z-40"
       aria-label="Main navigation"
     >
       {ITEMS.map((item, i) => {

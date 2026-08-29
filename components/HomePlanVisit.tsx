@@ -12,10 +12,10 @@ export default function HomePlanVisit() {
 
   return (
     <div className="flex flex-col gap-2 px-5 py-4 bg-canvas">
-      <h2 className="text-heading-l text-ink">{t.home.planYourVisit}</h2>
+      <h2 className="splash-rise text-heading-l text-ink">{t.home.planYourVisit}</h2>
       <button
         onClick={() => router.push('/activities')}
-        className="bg-white border border-hairline rounded-card shadow-[0px_0px_2.5px_rgba(0,0,0,0.1)] p-2 flex items-center justify-between gap-3 w-full text-left"
+        className="splash-rise bg-white border border-hairline rounded-card shadow-[0px_0px_2.5px_rgba(0,0,0,0.1)] p-2 flex items-center justify-between gap-3 w-full text-left"
       >
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative shrink-0 size-[45px] rounded-xl overflow-hidden bg-hairline">
