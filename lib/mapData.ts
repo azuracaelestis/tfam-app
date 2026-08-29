@@ -38,7 +38,17 @@ export type FloorData = {
     label: string
     subtext: string
     stops: string[]           // ordered room ids
+    /** Number shown on the first stop's badge (rest count up from it) — 1F
+     *  continues on B1 numbering conceptually but has no chips before it, so
+     *  starts at 1; 2F continues 1F's three stops, starting at 4. */
+    startNumber?: number
   }
+  /** Center point, in the mapImage's viewBox coordinate space, for each
+   *  suggestedRoute stop's numbered badge — only needed for a floor whose
+   *  map art has no such numbers already baked in (1F's are flattened
+   *  vector text baked into map-1f.svg; 2F has none, so it's rendered here
+   *  via RouteNumberBadge instead). Per Figma node 238:1670. */
+  routeMarkers?: Partial<Record<string, { x: number; y: number }>>
   /** Exported floor-plan illustration (room layout, labels, icons, and the
    *  Offline badge are all baked into this image) — width/height are its
    *  native SVG viewBox size, used to convert each room's `rect` into
@@ -49,11 +59,15 @@ export type FloorData = {
    *  mutually exclusive with the other amenities (only the active chip's
    *  marker renders). Per Figma nodes 229:967 (toilet) / 229:881 (locker). */
   amenityMarkers?: Partial<Record<AmenityType, { x: number; y: number }>>
-  /** An amenity icon baked permanently into mapImage (e.g. B1's Cafe icon+
-   *  label, always visible with no chip tapped) — `rect` covers just the
-   *  icon glyph, in the mapImage's viewBox space, so it can be masked with a
-   *  plain white cover whenever a *different* amenity chip is active. */
-  bakedAmenityIcon?: { amenity: AmenityType; rect: [number, number, number, number] }
+  /** The amenity marker shown when no chip is tapped (e.g. B1's Cafe, always
+   *  visible as a landmark) — must have a matching `amenityMarkers` entry.
+   *  Only use this for a spot with no baked art of its own (map-b1.svg has
+   *  no Cafe glyph — this marker is the only thing that ever draws it, in
+   *  every state), since there'd otherwise be no clean way to hide the baked
+   *  version when a different chip is tapped without a visible seam. A floor
+   *  whose default landmark *is* baked into its art (1F's Locker) should
+   *  leave it alone instead — omit this field and don't try to replace it. */
+  defaultAmenityMarker?: AmenityType
 }
 
 export const FLOORS: FloorData[] = [
@@ -64,15 +78,15 @@ export const FLOORS: FloorData[] = [
     gridRows: 3,
     amenityChips: ['toilet', 'cafe', 'locker'],
     mapImage: { src: '/map/map-b1.svg', width: 368, height: 461 },
-    // Cafe's marker sits over the same spot as the baked-in glyph it
-    // replaces (see bakedAmenityIcon below) — kept at the same 33x33 size as
-    // toilet/locker so all three amenity badges read consistently.
+    // map-b1.svg has no Cafe glyph baked in (removed — see defaultAmenityMarker
+    // below) — this is the only thing that ever draws it, matching the spot
+    // it used to occupy in the source art.
     amenityMarkers: {
       toilet: { x: 121, y: 340 },
       cafe: { x: 187, y: 106 },
       locker: { x: 302.5, y: 327 },
     },
-    bakedAmenityIcon: { amenity: 'cafe', rect: [162, 81, 50, 50] },
+    defaultAmenityMarker: 'cafe',
     rooms: [
       { id: 'cafe',          name: 'Cafe',          type: 'cafe',      amenity: 'cafe',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [23.5, 65.5, 324, 118] },
       { id: 'children-area', name: 'Children Area', type: 'children',                     col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [22.5, 201.5, 214, 117] },
@@ -95,6 +109,16 @@ export const FLOORS: FloorData[] = [
       stops: ['gallery-b', 'gallery-a', 'gallery-c'],
     },
     mapImage: { src: '/map/map-1f.svg', width: 368, height: 467 },
+    // Toilet sits at the left side of the Corridor/Gallery C boundary, per
+    // feedback; Locker at the right side, over the spot its own glyph used
+    // to occupy (now removed from map-1f.svg, like B1's Cafe — see
+    // defaultAmenityMarker's doc above — so it disappears cleanly on tap
+    // instead of the earlier always-visible-landmark compromise).
+    amenityMarkers: {
+      toilet: { x: 62, y: 357 },
+      locker: { x: 137.5, y: 359.5 },
+    },
+    defaultAmenityMarker: 'locker',
     rooms: [
       { id: 'gallery-a', name: 'Gallery A', type: 'gallery', exhibitionId: 'your-curious-journey',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [20, 60, 328, 119] },
       { id: 'gallery-c', name: 'Gallery C', type: 'gallery', exhibitionId: 'tfam-screening-project', col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [20, 197, 157, 140.7] },
@@ -112,6 +136,26 @@ export const FLOORS: FloorData[] = [
     amenityChips: ['toilet', 'cafe', 'locker'],
     disabledAmenityChips: ['cafe', 'locker'],
     mapImage: { src: '/map/map-2f.svg', width: 368, height: 461 },
+    // Toilet is 2F's only enabled chip, at the same relative Corridor-left
+    // spot as 1F's Toilet. No defaultAmenityMarker — per feedback, it must
+    // stay hidden until the chip is actually tapped, not shown up front.
+    amenityMarkers: {
+      toilet: { x: 72.5, y: 343 },
+    },
+    suggestedRoute: {
+      label: 'Suggested first visit route',
+      subtext: '~1.5 hours · 3 stops across second floor',
+      stops: ['gallery-a', 'gallery-c', 'gallery-b'],
+      startNumber: 4,
+    },
+    // Positions read from Figma node 238:1670's "Route marker" instances —
+    // map-2f.svg has no baked numbers of its own (unlike 1F), so these are
+    // rendered via RouteNumberBadge instead.
+    routeMarkers: {
+      'gallery-a': { x: 28, y: 61 },
+      'gallery-c': { x: 27, y: 226 },
+      'gallery-b': { x: 216, y: 61 },
+    },
     rooms: [
       { id: 'gallery-a', name: 'Gallery A',        type: 'gallery', exhibitionId: 'visions-of-tomorrow', col: 1, row: 1, colSpan: 3, rowSpan: 1, rect: [21.5, 60.5, 169, 142] },
       { id: 'gallery-b', name: 'Gallery B',        type: 'gallery', exhibitionId: 'forms-in-motion',     col: 4, row: 1, colSpan: 3, rowSpan: 1, amenityIcon: 'cafe', rect: [206.5, 60.5, 138, 142] },

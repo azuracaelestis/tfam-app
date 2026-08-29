@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { FLOORS, AMENITY_LABELS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
+import { getById } from '@/lib/exhibitions'
 import { STATE } from '@/lib/motion'
 import BottomNav from './BottomNav'
+import GalleryPreviewSheet from './GalleryPreviewSheet'
 
 // ── Floor Switcher ────────────────────────────────────────────────────────────
 //
@@ -90,6 +92,10 @@ function AmenityChips({
                 height={AMENITY_ICON_SIZE[chip] ?? 14}
                 alt=""
                 aria-hidden="true"
+                // Icons are opaque black-stroke assets (no currentColor), so
+                // disabled state is faked with opacity to match the disabled
+                // label's #ddd over this chip's white background.
+                className={isDisabled ? 'opacity-[0.13]' : undefined}
               />
             )}
             {AMENITY_LABELS[chip]}
@@ -173,10 +179,26 @@ function RoomHotspot({
   )
 }
 
-// Circular icon badge marking where an active amenity chip's facility sits on
-// the map — mutually exclusive per floor.amenityMarkers, replaces the old
-// red-ring room highlight (see lib/mapData.ts amenityMarkers doc).
-function AmenityMarker({
+// Circular icon badge marking where the active amenity chip's facility sits
+// on the map — mutually exclusive per floor.amenityMarkers, replaces the old
+// red-ring room highlight (see lib/mapData.ts amenityMarkers doc). Sized and
+// positioned to match the badge already baked into 1F's map art (r=16 circle
+// = 32px, ~14px-tall glyph — read directly from map-1f.svg's source, not
+// eyeballed from a screenshot). Each icon keeps its own native aspect ratio
+// at that ~14px height rather than being forced into a square, which was
+// making Toilet (11:15 native) render visibly bulkier than Locker (14:16).
+// B1's map art has no baked Cafe glyph of its own (removed from map-b1.svg)
+// — this badge is the only thing rendering it, in every state, via
+// `defaultAmenityMarker`.
+const AMENITY_BADGE_SIZE = 32
+const AMENITY_BADGE_ICON_DIMS: Record<AmenityType, { width: number; height: number }> = {
+  toilet: { width: 10, height: 14 },
+  cafe: { width: 16, height: 14 },
+  locker: { width: 12, height: 14 },
+  'changing-room': { width: 14, height: 14 },
+}
+
+function AmenityBadge({
   amenity,
   position,
   imageWidth,
@@ -190,43 +212,53 @@ function AmenityMarker({
   const style: React.CSSProperties = {
     left: `${(position.x / imageWidth) * 100}%`,
     top: `${(position.y / imageHeight) * 100}%`,
+    width: AMENITY_BADGE_SIZE,
+    height: AMENITY_BADGE_SIZE,
     transform: 'translate(-50%, -50%)',
   }
-  // Cafe's badge matches the size of the baked-in glyph it replaces;
-  // toilet/locker are scaled down 10% off that reference per feedback.
-  const badgeSize = amenity === 'cafe' ? 40 : 36
-  const iconSize = amenity === 'cafe' ? 22 : 20
+  const iconDims = AMENITY_BADGE_ICON_DIMS[amenity]
   return (
     <div
       className="absolute z-10 flex items-center justify-center rounded-full bg-[#f2f2f2] border border-[#ddd] pointer-events-none"
-      style={{ ...style, width: badgeSize, height: badgeSize }}
+      style={style}
       aria-hidden="true"
     >
-      <img src={`/images/maps/${amenity}.svg`} width={iconSize} height={iconSize} alt="" />
+      <img src={`/images/maps/${amenity}.svg`} width={iconDims.width} height={iconDims.height} alt="" />
     </div>
   )
 }
 
-// Covers a baked-in amenity icon (e.g. B1's always-visible Cafe glyph) with a
-// plain white patch while a different amenity chip is active — the icon
-// isn't a DOM node we can toggle since it's drawn into the SVG artwork.
-function BakedIconMask({
-  rect,
+// Numbered suggested-route stop marker (black circle, bold white number).
+// 1F's are baked directly into map-1f.svg (flattened vector text from the
+// original export) — this component exists only for floors like 2F whose
+// source art has no such baked numbers, driven by floor.routeMarkers.
+function RouteNumberBadge({
+  number,
+  position,
   imageWidth,
   imageHeight,
 }: {
-  rect: [number, number, number, number]
+  number: number
+  position: { x: number; y: number }
   imageWidth: number
   imageHeight: number
 }) {
-  const [x, y, w, h] = rect
   const style: React.CSSProperties = {
-    left: `${(x / imageWidth) * 100}%`,
-    top: `${(y / imageHeight) * 100}%`,
-    width: `${(w / imageWidth) * 100}%`,
-    height: `${(h / imageHeight) * 100}%`,
+    left: `${(position.x / imageWidth) * 100}%`,
+    top: `${(position.y / imageHeight) * 100}%`,
+    width: 30,
+    height: 32,
+    transform: 'translate(-50%, -50%)',
   }
-  return <div className="absolute bg-white rounded-full pointer-events-none" style={style} aria-hidden="true" />
+  return (
+    <div
+      className="absolute z-10 flex items-center justify-center rounded-full bg-[#0a0a0a] pointer-events-none"
+      style={style}
+      aria-hidden="true"
+    >
+      <span className="text-[16px] font-bold text-white">{number}</span>
+    </div>
+  )
 }
 
 function FloorPlan({
@@ -262,18 +294,21 @@ function FloorPlan({
         />
       ))}
 
-      {/* The baked-in Cafe glyph renders at its own fixed (smaller) size, so
-          it's always masked and replaced by our own 33x33 marker below —
-          keeps every amenity badge visually consistent. */}
-      {floor.bakedAmenityIcon && (
-        <BakedIconMask rect={floor.bakedAmenityIcon.rect} imageWidth={width} imageHeight={height} />
-      )}
+      {floor.suggestedRoute?.stops.map((roomId, i) => {
+        const position = floor.routeMarkers?.[roomId]
+        const number = (floor.suggestedRoute!.startNumber ?? 1) + i
+        return position ? (
+          <RouteNumberBadge key={roomId} number={number} position={position} imageWidth={width} imageHeight={height} />
+        ) : null
+      })}
 
+      {/* When no chip is tapped, a floor may still show one amenity marker
+          by default (B1's Cafe) — see FloorData.defaultAmenityMarker. */}
       {(() => {
-        const shownAmenity = activeAmenity ?? floor.bakedAmenityIcon?.amenity ?? null
+        const shownAmenity = activeAmenity ?? floor.defaultAmenityMarker ?? null
         const position = shownAmenity ? floor.amenityMarkers?.[shownAmenity] : undefined
         return shownAmenity && position ? (
-          <AmenityMarker amenity={shownAmenity} position={position} imageWidth={width} imageHeight={height} />
+          <AmenityBadge amenity={shownAmenity} position={position} imageWidth={width} imageHeight={height} />
         ) : null
       })()}
 
@@ -297,8 +332,10 @@ export default function MapClient() {
   const [activeFloorId, setActiveFloorId] = useState<string>('1F')
   const [activeAmenity, setActiveAmenity] = useState<AmenityType | null>(null)
   const [showRoute, setShowRoute] = useState(true)
+  const [previewId, setPreviewId] = useState<string | null>(null)
 
   const floor = FLOORS.find(f => f.id === activeFloorId) ?? FLOORS[1]
+  const previewExhibition = previewId ? getById(previewId) ?? null : null
 
   const handleFloorChange = (id: string) => {
     setActiveFloorId(id)
@@ -306,11 +343,19 @@ export default function MapClient() {
     setShowRoute(true)
   }
 
+  // Tapping a gallery opens a quick-peek sheet (slides up like the audio
+  // guide's AudioInputSheet) rather than jumping straight to the full
+  // ExhibitionOverlay — "More Info" inside it opens that instead.
   const handleRoomTap = (exhibitionId: string) => {
-    open(exhibitionId, 'map')
+    setPreviewId(exhibitionId)
   }
 
-  const showRouteBanner = activeFloorId === '1F' && !!floor.suggestedRoute && showRoute
+  const handleMoreInfo = () => {
+    if (previewId) open(previewId, 'map')
+    setPreviewId(null)
+  }
+
+  const showRouteBanner = !!floor.suggestedRoute && showRoute
 
   const captionText =
     activeFloorId === 'B1'
@@ -343,7 +388,7 @@ export default function MapClient() {
         onChange={setActiveAmenity}
       />
 
-      {/* Route banner (1F only) */}
+      {/* Route banner (any floor with a suggestedRoute) */}
       {showRouteBanner && floor.suggestedRoute && (
         <div className="mb-5">
           <RouteBanner
@@ -373,6 +418,13 @@ export default function MapClient() {
       )}
 
       <BottomNav />
+
+      <GalleryPreviewSheet
+        exhibition={previewExhibition}
+        open={previewId !== null}
+        onClose={() => setPreviewId(null)}
+        onMoreInfo={handleMoreInfo}
+      />
     </div>
   )
 }
