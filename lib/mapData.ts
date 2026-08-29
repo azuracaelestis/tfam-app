@@ -108,6 +108,15 @@ export const FLOORS: FloorData[] = [
       subtext: '~2 hours · 3 stops across first floor',
       stops: ['gallery-b', 'gallery-a', 'gallery-c'],
     },
+    // Positions read directly from the now-removed baked badges in
+    // map-1f.svg (each was a circle centered on these coordinates) before
+    // hiding the route stopped being able to erase them — rendered via
+    // RouteNumberBadge instead, same as 2F, so Hide can dismiss them too.
+    routeMarkers: {
+      'gallery-b': { x: 199, y: 205 },
+      'gallery-a': { x: 28, y: 67 },
+      'gallery-c': { x: 30, y: 205 },
+    },
     mapImage: { src: '/map/map-1f.svg', width: 368, height: 467 },
     // Toilet sits at the left side of the Corridor/Gallery C boundary, per
     // feedback; Locker at the right side, over the spot its own glyph used

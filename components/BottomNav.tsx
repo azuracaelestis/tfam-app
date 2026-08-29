@@ -1,8 +1,16 @@
 'use client'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
+import { motion } from 'motion/react'
 import { useTranslation } from '@/lib/useTranslation'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
+
+// Standalone timing for the active-tab indicator, not lib/motion.ts's STATE —
+// unlike the FloorSwitcher/Activities filter pills, a real route change is
+// happening underneath this (handled separately by PageTransitionWrapper's
+// R2 peer cross-dissolve), so it isn't the same relationship as those two
+// same-screen-state pills and shouldn't silently inherit their token.
+const INDICATOR_GLIDE = { duration: 0.22, ease: [0.3, 0.85, 0.3, 1] } as const
 
 const ITEMS = [
   { key: 'home',       icon: 'bottom-nav-home.svg',       w: 16, h: 17, href: '/' },
@@ -59,8 +67,10 @@ export default function BottomNav() {
         const inner = (
           <>
             {isActive && (
-              <span
+              <motion.span
+                layoutId="bottom-nav-indicator"
                 className="absolute top-0 left-1/2 -translate-x-1/2 h-1 w-[52px] bg-black rounded-full"
+                transition={INDICATOR_GLIDE}
                 aria-hidden="true"
               />
             )}

@@ -43,7 +43,7 @@ export default function HomeCards() {
         <div className="grid grid-cols-2 gap-3">
           {GRID_ITEMS.map((c) => item(c.label, c.icon, c.href))}
         </div>
-        {item(t.home.suggestedRoute, 'location.svg')}
+        {item(t.home.suggestedRoute, 'location.svg', '/map')}
       </div>
     </div>
   )

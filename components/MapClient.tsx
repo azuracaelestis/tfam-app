@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { FLOORS, AMENITY_LABELS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
 import { getById } from '@/lib/exhibitions'
@@ -139,15 +139,14 @@ function RouteBanner({
 
 // ── Floor Plan ────────────────────────────────────────────────────────────────
 //
-// The floor illustration (room layout, labels, icons, the Offline badge, and —
-// for 1F — the suggested-route step numbers) is now a single exported SVG per
-// floor (see lib/mapData.ts `mapImage`), not built from room data. Room data
-// still drives two things laid on top of it: invisible tap hotspots for
-// galleries (positioned via each room's `rect`, in the image's own coordinate
-// space, converted to percentages so they track the image at any render size)
-// and the amenity-highlight ring. Hiding the suggested route still dismisses
-// the banner text but can no longer erase the baked-in step numbers from the
-// image — a deliberate, minor trade-off of moving to a static illustration.
+// The floor illustration (room layout, labels, icons, the Offline badge) is a
+// single exported SVG per floor (see lib/mapData.ts `mapImage`), not built
+// from room data. Room data still drives things laid on top of it: invisible
+// tap hotspots for galleries (positioned via each room's `rect`, in the
+// image's own coordinate space, converted to percentages so they track the
+// image at any render size), the amenity-highlight ring, and the
+// suggested-route step numbers (via routeMarkers/RouteNumberBadge, on every
+// floor now — see that component's doc — so Hide can dismiss them cleanly).
 
 function RoomHotspot({
   room,
@@ -229,9 +228,17 @@ function AmenityBadge({
 }
 
 // Numbered suggested-route stop marker (black circle, bold white number).
-// 1F's are baked directly into map-1f.svg (flattened vector text from the
-// original export) — this component exists only for floors like 2F whose
-// source art has no such baked numbers, driven by floor.routeMarkers.
+// Every floor with a suggestedRoute drives these from floor.routeMarkers —
+// 1F's were originally baked directly into map-1f.svg (flattened vector
+// text from the original export), but that meant Hide couldn't dismiss
+// them, so they were removed from the source art in favor of this marker,
+// same as 2F.
+//
+// Faster and separate from STATE: the pins are secondary to the route
+// banner, not the primary thing being dismissed — they should read as
+// "also going," not compete with the banner's own 220ms collapse.
+const BADGE_FADE = { duration: 0.14, ease: 'linear' } as const
+
 function RouteNumberBadge({
   number,
   position,
@@ -264,10 +271,12 @@ function RouteNumberBadge({
 function FloorPlan({
   floor,
   activeAmenity,
+  showRoute,
   onRoomTap,
 }: {
   floor: FloorData
   activeAmenity: AmenityType | null
+  showRoute: boolean
   onRoomTap: (exhibitionId: string) => void
 }) {
   if (floor.disabled || !floor.mapImage) {
@@ -294,13 +303,23 @@ function FloorPlan({
         />
       ))}
 
-      {floor.suggestedRoute?.stops.map((roomId, i) => {
-        const position = floor.routeMarkers?.[roomId]
-        const number = (floor.suggestedRoute!.startNumber ?? 1) + i
-        return position ? (
-          <RouteNumberBadge key={roomId} number={number} position={position} imageWidth={width} imageHeight={height} />
-        ) : null
-      })}
+      <AnimatePresence>
+        {showRoute && floor.suggestedRoute?.stops.map((roomId, i) => {
+          const position = floor.routeMarkers?.[roomId]
+          const number = (floor.suggestedRoute!.startNumber ?? 1) + i
+          return position ? (
+            <motion.div
+              key={roomId}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={BADGE_FADE}
+            >
+              <RouteNumberBadge number={number} position={position} imageWidth={width} imageHeight={height} />
+            </motion.div>
+          ) : null
+        })}
+      </AnimatePresence>
 
       {/* When no chip is tapped, a floor may still show one amenity marker
           by default (B1's Cafe) — see FloorData.defaultAmenityMarker. */}
@@ -389,20 +408,30 @@ export default function MapClient() {
       />
 
       {/* Route banner (any floor with a suggestedRoute) */}
-      {showRouteBanner && floor.suggestedRoute && (
-        <div className="mb-5">
-          <RouteBanner
-            label={floor.suggestedRoute.label}
-            subtext={floor.suggestedRoute.subtext}
-            onHide={() => setShowRoute(false)}
-          />
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {showRouteBanner && floor.suggestedRoute && (
+          <motion.div
+            key="route-banner"
+            initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+            animate={{ height: 'auto', opacity: 1, marginBottom: 20 }}
+            exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+            transition={STATE}
+            style={{ overflow: 'hidden' }}
+          >
+            <RouteBanner
+              label={floor.suggestedRoute.label}
+              subtext={floor.suggestedRoute.subtext}
+              onHide={() => setShowRoute(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floor plan */}
       <FloorPlan
         floor={floor}
         activeAmenity={activeAmenity}
+        showRoute={showRoute}
         onRoomTap={handleRoomTap}
       />
 
