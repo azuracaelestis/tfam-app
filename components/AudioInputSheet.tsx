@@ -77,18 +77,29 @@ export default function AudioInputSheet({
       />
 
       {/* Sheet panel — always mounted, animate reacts to `open` (no
-          AnimatePresence) so this stays a plain animate-prop toggle. */}
+          AnimatePresence) so this stays a plain animate-prop toggle.
+          Fixed height (not content-driven) so the sheet reads as a
+          consistent portion of a phone viewport instead of growing to cover
+          the full screen. Sized so both modes' content fits without an
+          internal scroll — see the `shrink-0` note below for why that
+          matters more than just "make it tall enough". */}
       <motion.div
-        className="relative bg-white rounded-t-[32px] pt-6 pb-8 px-5 flex flex-col gap-6 font-noto"
+        className="relative bg-white rounded-t-[32px] pt-4 pb-6 px-5 flex flex-col gap-4 font-noto h-[650px] max-h-[75vh]"
         initial={{ y: '100%' }}
         animate={{ y: open ? 0 : '100%', transition: SHEET }}
       >
-        <CloseButton onClick={handleClose} className="self-end" />
+        <CloseButton onClick={handleClose} className="self-end shrink-0" />
 
         {/* Content assembles a beat after the panel — mode-switching (qr <->
-            manual) doesn't touch `open`, so it can't retrigger this. */}
+            manual) doesn't touch `open`, so it can't retrigger this.
+            `shrink-0` on every direct child below is load-bearing: without
+            it, flexbox's default min-height:auto + this wrapper's
+            overflow-y-auto silently COMPRESS children below their coded
+            size (e.g. an h-12 button rendering at half height) instead of
+            the wrapper actually scrolling. overflow-y-auto stays only as a
+            safety net for content that doesn't fit despite that. */}
         <motion.div
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-3 overflow-y-auto"
           initial={{ opacity: 0, y: 8 }}
           animate={{
             opacity: open ? 1 : 0,
@@ -99,13 +110,13 @@ export default function AudioInputSheet({
         {mode === 'qr' ? (
           <>
             {/* Header: icon + title + subtitle */}
-            <div className="flex flex-col items-center gap-3 w-full -mt-2">
+            <div className="flex flex-col items-center gap-2 w-full -mt-2 shrink-0">
               <div className="bg-icon-bg rounded-[8px] size-[54px] flex items-center justify-center">
                 <HeadphoneIcon />
               </div>
-              <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex flex-col items-center gap-2 text-center">
                 <h2 className="text-[20px] font-bold text-ink leading-normal">Audio Guide</h2>
-                <p className="text-body-l text-ink max-w-[260px]">
+                <p className="text-label-m text-ink max-w-[260px]">
                   Scan the QR code next to the artwork label to begin listening.
                 </p>
               </div>
@@ -122,27 +133,29 @@ export default function AudioInputSheet({
               transition={MODE}
               onClick={onQR}
               aria-label="Scan QR code"
-              className="relative bg-icon-bg rounded-[8px] size-[362px] mx-auto shrink-0"
+              className="relative bg-icon-bg rounded-[8px] size-[240px] mx-auto shrink-0"
             >
-              <img src="/qr-corner-frame.svg" alt="" className="absolute left-[32px] top-[40px] w-[291px] h-[41px]" />
+              <img src="/qr-corner-frame.svg" alt="" className="absolute left-[21px] top-[27px] w-[193px] h-[27px]" />
               <img
                 src="/qr-corner-frame.svg"
                 alt=""
-                className="absolute left-[32px] top-[284px] w-[291px] h-[41px] -scale-y-100"
+                className="absolute left-[21px] top-[188px] w-[193px] h-[27px] -scale-y-100"
               />
-              <div className="absolute left-[130px] top-[108px] bg-white rounded-2xl size-[103px] flex items-center justify-center">
-                <img src="/qr-scan-icon.svg" alt="" className="w-[68px] h-[68px]" />
+              <div className="absolute left-[86px] top-[72px] bg-white rounded-2xl size-[68px] flex items-center justify-center">
+                <img src="/qr-scan-icon.svg" alt="" className="w-[45px] h-[45px]" />
               </div>
-              <p className="absolute left-[70px] top-[226px] text-sm text-ink whitespace-nowrap">
+              <p className="absolute left-[46px] top-[150px] text-[9px] text-ink whitespace-nowrap">
                 Point your camera at the QR code
               </p>
             </motion.button>
 
-            {/* Enter code manually */}
-            <div className="flex flex-col gap-3 items-center w-full">
+            {/* Enter code manually — mt-3 adds 12px on top of the content
+                wrapper's own gap-3, so this section sits noticeably further
+                from the QR box than the header-to-QR spacing above it. */}
+            <div className="flex flex-col gap-2 items-center w-full shrink-0 mt-3">
               <button
                 onClick={() => setMode('manual')}
-                className="w-full h-12 rounded-pill bg-white border border-ink flex items-center justify-center gap-2 text-label-l text-ink"
+                className="w-full h-12 rounded-pill bg-white border border-ink flex items-center justify-center gap-2 text-label-l text-ink shrink-0"
               >
                 <HeadphoneIcon size={16} />
                 Enter code manually
@@ -155,11 +168,11 @@ export default function AudioInputSheet({
         ) : (
           <>
             {/* Header: icon + title + subtitle */}
-            <div className="flex flex-col items-center gap-3 w-full -mt-2">
+            <div className="flex flex-col items-center gap-2 w-full -mt-2 shrink-0">
               <div className="bg-icon-bg rounded-[8px] size-[54px] flex items-center justify-center">
                 <HeadphoneIcon />
               </div>
-              <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex flex-col items-center gap-2 text-center">
                 <h2 className="text-[20px] font-bold text-ink leading-normal">Audio Guide</h2>
                 <p className="text-label-m text-ink max-w-[260px]">
                   Find the number next to any artwork label and enter it below
@@ -168,8 +181,8 @@ export default function AudioInputSheet({
             </div>
 
             {/* Artwork Code input section */}
-            <div className="bg-white border border-hairline rounded-card h-[69px] flex items-center px-5 w-full">
-              <div className="flex items-center gap-8 flex-1">
+            <div className="bg-white border border-hairline rounded-card h-[69px] flex items-center px-5 w-full shrink-0">
+              <div className="flex items-center justify-center gap-8 flex-1">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <span key={i} className="text-[24px] font-semibold text-black w-6 text-center leading-none">
                     {i < code.length ? code[i] : '—'}
@@ -185,16 +198,22 @@ export default function AudioInputSheet({
               </motion.button>
             </div>
 
-            {/* Numpad */}
-            <Numpad onDigit={onDigit} onDelete={onDelete} />
+            {/* Numpad — sized down from its 60px/14px default so the whole
+                pad fits this sheet's fixed height alongside everything else,
+                without the wrapper needing to scroll. */}
+            <div className="shrink-0">
+              <Numpad onDigit={onDigit} onDelete={onDelete} keySize={42} gap={9} />
+            </div>
 
-            {/* Play button */}
+            {/* Play button — same h-12 as "Enter code manually" in QR mode,
+                deliberately kept in sync so the two primary actions read as
+                the same weight across modes. */}
             <motion.button
               layoutId="mode-player"
               transition={MODE}
               onClick={onPlay}
               disabled={code.length !== 4}
-              className="w-full h-12 rounded-pill bg-black text-white text-label-l flex items-center justify-center gap-2 disabled:opacity-40 transition-opacity"
+              className="w-full h-12 rounded-pill bg-black text-white text-label-l flex items-center justify-center gap-2 disabled:opacity-40 transition-opacity shrink-0"
             >
               <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
               Play audio guide
@@ -202,7 +221,7 @@ export default function AudioInputSheet({
 
             <button
               onClick={() => setMode('qr')}
-              className="text-xs text-ink-secondary text-center w-full"
+              className="text-xs text-ink-secondary text-center w-full shrink-0"
             >
               Back to QR scan
             </button>

@@ -299,8 +299,17 @@ function FloorPlan({
   const { src, width, height } = floor.mapImage
 
   return (
-    <div className="relative mx-5" style={{ aspectRatio: `${width} / ${height}` }}>
-      <img src={src} alt={`${floor.label} floor plan`} className="absolute inset-0 w-full h-full" />
+    // The floor plan sizes this box, rather than the box sizing the image via
+    // `aspect-ratio`. WebKit ignores aspect-ratio on a block flex item inside
+    // a column flex container (measured: it stretched this box to 510px tall
+    // where the ratio calls for 459px), and a floor SVG then scaled itself to
+    // that wrong height — overflowing ~40px off the right edge on iOS Safari.
+    // Letting the in-flow image dictate the height removes that whole class of
+    // engine disagreement; overflow-hidden is the belt-and-braces guarantee.
+    // Every overlay below positions in percentages, so they still track the
+    // image exactly at any render size.
+    <div className="relative mx-5 overflow-hidden">
+      <img src={src} alt={`${floor.label} floor plan`} width={width} height={height} className="block w-full h-auto" />
 
       {floor.rooms.map(room => (
         <RoomHotspot

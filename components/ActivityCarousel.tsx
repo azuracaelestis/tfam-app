@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState, useLayoutEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, animate } from 'motion/react'
@@ -14,8 +14,9 @@ import { LIFT } from '@/lib/motion'
 
 const CARD_W      = 262
 const CARD_GAP    = 8
-const CARD_STRIDE = CARD_W + CARD_GAP
-const LEFT_INSET  = 20
+const CARD_STRIDE = CARD_W + CARD_GAP   // 270 — translateX per card step
+const LEFT_INSET  = 20                  // CSS padding-left on the track
+const RIGHT_INSET = 20                  // CSS padding-right on the track — mirrors LEFT_INSET
 
 const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
 const SWIPE_OFFSET   = CARD_STRIDE * 0.3
@@ -27,9 +28,25 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
   const [lang] = useLanguage()
   const [activeIndex, setActiveIndex] = useState(0)
   const trackX = useMotionValue(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerW, setContainerW] = useState(0)
+
+  useLayoutEffect(() => {
+    if (containerRef.current) setContainerW(containerRef.current.offsetWidth)
+  }, [])
+
+  // Scrolling a flat `index * CARD_STRIDE` overshoots once the track's end is
+  // already on screen — the last card would sit left-aligned with a wide gap
+  // of dead space beside it. Clamping to the track's real overflow parks the
+  // final card against RIGHT_INSET instead, mirroring LEFT_INSET on the first
+  // card. Same treatment as ExhibitionCarousel's track.
+  const trackContentWidth = LEFT_INSET + activities.length * CARD_W + (activities.length - 1) * CARD_GAP + RIGHT_INSET
+  const maxScroll = Math.max(trackContentWidth - containerW, 0)
+
+  const targetFor = (index: number) => -Math.min(index * CARD_STRIDE, maxScroll)
 
   const snapToCard = (index: number) => {
-    animate(trackX, -index * CARD_STRIDE, SNAP_SPRING)
+    animate(trackX, targetFor(index), SNAP_SPRING)
     setActiveIndex(index)
   }
 
@@ -46,12 +63,12 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden">
+      <div ref={containerRef} className="overflow-hidden">
         <motion.div
           className="flex gap-2"
-          style={{ x: trackX, paddingLeft: LEFT_INSET, paddingRight: LEFT_INSET }}
+          style={{ x: trackX, paddingLeft: LEFT_INSET, paddingRight: RIGHT_INSET }}
           drag="x"
-          dragConstraints={{ left: -(activities.length - 1) * CARD_STRIDE, right: 0 }}
+          dragConstraints={{ left: -maxScroll, right: 0 }}
           dragElastic={0.05}
           dragMomentum={false}
           onDragEnd={handleDragEnd}

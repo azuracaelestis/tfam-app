@@ -12,6 +12,13 @@ import { useLanguage } from '@/lib/useLanguage'
 import { translateTag } from '@/lib/translateTag'
 import { STATE, LIFT } from '@/lib/motion'
 
+// Same spring as What's On's tab pill (WhatsOnClient.tsx) and the carousels'
+// snap-to-card settle (ExhibitionCarousel.tsx, ActivityCarousel.tsx) — this
+// filter pill has no swipeable track to read its position off of the way
+// What's On's does, but tapping between filters should still feel like the
+// same physical object, not a different law.
+const SNAP_SPRING = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
+
 // ── List card ──────────────────────────────────────────────────────────────────
 
 function ActivityListCard({ activity: a, bookThis, lang, t }: {
@@ -101,7 +108,7 @@ export default function ActivitiesClient() {
                 <motion.div
                   layoutId="activities-filter-pill"
                   className="absolute inset-0 rounded-pill bg-white"
-                  transition={STATE}
+                  transition={SNAP_SPRING}
                 />
               )}
               <span className="relative z-10">{t.activities[f.tKey]}</span>

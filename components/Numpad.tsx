@@ -5,6 +5,12 @@ import { motion } from 'motion/react'
 interface NumpadProps {
   onDigit: (d: string) => void
   onDelete: () => void
+  /** Key height in px and gap between keys/rows in px — defaults match the
+   *  original standalone numpad; AudioInputSheet's manual mode passes a
+   *  smaller size so the whole pad fits its fixed-height sheet without
+   *  scrolling. */
+  keySize?: number
+  gap?: number
 }
 
 const ROWS = [
@@ -22,19 +28,22 @@ function DeleteIcon() {
   )
 }
 
-export default function Numpad({ onDigit, onDelete }: NumpadProps) {
+export default function Numpad({ onDigit, onDelete, keySize = 60, gap = 14 }: NumpadProps) {
   const keyClass =
-    'flex-1 h-[60px] rounded-card bg-white border border-hairline text-black text-[24px] font-semibold flex items-center justify-center active:bg-gray-100 transition-colors'
+    'flex-1 rounded-card bg-white border border-hairline text-black font-semibold flex items-center justify-center active:bg-gray-100 transition-colors'
+  const keyStyle = { height: keySize, fontSize: Math.round(keySize * 0.4) }
+  const gapStyle = { gap }
 
   return (
-    <div className="flex flex-col gap-[14px]">
+    <div className="flex flex-col" style={gapStyle}>
       {ROWS.map((row) => (
-        <div key={row.join('')} className="flex gap-[14px]">
+        <div key={row.join('')} className="flex" style={gapStyle}>
           {row.map((d) => (
             <motion.button
               key={d}
               onClick={() => onDigit(d)}
               className={keyClass}
+              style={keyStyle}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.15 }}
             >
@@ -45,11 +54,12 @@ export default function Numpad({ onDigit, onDelete }: NumpadProps) {
       ))}
 
       {/* Last row: empty · 0 · delete */}
-      <div className="flex gap-[14px]">
-        <div className="flex-1 h-[60px]" />
+      <div className="flex" style={gapStyle}>
+        <div className="flex-1" style={{ height: keySize }} />
         <motion.button
           onClick={() => onDigit('0')}
           className={keyClass}
+          style={keyStyle}
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.15 }}
         >
@@ -57,7 +67,8 @@ export default function Numpad({ onDigit, onDelete }: NumpadProps) {
         </motion.button>
         <motion.button
           onClick={onDelete}
-          className="flex-1 h-[60px] rounded-card bg-white border border-hairline flex items-center justify-center active:bg-gray-100 transition-colors"
+          className="flex-1 rounded-card bg-white border border-hairline flex items-center justify-center active:bg-gray-100 transition-colors"
+          style={{ height: keySize }}
           aria-label="Delete digit"
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.15 }}
