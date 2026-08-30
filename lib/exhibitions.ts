@@ -54,6 +54,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'your-curious-journey',
     title: 'Your Curious Journey',
+    titleZh: '你的好奇之旅',
     image: '/images/your-curious-journey.png',
     images: [
       '/images/Your Curious Journey/your-curious-journey-1.jpg',
@@ -74,6 +75,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'forms-in-motion',
     title: 'Forms in Motion',
+    titleZh: '動態形式',
     image: '/images/forms-in-motion.png',
     images: [
       '/images/Forms in Motion/forms-in-motion-1.jpg',
@@ -94,6 +96,7 @@ export const exhibitions: Exhibition[] = [
   {
     id: 'visions-of-tomorrow',
     title: 'Vision of Tomorrow',
+    titleZh: '明日願景',
     image: '/images/Vision of Tomorrow/vision-of-tomorrow.jpg',
     images: [
       '/images/Vision of Tomorrow/vision-of-tomorrow.jpg',

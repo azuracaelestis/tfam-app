@@ -1,7 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FLOORS, AMENITY_LABELS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
+import { FLOORS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
+import { getById } from '@/lib/exhibitions'
+import { useTranslation } from '@/lib/useTranslation'
+import { useLanguage } from '@/lib/useLanguage'
 import BottomNav from './BottomNav'
 
 // ── Floor Switcher ────────────────────────────────────────────────────────────
@@ -57,6 +60,7 @@ function AmenityChips({
   active: AmenityType | null
   onChange: (chip: AmenityType | null) => void
 }) {
+  const t = useTranslation()
   if (chips.length === 0) return null
   return (
     <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide">
@@ -80,7 +84,7 @@ function AmenityChips({
               className={chip === active ? 'invert' : ''}
             />
           )}
-          {AMENITY_LABELS[chip]}
+          {t.map.amenities[chip]}
         </button>
       ))}
     </div>
@@ -98,6 +102,7 @@ function RouteBanner({
   subtext: string
   onHide: () => void
 }) {
+  const t = useTranslation()
   return (
     <div className="mx-4 bg-info-bg rounded-lg px-[18px] py-[18px] flex items-center gap-3">
       {/* Location pin icon */}
@@ -112,7 +117,7 @@ function RouteBanner({
         onClick={onHide}
         className="shrink-0 border border-black rounded-2xl px-5 py-1 text-sm text-black bg-white"
       >
-        Hide
+        {t.map.hide}
       </button>
     </div>
   )
@@ -132,6 +137,8 @@ function RoomCard({
   onTap?: () => void
 }) {
   const isAmenityActive = activeAmenity !== null && room.amenity === activeAmenity
+  const t = useTranslation()
+  const [lang] = useLanguage()
   const isTappable = Boolean(room.exhibitionId) && Boolean(onTap)
   const isCorridorLike = room.type === 'corridor' || room.type === 'lobby'
   const isStaircase = room.type === 'staircase'
@@ -170,9 +177,11 @@ function RoomCard({
   }
 
   // For galleries with an exhibition, show name + exhibition title
-  const exhibitionName = room.exhibitionId
-    ? EXHIBITION_NAMES[room.exhibitionId] ?? null
+  const exhibition = room.exhibitionId ? getById(room.exhibitionId) : undefined
+  const exhibitionName = exhibition
+    ? (lang === 'zh' && exhibition.titleZh ? exhibition.titleZh : exhibition.title)
     : null
+  const roomLabel = t.map.roomNames[room.id as keyof typeof t.map.roomNames] ?? room.name
 
   const content = (
     <>
@@ -185,7 +194,7 @@ function RoomCard({
         {room.amenity === 'cafe' && (
           <img src="/images/maps/cafe.svg" width={32} height={32} alt="" aria-hidden="true" />
         )}
-        <span className="text-sm font-semibold leading-tight text-black">{room.name}</span>
+        <span className="text-sm font-semibold leading-tight text-black">{roomLabel}</span>
         {exhibitionName && (
           <span className="text-sm font-normal text-black leading-snug">{exhibitionName}</span>
         )}
@@ -213,15 +222,6 @@ function RoomCard({
   )
 }
 
-// Exhibition display names for map cards
-const EXHIBITION_NAMES: Record<string, string> = {
-  'your-curious-journey':   'Your Curious Journey',
-  'forms-in-motion':        'Forms in Motion',
-  'visions-of-tomorrow':    'Vision of Tomorrow',
-  'material-extensions':    'Material Extensions',
-  'surrealism':             'Surrealism',
-  'tfam-screening-project': 'TFAM Screening Project',
-}
 
 // ── Floor Plan ────────────────────────────────────────────────────────────────
 
@@ -236,6 +236,7 @@ function FloorPlan({
   showRoute: boolean
   onRoomTap: (exhibitionId: string) => void
 }) {
+  const t = useTranslation()
   const stops = showRoute ? (floor.suggestedRoute?.stops ?? []) : []
 
   return (
@@ -243,13 +244,13 @@ function FloorPlan({
       {/* Offline badge — sits above the grid, right-aligned */}
       <div className="flex justify-end mb-3">
         <span className="bg-[#d2d0d0] text-black text-xs font-normal px-2.5 py-1 rounded-full leading-none">
-          Offline
+          {t.map.offline}
         </span>
       </div>
 
       {floor.disabled || floor.rooms.length === 0 ? (
         <div className="flex items-center justify-center h-[240px]">
-          <p className="text-sm text-tfam-mid">Content coming soon</p>
+          <p className="text-sm text-tfam-mid">{t.map.contentComingSoon}</p>
         </div>
       ) : (
         <div
@@ -278,7 +279,7 @@ function FloorPlan({
           <div
             className="absolute z-10 flex items-center justify-center"
             style={{ bottom: '28px', right: '28px' }}
-            aria-label="You are here"
+            aria-label={t.map.youAreHere}
           >
             <span className="absolute inline-flex size-5 rounded-full bg-[#3dba6a] opacity-75 animate-ping" />
             <span className="relative inline-flex size-3 rounded-full bg-[#3dba6a] ring-2 ring-white" />
@@ -293,6 +294,7 @@ function FloorPlan({
 
 export default function MapClient() {
   const router = useRouter()
+  const t = useTranslation()
   const [activeFloorId, setActiveFloorId] = useState<string>('1F')
   const [activeAmenity, setActiveAmenity] = useState<AmenityType | null>(null)
   const [showRoute, setShowRoute] = useState(true)
@@ -313,16 +315,16 @@ export default function MapClient() {
 
   const captionText =
     activeFloorId === 'B1'
-      ? 'You are here · Tap a chip above to highlight facilities'
+      ? t.map.youAreHereB1
       : showRouteBanner
       ? null
-      : 'You are here · Tap any gallery to see exhibition'
+      : t.map.youAreHereGeneric
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
       {/* Header */}
       <header className="px-5 pt-14 pb-3">
-        <h1 className="text-[20px] font-bold text-black">Map</h1>
+        <h1 className="text-[20px] font-bold text-black">{t.map.title}</h1>
       </header>
 
       {/* Floor switcher */}
@@ -345,8 +347,8 @@ export default function MapClient() {
       {showRouteBanner && floor.suggestedRoute && (
         <div className="mb-3">
           <RouteBanner
-            label={floor.suggestedRoute.label}
-            subtext={floor.suggestedRoute.subtext}
+            label={t.map.route.label}
+            subtext={t.map.route.subtext}
             onHide={() => setShowRoute(false)}
           />
         </div>
