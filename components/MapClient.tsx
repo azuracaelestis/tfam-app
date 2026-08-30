@@ -1,8 +1,10 @@
 'use client'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { FLOORS, AMENITY_LABELS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
+import { FLOORS, type AmenityType, type Room, type FloorData } from '@/lib/mapData'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
+import { useLanguage, type Language } from '@/lib/useLanguage'
+import { useTranslation } from '@/lib/useTranslation'
 import { getById } from '@/lib/exhibitions'
 import { STATE } from '@/lib/motion'
 import BottomNav from './BottomNav'
@@ -69,6 +71,7 @@ function AmenityChips({
   active: AmenityType | null
   onChange: (chip: AmenityType | null) => void
 }) {
+  const t = useTranslation()
   if (chips.length === 0) return null
   return (
     <div className="flex gap-3 items-center overflow-x-auto px-5 py-3 scrollbar-hide">
@@ -98,7 +101,7 @@ function AmenityChips({
                 className={isDisabled ? 'opacity-[0.13]' : undefined}
               />
             )}
-            {AMENITY_LABELS[chip]}
+            {t.map.amenities[chip]}
           </button>
         )
       })}
@@ -152,11 +155,13 @@ function RoomHotspot({
   room,
   imageWidth,
   imageHeight,
+  lang,
   onTap,
 }: {
   room: Room
   imageWidth: number
   imageHeight: number
+  lang: Language
   onTap?: () => void
 }) {
   if (!room.rect || !onTap) return null
@@ -173,7 +178,7 @@ function RoomHotspot({
       className="absolute active:bg-black/5 transition-colors duration-75"
       style={style}
       onClick={onTap}
-      aria-label={room.name}
+      aria-label={lang === 'zh' && room.nameZh ? room.nameZh : room.name}
     />
   )
 }
@@ -272,11 +277,13 @@ function FloorPlan({
   floor,
   activeAmenity,
   showRoute,
+  lang,
   onRoomTap,
 }: {
   floor: FloorData
   activeAmenity: AmenityType | null
   showRoute: boolean
+  lang: Language
   onRoomTap: (exhibitionId: string) => void
 }) {
   if (floor.disabled || !floor.mapImage) {
@@ -299,6 +306,7 @@ function FloorPlan({
           room={room}
           imageWidth={width}
           imageHeight={height}
+          lang={lang}
           onTap={room.exhibitionId ? () => onRoomTap(room.exhibitionId!) : undefined}
         />
       ))}
@@ -348,6 +356,7 @@ function FloorPlan({
 
 export default function MapClient() {
   const { open } = useExhibitionOverlay()
+  const [lang] = useLanguage()
   const [activeFloorId, setActiveFloorId] = useState<string>('1F')
   const [activeAmenity, setActiveAmenity] = useState<AmenityType | null>(null)
   const [showRoute, setShowRoute] = useState(true)
@@ -432,6 +441,7 @@ export default function MapClient() {
         floor={floor}
         activeAmenity={activeAmenity}
         showRoute={showRoute}
+        lang={lang}
         onRoomTap={handleRoomTap}
       />
 

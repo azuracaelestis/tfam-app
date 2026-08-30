@@ -8,6 +8,7 @@ export type AmenityType = 'toilet' | 'cafe' | 'locker' | 'changing-room'
 export type Room = {
   id: string
   name: string
+  nameZh?: string
   type: 'gallery' | 'corridor' | 'lobby' | 'bookstore' | 'children' | 'staircase' | 'landing' | AmenityType
   amenity?: AmenityType       // set when this room IS an amenity (used for chip filtering)
   amenityIcon?: AmenityType   // renders a small icon badge in the bottom-right corner of the card
@@ -88,7 +89,7 @@ export const FLOORS: FloorData[] = [
     },
     defaultAmenityMarker: 'cafe',
     rooms: [
-      { id: 'cafe',          name: 'Cafe',          type: 'cafe',      amenity: 'cafe',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [23.5, 65.5, 324, 118] },
+      { id: 'cafe',          name: 'Cafe',          nameZh: '咖啡廳',   type: 'cafe',      amenity: 'cafe',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [23.5, 65.5, 324, 118] },
       { id: 'children-area', name: 'Children Area', type: 'children',                     col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [22.5, 201.5, 214, 117] },
       { id: 'book-store',    name: 'Book Store',    type: 'bookstore',                    col: 4, row: 2, colSpan: 3, rowSpan: 1, rect: [253.5, 201.5, 93, 117] },
       { id: 'corridor',      name: 'Corridor',      type: 'corridor',                     col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [20.5, 341.5, 191, 89] },
@@ -189,11 +190,4 @@ export const FLOORS: FloorData[] = [
 
 export function getFloor(id: string): FloorData | undefined {
   return FLOORS.find(f => f.id === id)
-}
-
-export const AMENITY_LABELS: Record<AmenityType, string> = {
-  toilet:          'Toilet',
-  cafe:            'Cafe',
-  locker:          'Locker',
-  'changing-room': 'Changing Room',
 }

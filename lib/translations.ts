@@ -179,7 +179,14 @@ const en = {
     durationMins:    '{n} mins',
   },
   map: {
-    title: 'Map',
+    title:      'Map',
+    youAreHere: 'You are here',
+    amenities: {
+      toilet:          'Toilet',
+      cafe:            'Cafe',
+      locker:          'Locker',
+      'changing-room': 'Changing Room',
+    },
   },
 }
 
@@ -363,6 +370,16 @@ const zhOverrides: Partial<T> = {
     aboutTitle:    '關於展覽',
     seeOnMap:      '在地圖上查看',
     durationMins:  '{n} 分鐘',
+  },
+  map: {
+    title:      '地圖',
+    youAreHere: '您在這裡',
+    amenities: {
+      toilet:          '洗手間',
+      cafe:            '咖啡廳',
+      locker:          '置物櫃',
+      'changing-room': '更衣室',
+    },
   },
 }
 
