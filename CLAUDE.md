@@ -77,3 +77,10 @@ The map, not every file:
 - Never commit secrets or API keys.
 - Do not change `next.config.ts` or `tsconfig.json` without explaining why.
 - Treat `package-lock.json` as managed by npm — don't hand-edit it.
+
+## Known gaps
+- Map screen floor-plan art (`ui-v2`) has room names and exhibition titles
+  baked into the SVG per floor. This text does not respond to language
+  switching. Needs a decision: maintain per-language art, or redesign to
+  render labels as real text over a plain background. See conversation
+  2026-08-30 for full context.
