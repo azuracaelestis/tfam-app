@@ -179,8 +179,13 @@ const en = {
     durationMins:    '{n} mins',
   },
   map: {
-    title:      'Map',
-    youAreHere: 'You are here',
+    title:             'Map',
+    hide:              'Hide',
+    offline:           'Offline',
+    contentComingSoon: 'Content coming soon',
+    youAreHere:        'You are here',
+    youAreHereB1:      'You are here · Tap a chip above to highlight facilities',
+    youAreHereGeneric: 'You are here · Tap any gallery to see exhibition',
     amenities: {
       toilet:          'Toilet',
       cafe:            'Cafe',
@@ -372,8 +377,13 @@ const zhOverrides: Partial<T> = {
     durationMins:  '{n} 分鐘',
   },
   map: {
-    title:      '地圖',
-    youAreHere: '您在這裡',
+    title:             '地圖',
+    hide:              '隱藏',
+    offline:           '離線',
+    contentComingSoon: '內容即將推出',
+    youAreHere:        '您在這裡',
+    youAreHereB1:      '您在這裡．點擊上方標籤以標示設施位置',
+    youAreHereGeneric: '您在這裡．點擊任一展廳查看展覽資訊',
     amenities: {
       toilet:          '洗手間',
       cafe:            '咖啡廳',

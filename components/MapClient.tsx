@@ -120,6 +120,7 @@ function RouteBanner({
   subtext: string
   onHide: () => void
 }) {
+  const t = useTranslation()
   return (
     <div className="mx-5 bg-info-bg rounded-lg px-[18px] py-[18px] flex items-center gap-3">
       {/* Location pin icon */}
@@ -134,7 +135,7 @@ function RouteBanner({
         onClick={onHide}
         className="shrink-0 border border-black rounded-2xl px-5 py-1 text-sm text-black bg-white"
       >
-        Hide
+        {t.map.hide}
       </button>
     </div>
   )
@@ -286,10 +287,11 @@ function FloorPlan({
   lang: Language
   onRoomTap: (exhibitionId: string) => void
 }) {
+  const t = useTranslation()
   if (floor.disabled || !floor.mapImage) {
     return (
       <div className="relative mx-5 rounded-2xl border border-[#ddd] overflow-hidden bg-[#f8f8f8] p-5 flex items-center justify-center h-[240px]">
-        <p className="text-sm text-tfam-mid">Content coming soon</p>
+        <p className="text-sm text-tfam-mid">{t.map.contentComingSoon}</p>
       </div>
     )
   }
@@ -343,7 +345,7 @@ function FloorPlan({
       <div
         className="absolute z-10 flex items-center justify-center"
         style={{ bottom: '6%', right: '7.5%' }}
-        aria-label="You are here"
+        aria-label={t.map.youAreHere}
       >
         <span className="absolute inline-flex size-5 rounded-full bg-[#1abd6e] opacity-75 animate-ping" />
         <span className="relative inline-flex size-3 rounded-full bg-[#1abd6e] ring-2 ring-white" />
@@ -357,6 +359,7 @@ function FloorPlan({
 export default function MapClient() {
   const { open } = useExhibitionOverlay()
   const [lang] = useLanguage()
+  const t = useTranslation()
   const [activeFloorId, setActiveFloorId] = useState<string>('1F')
   const [activeAmenity, setActiveAmenity] = useState<AmenityType | null>(null)
   const [showRoute, setShowRoute] = useState(true)
@@ -387,16 +390,16 @@ export default function MapClient() {
 
   const captionText =
     activeFloorId === 'B1'
-      ? 'You are here | Tap a chip above to highlight facilities'
+      ? t.map.youAreHereB1
       : showRouteBanner
       ? null
-      : 'You are here | Tap any gallery to see exhibition'
+      : t.map.youAreHereGeneric
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
       {/* Header */}
       <header className="bg-white px-5 py-[10px] flex items-end">
-        <h1 className="text-[32px] font-semibold text-[#0a0a0a] leading-normal">Map</h1>
+        <h1 className="text-[32px] font-semibold text-[#0a0a0a] leading-normal">{t.map.title}</h1>
       </header>
 
       {/* Floor switcher */}
