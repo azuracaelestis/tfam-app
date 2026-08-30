@@ -57,7 +57,9 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
           dragMomentum={false}
           onDragEnd={handleDragEnd}
         >
-          {exhibitions.map((ex, i) => (
+          {exhibitions.map((ex, i) => {
+            const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
+            return (
             <div
               key={ex.id}
               className="relative w-[313px] h-[390px] shrink-0 rounded-[16px] overflow-hidden border border-border-card bg-tfam-light"
@@ -76,7 +78,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
               {/* White content overlay — bottom 57.5% of card (~224px) */}
               <div className="absolute bottom-0 left-0 right-0 bg-white px-5 pt-4 pb-[27px] flex flex-col gap-[18px]">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-[24px] font-bold text-black leading-[30px]">{ex.title}</h3>
+                  <h3 className="text-[24px] font-bold text-black leading-[30px]">{displayTitle}</h3>
                   <p className="text-[14px] text-tfam-mid leading-normal">{metaLine(ex, lang)}</p>
                 </div>
                 <p className="text-[14px] text-black leading-snug line-clamp-3">
@@ -90,7 +92,8 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                 </button>
               </div>
             </div>
-          ))}
+            )
+          })}
         </motion.div>
       </div>
 

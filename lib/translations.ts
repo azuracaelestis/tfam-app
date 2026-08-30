@@ -209,7 +209,34 @@ const en = {
     minsToExplore:   '~__DURATION__ mins to explore',
   },
   map: {
-    title: 'Map',
+    title:             'Map',
+    hide:              'Hide',
+    offline:           'Offline',
+    contentComingSoon: 'Content coming soon',
+    youAreHere:        'You are here',
+    youAreHereB1:      'You are here · Tap a chip above to highlight facilities',
+    youAreHereGeneric: 'You are here · Tap any gallery to see exhibition',
+    amenities: {
+      toilet:          'Toilet',
+      cafe:            'Cafe',
+      locker:          'Locker',
+      'changing-room': 'Changing Room',
+    },
+    roomNames: {
+      cafe:            'Cafe',
+      'children-area': 'Children Area',
+      'book-store':    'Book Store',
+      corridor:        'Corridor',
+      'gallery-a':     'Gallery A',
+      'gallery-b':     'Gallery B',
+      'gallery-c':     'Gallery C',
+      'gallery-d':     'Gallery D',
+      lobby:           'Lobby / Entrance',
+    },
+    route: {
+      label:   'Suggested first visit route',
+      subtext: '~2 hours · 3 stops across first floor',
+    },
   },
 }
 
@@ -429,6 +456,36 @@ const zhOverrides: Partial<T> = {
     audioGuide:    '語音導覽',
     gettingHere:   '如何前往',
     minsToExplore: '約 __DURATION__ 分鐘參觀',
+  },
+  map: {
+    title:             '地圖',
+    hide:              '隱藏',
+    offline:           '離線',
+    contentComingSoon: '內容即將推出',
+    youAreHere:        '您在這裡',
+    youAreHereB1:      '您在這裡．點擊上方標籤以標示設施位置',
+    youAreHereGeneric: '您在這裡．點擊任一展廳查看展覽資訊',
+    amenities: {
+      toilet:          '洗手間',
+      cafe:            '咖啡廳',
+      locker:          '置物櫃',
+      'changing-room': '更衣室',
+    },
+    roomNames: {
+      cafe:            '咖啡廳',
+      'children-area': '兒童天地',
+      'book-store':    '書店',
+      corridor:        '走廊',
+      'gallery-a':     'A展廳',
+      'gallery-b':     'B展廳',
+      'gallery-c':     'C展廳',
+      'gallery-d':     'D展廳',
+      lobby:           '大廳／入口',
+    },
+    route: {
+      label:   '建議首次參觀路線',
+      subtext: '約 2 小時．一樓 3 站',
+    },
   },
 }
 
