@@ -12,12 +12,13 @@ import { useLanguage } from '@/lib/useLanguage'
 import { translateTag } from '@/lib/translateTag'
 import { STATE, LIFT } from '@/lib/motion'
 
-// Same spring as What's On's tab pill (WhatsOnClient.tsx) and the carousels'
-// snap-to-card settle (ExhibitionCarousel.tsx, ActivityCarousel.tsx) — this
-// filter pill has no swipeable track to read its position off of the way
-// What's On's does, but tapping between filters should still feel like the
-// same physical object, not a different law.
-const SNAP_SPRING = { type: 'spring' as const, visualDuration: 0.3, bounce: 0.1 }
+// A tight, low-bounce spring (What's On's SNAP_SPRING) decelerates almost
+// immediately and spends the rest of its travel creeping the last few
+// pixels — over What's On's near-full-screen swipe that reads as a glide,
+// but over this pill's ~86px hop between adjacent tabs it reads as a snap.
+// BottomNav's active-tab indicator covers a similarly short hop and visibly
+// glides, so this pill borrows its duration/ease instead of the spring.
+const GLIDE = { duration: 0.22, ease: [0.3, 0.85, 0.3, 1] } as const
 
 // ── List card ──────────────────────────────────────────────────────────────────
 
@@ -108,7 +109,7 @@ export default function ActivitiesClient() {
                 <motion.div
                   layoutId="activities-filter-pill"
                   className="absolute inset-0 rounded-pill bg-white"
-                  transition={SNAP_SPRING}
+                  transition={GLIDE}
                 />
               )}
               <span className="relative z-10">{t.activities[f.tKey]}</span>
