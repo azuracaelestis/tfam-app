@@ -37,7 +37,9 @@ export type FloorData = {
   disabledAmenityChips?: AmenityType[]
   suggestedRoute?: {
     label: string
+    labelZh?: string
     subtext: string
+    subtextZh?: string
     stops: string[]           // ordered room ids
     /** Number shown on the first stop's badge (rest count up from it) — 1F
      *  continues on B1 numbering conceptually but has no chips before it, so
@@ -89,10 +91,10 @@ export const FLOORS: FloorData[] = [
     },
     defaultAmenityMarker: 'cafe',
     rooms: [
-      { id: 'cafe',          name: 'Cafe',          nameZh: '咖啡廳',   type: 'cafe',      amenity: 'cafe',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [23.5, 65.5, 324, 118] },
-      { id: 'children-area', name: 'Children Area', type: 'children',                     col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [22.5, 201.5, 214, 117] },
-      { id: 'book-store',    name: 'Book Store',    type: 'bookstore',                    col: 4, row: 2, colSpan: 3, rowSpan: 1, rect: [253.5, 201.5, 93, 117] },
-      { id: 'corridor',      name: 'Corridor',      type: 'corridor',                     col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [20.5, 341.5, 191, 89] },
+      { id: 'cafe',          name: 'Cafe',          nameZh: '咖啡廳',     type: 'cafe',      amenity: 'cafe',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [23.5, 65.5, 324, 118] },
+      { id: 'children-area', name: 'Children Area', nameZh: '兒童遊戲區', type: 'children',                     col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [22.5, 201.5, 214, 117] },
+      { id: 'book-store',    name: 'Book Store',    nameZh: '書店',       type: 'bookstore',                    col: 4, row: 2, colSpan: 3, rowSpan: 1, rect: [253.5, 201.5, 93, 117] },
+      { id: 'corridor',      name: 'Corridor',      nameZh: '走廊',       type: 'corridor',                     col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [20.5, 341.5, 191, 89] },
       { id: 'landing',       name: '',              type: 'landing',                      col: 4, row: 3, colSpan: 1, rowSpan: 1, rect: [222.5, 341.5, 29, 28] },
       { id: 'staircase',     name: '',              type: 'staircase',                    col: 5, row: 3, colSpan: 2, rowSpan: 1, rect: [222.5, 379.5, 121, 51] },
     ],
@@ -106,7 +108,9 @@ export const FLOORS: FloorData[] = [
     disabledAmenityChips: ['cafe'],
     suggestedRoute: {
       label: 'Suggested first visit route',
+      labelZh: '建議首次參觀路線',
       subtext: '~2 hours · 3 stops across first floor',
+      subtextZh: '約 2 小時．一樓 3 個停靠點',
       stops: ['gallery-b', 'gallery-a', 'gallery-c'],
     },
     // Positions read directly from the now-removed baked badges in
@@ -130,10 +134,10 @@ export const FLOORS: FloorData[] = [
     },
     defaultAmenityMarker: 'locker',
     rooms: [
-      { id: 'gallery-a', name: 'Gallery A', type: 'gallery', exhibitionId: 'your-curious-journey',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [20, 60, 328, 119] },
-      { id: 'gallery-c', name: 'Gallery C', type: 'gallery', exhibitionId: 'tfam-screening-project', col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [20, 197, 157, 140.7] },
-      { id: 'gallery-b', name: 'Gallery B', type: 'gallery', exhibitionId: 'material-extensions',    col: 4, row: 2, colSpan: 3, rowSpan: 1, rect: [191, 197, 157, 140.7] },
-      { id: 'corridor',  name: 'Corridor',  type: 'corridor',                                        col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [20, 359.7, 157, 70.3] },
+      { id: 'gallery-a', name: 'Gallery A', nameZh: '展覽廳 A', type: 'gallery', exhibitionId: 'your-curious-journey',   col: 1, row: 1, colSpan: 6, rowSpan: 1, rect: [20, 60, 328, 119] },
+      { id: 'gallery-c', name: 'Gallery C', nameZh: '展覽廳 C', type: 'gallery', exhibitionId: 'tfam-screening-project', col: 1, row: 2, colSpan: 3, rowSpan: 1, rect: [20, 197, 157, 140.7] },
+      { id: 'gallery-b', name: 'Gallery B', nameZh: '展覽廳 B', type: 'gallery', exhibitionId: 'material-extensions',    col: 4, row: 2, colSpan: 3, rowSpan: 1, rect: [191, 197, 157, 140.7] },
+      { id: 'corridor',  name: 'Corridor',  nameZh: '走廊',     type: 'corridor',                                        col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [20, 359.7, 157, 70.3] },
       { id: 'landing',   name: '',          type: 'landing',                                         col: 4, row: 3, colSpan: 1, rowSpan: 1, rect: [191, 359.7, 30, 29] },
       { id: 'staircase', name: '',          type: 'staircase',                                       col: 5, row: 3, colSpan: 2, rowSpan: 1, rect: [191, 397.7, 122, 52] },
     ],
@@ -154,7 +158,9 @@ export const FLOORS: FloorData[] = [
     },
     suggestedRoute: {
       label: 'Suggested first visit route',
+      labelZh: '建議首次參觀路線',
       subtext: '~1.5 hours · 3 stops across second floor',
+      subtextZh: '約 1.5 小時．二樓 3 個停靠點',
       stops: ['gallery-a', 'gallery-c', 'gallery-b'],
       startNumber: 4,
     },
@@ -167,12 +173,12 @@ export const FLOORS: FloorData[] = [
       'gallery-b': { x: 216, y: 61 },
     },
     rooms: [
-      { id: 'gallery-a', name: 'Gallery A',        type: 'gallery', exhibitionId: 'visions-of-tomorrow', col: 1, row: 1, colSpan: 3, rowSpan: 1, rect: [21.5, 60.5, 169, 142] },
-      { id: 'gallery-b', name: 'Gallery B',        type: 'gallery', exhibitionId: 'forms-in-motion',     col: 4, row: 1, colSpan: 3, rowSpan: 1, amenityIcon: 'cafe', rect: [206.5, 60.5, 138, 142] },
-      { id: 'gallery-c', name: 'Gallery C',        type: 'gallery', exhibitionId: 'surrealism',           col: 1, row: 2, colSpan: 1, rowSpan: 1, rect: [21.5, 215.5, 91, 117] },
-      { id: 'lobby',     name: 'Lobby / Entrance', type: 'lobby',                                        col: 2, row: 2, colSpan: 2, rowSpan: 1, rect: [124.5, 215.5, 104, 117] },
-      { id: 'gallery-d', name: 'Gallery D',        type: 'gallery',                                      col: 4, row: 2, colSpan: 3, rowSpan: 1, amenityIcon: 'cafe', rect: [240.5, 215.5, 104, 117] },
-      { id: 'corridor',  name: 'Corridor',         type: 'corridor',                                     col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [21.5, 345.5, 191, 89] },
+      { id: 'gallery-a', name: 'Gallery A',        nameZh: '展覽廳 A',   type: 'gallery', exhibitionId: 'visions-of-tomorrow', col: 1, row: 1, colSpan: 3, rowSpan: 1, rect: [21.5, 60.5, 169, 142] },
+      { id: 'gallery-b', name: 'Gallery B',        nameZh: '展覽廳 B',   type: 'gallery', exhibitionId: 'forms-in-motion',     col: 4, row: 1, colSpan: 3, rowSpan: 1, amenityIcon: 'cafe', rect: [206.5, 60.5, 138, 142] },
+      { id: 'gallery-c', name: 'Gallery C',        nameZh: '展覽廳 C',   type: 'gallery', exhibitionId: 'surrealism',           col: 1, row: 2, colSpan: 1, rowSpan: 1, rect: [21.5, 215.5, 91, 117] },
+      { id: 'lobby',     name: 'Lobby / Entrance', nameZh: '大廳／入口', type: 'lobby',                                        col: 2, row: 2, colSpan: 2, rowSpan: 1, rect: [124.5, 215.5, 104, 117] },
+      { id: 'gallery-d', name: 'Gallery D',        nameZh: '展覽廳 D',   type: 'gallery',                                      col: 4, row: 2, colSpan: 3, rowSpan: 1, amenityIcon: 'cafe', rect: [240.5, 215.5, 104, 117] },
+      { id: 'corridor',  name: 'Corridor',         nameZh: '走廊',       type: 'corridor',                                     col: 1, row: 3, colSpan: 3, rowSpan: 1, rect: [21.5, 345.5, 191, 89] },
       { id: 'landing',   name: '',                 type: 'landing',                                      col: 4, row: 3, colSpan: 1, rowSpan: 1, rect: [223.5, 345.5, 29, 28] },
       { id: 'staircase', name: '',                 type: 'staircase',                                    col: 5, row: 3, colSpan: 2, rowSpan: 1, rect: [223.5, 383.5, 121, 51] },
     ],

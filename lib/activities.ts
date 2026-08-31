@@ -22,6 +22,7 @@ export const activities: Activity[] = [
     category: 'class',
     tags: ['Free', 'Classes', '2 hrs', 'Age 12+'],
     description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
+    descriptionZh: '跟隨北美館駐館藝術家，學習基礎水彩技法。',
     popular: true,
   },
   {
@@ -31,7 +32,8 @@ export const activities: Activity[] = [
     image: '/images/activities/curator-led.png',
     category: 'tour',
     tags: ['Free', 'Tours', '3 hrs', 'Age 18+'],
-    description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
+    description: 'Join a curator-led tour highlighting the stories behind current exhibitions.',
+    descriptionZh: '參加策展人導覽，深入了解當期展覽背後的故事。',
     popular: true,
   },
   {
@@ -41,7 +43,8 @@ export const activities: Activity[] = [
     image: '/images/activities/ink-painting-workshop.png',
     category: 'class',
     tags: ['Free', 'Classes', '4 hrs', 'Age 16+'],
-    description: 'Learn essential watercolor techniques with a TFAM teaching artist.',
+    description: 'Learn traditional ink painting techniques in this hands-on workshop.',
+    descriptionZh: '透過實作課程，學習傳統水墨畫技法。',
     popular: true,
   },
   // ── Other Activities (list) — matching Figma exactly ─────────────────────────

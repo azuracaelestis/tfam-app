@@ -152,6 +152,45 @@ function RouteBanner({
 // suggested-route step numbers (via routeMarkers/RouteNumberBadge, on every
 // floor now — see that component's doc — so Hide can dismiss them cleanly).
 
+// Room name (+ exhibition title, for galleries) rendered as real text over the
+// floor art — the art itself used to have this baked in as flattened vector
+// paths (see git history), which meant it couldn't respond to language
+// switching. Positioned over the same `rect` RoomHotspot uses, so it lines up
+// with the room's card in the underlying image at any render size.
+function RoomLabel({
+  room,
+  imageWidth,
+  imageHeight,
+  lang,
+}: {
+  room: Room
+  imageWidth: number
+  imageHeight: number
+  lang: Language
+}) {
+  if (!room.rect || !room.name) return null
+  const [x, y, w, h] = room.rect
+  const style: React.CSSProperties = {
+    left: `${(x / imageWidth) * 100}%`,
+    top: `${(y / imageHeight) * 100}%`,
+    width: `${(w / imageWidth) * 100}%`,
+    height: `${(h / imageHeight) * 100}%`,
+  }
+  const displayName = lang === 'zh' && room.nameZh ? room.nameZh : room.name
+  const exhibition = room.exhibitionId ? getById(room.exhibitionId) : undefined
+  const subtitle = exhibition ? (lang === 'zh' && exhibition.titleZh ? exhibition.titleZh : exhibition.title) : undefined
+
+  return (
+    <div
+      className="absolute flex flex-col items-center justify-center gap-1 text-center px-2 pointer-events-none"
+      style={style}
+    >
+      <span className="text-sm font-semibold text-[#0a0a0a] leading-tight">{displayName}</span>
+      {subtitle && <span className="text-xs text-[#0a0a0a] leading-tight">{subtitle}</span>}
+    </div>
+  )
+}
+
 function RoomHotspot({
   room,
   imageWidth,
@@ -312,6 +351,10 @@ function FloorPlan({
       <img src={src} alt={`${floor.label} floor plan`} width={width} height={height} className="block w-full h-auto" />
 
       {floor.rooms.map(room => (
+        <RoomLabel key={`label-${room.id}`} room={room} imageWidth={width} imageHeight={height} lang={lang} />
+      ))}
+
+      {floor.rooms.map(room => (
         <RoomHotspot
           key={room.id}
           room={room}
@@ -440,8 +483,8 @@ export default function MapClient() {
             style={{ overflow: 'hidden' }}
           >
             <RouteBanner
-              label={floor.suggestedRoute.label}
-              subtext={floor.suggestedRoute.subtext}
+              label={lang === 'zh' && floor.suggestedRoute.labelZh ? floor.suggestedRoute.labelZh : floor.suggestedRoute.label}
+              subtext={lang === 'zh' && floor.suggestedRoute.subtextZh ? floor.suggestedRoute.subtextZh : floor.suggestedRoute.subtext}
               onHide={() => setShowRoute(false)}
             />
           </motion.div>
