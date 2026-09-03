@@ -22,11 +22,33 @@ const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0
 const SWIPE_OFFSET   = CARD_STRIDE * 0.3
 const SWIPE_VELOCITY = 400
 
+// Same glyphs as ExhibitionCarousel's slider arrows.
+function SliderArrowLeftIcon() {
+  return (
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+      <path d="M7 1L1.5 6.5L7 12" stroke="#111111" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function SliderArrowRightIcon() {
+  return (
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+      <path d="M1 1L6.5 6.5L1 12" stroke="#111111" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export default function ActivityCarousel({ activities }: { activities: Activity[] }) {
   const router = useRouter()
   const t = useTranslation()
   const [lang] = useLanguage()
   const [activeIndex, setActiveIndex] = useState(0)
+  // Same reveal-on-drag rule as ExhibitionCarousel's arrows — hidden until
+  // the first drag, then stay visible, so this finger-first screen isn't
+  // cluttered with tap targets before the visitor has shown any intent to
+  // browse further.
+  const [hasDragged, setHasDragged] = useState(false)
   const trackX = useMotionValue(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerW, setContainerW] = useState(0)
@@ -63,7 +85,7 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
 
   return (
     <div className="flex flex-col gap-4">
-      <div ref={containerRef} className="overflow-hidden">
+      <div ref={containerRef} className="relative overflow-hidden">
         <motion.div
           className="flex gap-2"
           style={{ x: trackX, paddingLeft: LEFT_INSET, paddingRight: RIGHT_INSET }}
@@ -71,6 +93,7 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
           dragConstraints={{ left: -maxScroll, right: 0 }}
           dragElastic={0.05}
           dragMomentum={false}
+          onDragStart={() => setHasDragged(true)}
           onDragEnd={handleDragEnd}
         >
           {activities.map((a, i) => {
@@ -107,6 +130,36 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
             )
           })}
         </motion.div>
+
+        {/* Tap targets for the same navigation the drag gesture already does
+            — hidden until the visitor actually drags once, then stay visible.
+            Gated on maxScroll > 0 too: on a wide enough viewport all cards
+            already fit on screen, so an arrow that's technically clickable
+            but moves nothing would be worse than no arrow at all. */}
+        {activities.length > 1 && maxScroll > 0 && (
+          <>
+            <button
+              aria-label={t.activities.prevActivity}
+              disabled={activeIndex === 0}
+              onClick={() => snapToCard(activeIndex - 1)}
+              className={`absolute left-3 top-[79px] -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
+                hasDragged && activeIndex > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <SliderArrowLeftIcon />
+            </button>
+            <button
+              aria-label={t.activities.nextActivity}
+              disabled={activeIndex === activities.length - 1}
+              onClick={() => snapToCard(activeIndex + 1)}
+              className={`absolute right-3 top-[79px] -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
+                hasDragged && activeIndex < activities.length - 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <SliderArrowRightIcon />
+            </button>
+          </>
+        )}
       </div>
 
       <div className="flex items-center justify-center gap-[7px]">
