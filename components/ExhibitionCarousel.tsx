@@ -24,9 +24,35 @@ const SNAP_SPRING    = { type: 'spring' as const, visualDuration: 0.3, bounce: 0
 const SWIPE_OFFSET   = CARD_STRIDE * 0.3   // ~81px drag → advance one card
 const SWIPE_VELOCITY = 400                  // px/s fast-flick threshold
 
+// Same glyphs as ExhibitionImageSlider's slider arrows — kept local rather
+// than shared since that slider's arrows are hover-gated (a desktop-only
+// affordance), while these only reveal on drag (see hasDragged below); the
+// two components' reveal rules are different enough that a shared button
+// would need its own visibility prop anyway.
+function SliderArrowLeftIcon() {
+  return (
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+      <path d="M7 1L1.5 6.5L7 12" stroke="#111111" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function SliderArrowRightIcon() {
+  return (
+    <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+      <path d="M1 1L6.5 6.5L1 12" stroke="#111111" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: ExhibitionCarouselProps) {
   const t = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
+  // Usability testing found visitors never discovered this carousel could be
+  // dragged at all, let alone that (once revealed) it also has tap targets —
+  // so the arrows stay hidden until the first drag, rather than sitting there
+  // permanently as visual clutter on a screen that's otherwise finger-first.
+  const [hasDragged, setHasDragged] = useState(false)
   const trackX = useMotionValue(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerW, setContainerW] = useState(0)
@@ -60,8 +86,9 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Clipping container */}
-      <div ref={containerRef} className="overflow-hidden">
+      {/* Clipping container — `relative` anchors the arrow buttons so they
+          stay fixed over the viewport instead of scrolling with the track. */}
+      <div ref={containerRef} className="relative overflow-hidden">
         <motion.div
           className="flex gap-2"
           style={{ x: trackX, paddingLeft: LEFT_INSET, paddingRight: RIGHT_INSET }}
@@ -69,6 +96,7 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
           dragConstraints={{ left: -maxScroll, right: 0 }}
           dragElastic={0.05}
           dragMomentum={false}
+          onDragStart={() => setHasDragged(true)}
           onDragEnd={handleDragEnd}
         >
           {exhibitions.map((ex, i) => {
@@ -109,6 +137,39 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
             )
           })}
         </motion.div>
+
+        {/* Tap targets for the same navigation the drag gesture already does
+            — hidden until the visitor actually drags once (see hasDragged),
+            then stay visible for the rest of this screen's life. Positioned
+            over the fixed-height image row (158px) rather than the full,
+            variable-height card. Gated on maxScroll > 0 too, not just card
+            count: on a wide enough viewport all cards already fit on screen
+            (nothing left to scroll to), and without this an arrow would sit
+            there "clickable" but visibly do nothing when tapped. */}
+        {exhibitions.length > 1 && maxScroll > 0 && (
+          <>
+            <button
+              aria-label={t.whatsOn.prevExhibition}
+              disabled={activeIndex === 0}
+              onClick={() => snapToCard(activeIndex - 1)}
+              className={`absolute left-3 top-[79px] -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
+                hasDragged && activeIndex > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <SliderArrowLeftIcon />
+            </button>
+            <button
+              aria-label={t.whatsOn.nextExhibition}
+              disabled={activeIndex === exhibitions.length - 1}
+              onClick={() => snapToCard(activeIndex + 1)}
+              className={`absolute right-3 top-[79px] -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
+                hasDragged && activeIndex < exhibitions.length - 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <SliderArrowRightIcon />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Pagination dots */}

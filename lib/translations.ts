@@ -39,6 +39,8 @@ const en = {
     notifyMe:   'Notify Me',
     learnMore:  'Learn More',
     explore:    'Explore',
+    prevExhibition: 'Previous exhibition',
+    nextExhibition: 'Next exhibition',
   },
   activities: {
     title:           'Activities',
@@ -237,6 +239,8 @@ const zhOverrides: Partial<T> = {
     notifyMe:   '提醒我',
     learnMore:  '了解更多',
     explore:    '探索',
+    prevExhibition: '上一個展覽',
+    nextExhibition: '下一個展覽',
   },
   activities: {
     title:           '活動',
