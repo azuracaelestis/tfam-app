@@ -39,7 +39,6 @@ export default function ExhibitionImageSlider({
   const trackX    = useMotionValue(0)
   const sliderRef = useRef<HTMLDivElement>(null)
   const [sliderW, setSliderW] = useState(0)
-  const [hovered, setHovered] = useState(false)
 
   useLayoutEffect(() => {
     if (sliderRef.current) setSliderW(sliderRef.current.offsetWidth)
@@ -65,11 +64,7 @@ export default function ExhibitionImageSlider({
 
   return (
     <div className="shrink-0">
-      <div
-        className="relative w-full h-[225px]"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
+      <div className="relative w-full h-[225px]">
         <div ref={sliderRef} className="overflow-hidden w-full h-full bg-canvas">
           <motion.div
             className="flex h-full"
@@ -101,6 +96,10 @@ export default function ExhibitionImageSlider({
           </motion.div>
         </div>
 
+        {/* Unlike the What's On carousel's cards, this is a full-bleed hero
+            image with no other visual hint that there's more to see — so
+            these arrows are visible immediately rather than waiting for a
+            first drag to reveal them. */}
         {images.length > 1 && (
           <>
             <button
@@ -108,7 +107,7 @@ export default function ExhibitionImageSlider({
               disabled={activeIndex === 0}
               onClick={() => snapTo(activeIndex - 1)}
               className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
-                hovered && activeIndex > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                activeIndex > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
               <SliderArrowLeftIcon />
@@ -118,7 +117,7 @@ export default function ExhibitionImageSlider({
               disabled={activeIndex === images.length - 1}
               onClick={() => snapTo(activeIndex + 1)}
               className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 size-9 rounded-full bg-white/80 shadow-md flex items-center justify-center transition-opacity duration-150 focus-visible:opacity-100 ${
-                hovered && activeIndex < images.length - 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                activeIndex < images.length - 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
               <SliderArrowRightIcon />
