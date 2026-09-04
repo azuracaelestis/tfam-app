@@ -5,6 +5,24 @@ import { useAnimate } from 'motion/react'
 import { type Activity } from '@/lib/activities'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
+import SkeletonReveal from './SkeletonReveal'
+import SkeletonBlock from './SkeletonBlock'
+
+function ConfirmBookingSkeleton() {
+  return (
+    <div className="flex flex-col gap-[24px] px-5 pt-[48px] pb-[69px]">
+      <SkeletonBlock className="h-[24px] w-[160px] mx-auto" />
+      <SkeletonBlock className="h-[150px] w-full rounded-[16px]" />
+      <div className="flex flex-col gap-[12px]">
+        <SkeletonBlock className="h-[16px] w-[100px]" />
+        <SkeletonBlock className="h-[50px] w-full rounded-[12px]" />
+        <SkeletonBlock className="h-[50px] w-full rounded-[12px]" />
+      </div>
+      <SkeletonBlock className="h-[70px] w-full rounded-[12px]" />
+      <SkeletonBlock className="h-[48px] w-full rounded-[80px]" />
+    </div>
+  )
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -113,6 +131,7 @@ export default function ConfirmBookingClient({
       </header>
 
       {/* Main content */}
+      <SkeletonReveal skeleton={<ConfirmBookingSkeleton />}>
       <div className="flex flex-col gap-[24px] px-5 pt-[48px] pb-[69px]">
 
         {/* Title */}
@@ -185,6 +204,7 @@ export default function ConfirmBookingClient({
         </button>
 
       </div>
+      </SkeletonReveal>
     </div>
   )
 }

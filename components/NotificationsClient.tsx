@@ -3,6 +3,28 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useNotificationSettings, ALL_CATEGORIES, type Category } from '@/lib/useNotificationSettings'
 import { useTranslation } from '@/lib/useTranslation'
+import SkeletonReveal from './SkeletonReveal'
+import SkeletonBlock from './SkeletonBlock'
+
+function NotificationsSkeleton() {
+  return (
+    <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[101px]">
+      <div className="flex flex-col gap-[12px]">
+        <SkeletonBlock className="h-[24px] w-[120px]" />
+        <div className="flex flex-col gap-[8px]">
+          <SkeletonBlock className="h-[76px] w-full rounded-card" />
+          <SkeletonBlock className="h-[76px] w-full rounded-card" />
+          <SkeletonBlock className="h-[76px] w-full rounded-card" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-[12px]">
+        <SkeletonBlock className="h-[24px] w-[140px]" />
+        <SkeletonBlock className="h-[150px] w-full rounded-card" />
+      </div>
+      <SkeletonBlock className="h-[70px] w-full rounded-card" />
+    </div>
+  )
+}
 
 function ChevronLeft() {
   return (
@@ -101,6 +123,7 @@ export default function NotificationsClient() {
       </header>
 
       {/* Content */}
+      <SkeletonReveal skeleton={<NotificationsSkeleton />}>
       <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[101px]">
 
         {/* Alert Types */}
@@ -198,6 +221,7 @@ export default function NotificationsClient() {
         </div>
 
       </div>
+      </SkeletonReveal>
     </div>
   )
 }

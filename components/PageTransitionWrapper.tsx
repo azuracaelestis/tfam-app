@@ -8,10 +8,12 @@ type Listener = () => void
 
 interface TransitionContextValue {
   subscribe: (fn: Listener) => () => void
+  skeletonEligible: boolean
 }
 
 const TransitionContext = createContext<TransitionContextValue>({
   subscribe: () => () => {},
+  skeletonEligible: false,
 })
 
 // Hook for page components to register a callback that fires once the
@@ -21,6 +23,15 @@ export function useOnTransitionComplete(fn: Listener) {
   const fnRef = useRef(fn)
   fnRef.current = fn
   useEffect(() => subscribe(() => fnRef.current()), [subscribe])
+}
+
+// True only for a genuine sub-screen reached by pushing deeper or coming
+// back — never a bottom-nav tab (even when a tab is the target of a 'back',
+// e.g. Notifications -> Settings), and never 'lift' or 'mode', which already
+// have their own shared-element choreography a skeleton would compete with.
+// See SkeletonReveal.tsx for what consumes this.
+export function useSkeletonEligible(): boolean {
+  return useContext(TransitionContext).skeletonEligible
 }
 
 // The five bottom-nav destinations are peers with no hierarchy — matched
@@ -133,7 +144,7 @@ const exitVariants = {
 // frozen at whatever they were when it was mounted, since React no longer
 // re-renders it once it's dropped from the tree) can still learn the direction
 // of the navigation that is removing it right now.
-function AnimatedPage({ children, direction }: { children: ReactNode; direction: Direction }) {
+function AnimatedPage({ children, direction, skeletonEligible }: { children: ReactNode; direction: Direction; skeletonEligible: boolean }) {
   const listenersRef = useRef(new Set<Listener>())
   const hasEnteredRef = useRef(false)
   // AnimatePresence keeps an exiting page mounted (opacity fading toward 0,
@@ -159,7 +170,7 @@ function AnimatedPage({ children, direction }: { children: ReactNode; direction:
   }, [])
 
   return (
-    <TransitionContext.Provider value={{ subscribe }}>
+    <TransitionContext.Provider value={{ subscribe, skeletonEligible }}>
       <motion.div
         className="absolute inset-0 overflow-y-auto"
         initial={initialFor(direction)}
@@ -180,6 +191,7 @@ export default function PageTransitionWrapper({ children }: { children: ReactNod
   const pathname = usePathname()
   const prevPathnameRef = useRef(pathname)
   const direction = classify(prevPathnameRef.current, pathname)
+  const skeletonEligible = (direction === 'deeper' || direction === 'back') && !TAB_ROUTES.has(pathname)
 
   // Bumped once per actual pathname change (see navKeyRef below) — read
   // during render, so the very same navigation's key stays stable across
@@ -197,7 +209,7 @@ export default function PageTransitionWrapper({ children }: { children: ReactNod
   return (
     <div className="relative flex-1 overflow-hidden">
       <AnimatePresence mode="sync" initial={false} custom={direction}>
-        <AnimatedPage key={`${pathname}-${navKeyRef.current}`} direction={direction}>
+        <AnimatedPage key={`${pathname}-${navKeyRef.current}`} direction={direction} skeletonEligible={skeletonEligible}>
           {children}
         </AnimatedPage>
       </AnimatePresence>

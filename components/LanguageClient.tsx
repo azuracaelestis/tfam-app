@@ -2,6 +2,27 @@
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/useLanguage'
 import { useTranslation } from '@/lib/useTranslation'
+import SkeletonReveal from './SkeletonReveal'
+import SkeletonBlock from './SkeletonBlock'
+
+function LanguageSkeleton() {
+  return (
+    <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[69px] w-full">
+      <div className="flex flex-col gap-[12px]">
+        <SkeletonBlock className="h-[24px] w-[160px]" />
+        <div className="flex flex-col gap-[8px]">
+          <SkeletonBlock className="h-[76px] w-full rounded-card" />
+          <SkeletonBlock className="h-[76px] w-full rounded-card" />
+        </div>
+      </div>
+      <SkeletonBlock className="h-[60px] w-full rounded-card" />
+      <div className="flex flex-col gap-[12px] mt-2">
+        <SkeletonBlock className="h-[24px] w-[200px]" />
+        <SkeletonBlock className="h-[90px] w-full rounded-card" />
+      </div>
+    </div>
+  )
+}
 
 function ChevronLeft() {
   return (
@@ -83,6 +104,7 @@ export default function LanguageClient() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
+        <SkeletonReveal skeleton={<LanguageSkeleton />}>
         <div className="flex flex-col gap-[24px] px-5 pt-[16px] pb-[69px] w-full">
 
           {/* Display Language */}
@@ -130,6 +152,7 @@ export default function LanguageClient() {
           </div>
 
         </div>
+        </SkeletonReveal>
       </div>
     </div>
   )

@@ -7,6 +7,25 @@ import { type Activity, scheduledDates, TIME_SLOTS } from '@/lib/activities'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
 import { LIFT } from '@/lib/motion'
+import SkeletonReveal from './SkeletonReveal'
+import SkeletonBlock from './SkeletonBlock'
+
+function ChooseDateSkeleton() {
+  return (
+    <div className="flex flex-col gap-[36px] px-5 pt-[16px]">
+      <SkeletonBlock className="h-[68px] w-full" />
+      <div className="flex flex-col gap-[24px]">
+        <div className="flex items-center gap-[29px]">
+          <SkeletonBlock className="size-11 rounded-full shrink-0" />
+          <SkeletonBlock className="h-[20px] flex-1" />
+          <SkeletonBlock className="size-11 rounded-full shrink-0" />
+        </div>
+        <SkeletonBlock className="h-[268px] w-full" />
+      </div>
+      <SkeletonBlock className="h-[48px] w-full rounded-[80px]" />
+    </div>
+  )
+}
 
 function getLocale(lang: 'en' | 'zh'): string {
   return lang === 'zh' ? 'zh-TW' : 'en-US'
@@ -181,6 +200,7 @@ export default function ChooseDateClient({
       </header>
 
       {/* Main content */}
+      <SkeletonReveal skeleton={<ChooseDateSkeleton />}>
       <div className="flex flex-col gap-[36px] px-5 pt-[16px]">
 
         {/* Activity summary card */}
@@ -393,6 +413,7 @@ export default function ChooseDateClient({
           </button>
         </motion.div>
       </div>
+      </SkeletonReveal>
     </div>
   )
 }
