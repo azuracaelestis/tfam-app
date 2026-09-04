@@ -35,6 +35,7 @@ function FloorSwitcher({
             key={floor.id}
             onClick={() => !floor.disabled && onChange(floor.id)}
             disabled={floor.disabled}
+            aria-current={isActive ? 'true' : undefined}
             className={[
               'relative flex-1 h-[44px] rounded-full text-sm font-semibold text-center transition-colors duration-150',
               floor.disabled ? 'text-[#ddd] cursor-not-allowed' : isActive ? 'text-white' : 'text-[#0a0a0a]',
@@ -114,10 +115,17 @@ function AmenityChips({
 function RouteBanner({
   label,
   subtext,
+  stopLabels,
   onHide,
 }: {
   label: string
   subtext: string
+  // Room names in the actual intended visit order — the numbered badges
+  // drawn over the floor plan carry that order purely visually (each one
+  // absolutely positioned at its own room's coordinates), so DOM/reading
+  // order there follows floor.rooms, not the route. This list is the real
+  // sequence for anyone not reading the numbers off the image.
+  stopLabels: string[]
   onHide: () => void
 }) {
   const t = useTranslation()
@@ -130,6 +138,11 @@ function RouteBanner({
       <div className="flex-1 flex flex-col gap-0.5">
         <p className="text-sm font-semibold text-black leading-normal">{label}</p>
         <p className="text-sm font-normal text-black leading-normal">{subtext}</p>
+        <ol className="sr-only">
+          {stopLabels.map((stopLabel, i) => (
+            <li key={i}>{stopLabel}</li>
+          ))}
+        </ol>
       </div>
       <button
         onClick={onHide}
@@ -395,9 +408,10 @@ function FloorPlan({
 
       {/* "You are here" green dot — pulsing flare */}
       <div
+        role="img"
         className="absolute z-10 flex items-center justify-center"
         style={{ bottom: '6%', right: '7.5%' }}
-        aria-label={t.map.youAreHere}
+        aria-label={`${t.map.youAreHere}: ${floor.label}`}
       >
         <span className="absolute inline-flex size-5 rounded-full bg-[#1abd6e] opacity-75 animate-ping" />
         <span className="relative inline-flex size-3 rounded-full bg-[#1abd6e] ring-2 ring-white" />
@@ -440,12 +454,11 @@ export default function MapClient() {
 
   const showRouteBanner = !!floor.suggestedRoute && showRoute
 
-  const captionText =
-    activeFloorId === 'B1'
-      ? t.map.youAreHereB1
-      : showRouteBanner
-      ? null
-      : t.map.youAreHereGeneric
+  // Always shown, even alongside the route banner — that banner explains
+  // the route, not the dot itself, and hiding this left the "you are here"
+  // marker with no on-screen text at all on 1F's default (banner-visible)
+  // state.
+  const captionText = activeFloorId === 'B1' ? t.map.youAreHereB1 : t.map.youAreHereGeneric
 
   return (
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
@@ -485,6 +498,10 @@ export default function MapClient() {
             <RouteBanner
               label={lang === 'zh' && floor.suggestedRoute.labelZh ? floor.suggestedRoute.labelZh : floor.suggestedRoute.label}
               subtext={lang === 'zh' && floor.suggestedRoute.subtextZh ? floor.suggestedRoute.subtextZh : floor.suggestedRoute.subtext}
+              stopLabels={floor.suggestedRoute.stops.map(roomId => {
+                const room = floor.rooms.find(r => r.id === roomId)
+                return lang === 'zh' && room?.nameZh ? room.nameZh : room?.name ?? roomId
+              })}
               onHide={() => setShowRoute(false)}
             />
           </motion.div>

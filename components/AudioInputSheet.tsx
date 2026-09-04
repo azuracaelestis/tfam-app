@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'motion/react'
 import Numpad from './Numpad'
+import { getArtworkByCode } from '@/lib/artworks'
+import { useTranslation } from '@/lib/useTranslation'
 import { SHEET, MODE } from '@/lib/motion'
 
 const SHEET_TITLE_ID = 'audio-guide-sheet-title'
@@ -86,10 +88,28 @@ export default function AudioInputSheet({
   onQR,
   open,
 }: AudioInputSheetProps) {
+  const t = useTranslation()
   const [mode, setMode] = useState<'qr' | 'manual'>('qr')
+  const [invalidCode, setInvalidCode] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
+
+  // Editing the code (even by one digit) is the visitor acting on the
+  // error — clear it immediately rather than waiting for another Play tap,
+  // so the message doesn't linger over digits it no longer describes.
+  useEffect(() => {
+    setInvalidCode(false)
+  }, [code])
+
+  const handlePlayClick = () => {
+    if (code.length !== 4) return
+    if (getArtworkByCode(code)) {
+      onPlay()
+    } else {
+      setInvalidCode(true)
+    }
+  }
 
   const handleClose = useCallback(() => {
     onClose()
@@ -278,11 +298,24 @@ export default function AudioInputSheet({
               </motion.button>
             </div>
 
+            {/* Inline error — an unrecognised code used to replace this
+                entire screen with a full-page dead end (only "Back to
+                Home", no way to retry). Showing it here instead keeps the
+                keypad on screen with the digits still there to edit, and
+                role="alert" announces it the moment it appears. */}
+            {invalidCode && (
+              <div role="alert" className="bg-[#fdecea] border border-[#f3b4ac] rounded-card px-4 py-1 shrink-0">
+                <p className="text-xs text-[#8a2c22] leading-snug">
+                  {t.play.artworkNotFoundDetail.replace('__CODE__', code)}
+                </p>
+              </div>
+            )}
+
             {/* Numpad — sized down from its 60px/14px default so the whole
                 pad fits this sheet's fixed height alongside everything else,
                 without the wrapper needing to scroll. */}
             <div className="shrink-0">
-              <Numpad onDigit={onDigit} onDelete={onDelete} keySize={44} gap={9} />
+              <Numpad onDigit={onDigit} onDelete={onDelete} keySize={44} gap={4} />
             </div>
 
             {/* Play button — same h-12 as "Enter code manually" in QR mode,
@@ -291,7 +324,7 @@ export default function AudioInputSheet({
             <motion.button
               layoutId="mode-player"
               transition={MODE}
-              onClick={onPlay}
+              onClick={handlePlayClick}
               disabled={code.length !== 4}
               className="w-full h-12 rounded-pill bg-black text-white text-label-l flex items-center justify-center gap-2 disabled:opacity-40 transition-opacity shrink-0"
             >
