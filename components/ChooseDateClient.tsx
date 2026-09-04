@@ -172,7 +172,7 @@ export default function ChooseDateClient({
       <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
           onClick={handleBack}
-          className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
+          className="relative flex items-center gap-[12px] active:opacity-60 transition-opacity before:content-[''] before:absolute before:-inset-y-[12px] before:inset-x-0"
           aria-label="Back to Activities"
         >
           <ChevronLeft />
@@ -218,7 +218,7 @@ export default function ChooseDateClient({
             <button
               onClick={prevMonth}
               disabled={isCurrentMonth}
-              className="size-[32px] shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] disabled:opacity-20 transition-colors"
+              className="size-11 shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] disabled:opacity-20 transition-colors"
               aria-label={t.chooseDate.prevMonth}
             >
               <MonthNavChevron direction="left" />
@@ -228,7 +228,7 @@ export default function ChooseDateClient({
             </p>
             <button
               onClick={nextMonth}
-              className="size-[32px] shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] transition-colors"
+              className="size-11 shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] transition-colors"
               aria-label={t.chooseDate.nextMonth}
             >
               <MonthNavChevron direction="right" />
@@ -266,7 +266,7 @@ export default function ChooseDateClient({
                       <div key={ci} className="flex items-center justify-center h-[32px]">
                         <button
                           onClick={() => handleDayClick(day)}
-                          className="bg-black p-[4px] rounded-[8px] active:opacity-70"
+                          className="relative bg-black p-[4px] rounded-[8px] active:opacity-70 before:content-[''] before:absolute before:-inset-[6px]"
                         >
                           <div className="size-[24px] rounded-[4px] flex items-center justify-center">
                             <span className="text-[14px] font-bold text-white leading-none">{day}</span>
@@ -281,7 +281,7 @@ export default function ChooseDateClient({
                       <div key={ci} className="flex items-center justify-center h-[32px]">
                         <button
                           onClick={() => handleDayClick(day)}
-                          className="bg-[#ececec] border border-[#ddd] p-[4px] rounded-[8px] active:opacity-70"
+                          className="relative bg-[#ececec] border border-[#ddd] p-[4px] rounded-[8px] active:opacity-70 before:content-[''] before:absolute before:-inset-[6px]"
                         >
                           <div className="size-[24px] rounded-[4px] flex items-center justify-center">
                             <span className="text-[14px] font-bold text-black leading-none">{day}</span>
@@ -326,9 +326,11 @@ export default function ChooseDateClient({
           </div>
         </motion.div>
 
-        {/* Time slot picker — shown once a date is selected */}
+        {/* Time slot picker — shown once a date is selected. role="status"
+            so a screen reader announces the newly-available slots the same
+            moment a sighted visitor sees them appear. */}
         {selectedDate && selectedDateEntry && (
-          <div className="flex flex-col gap-[12px]">
+          <div className="flex flex-col gap-[12px]" role="status">
             <p className="text-[16px] font-semibold text-black leading-none">{t.chooseDate.chooseATime}</p>
             <div className="flex gap-[8px]">
               {TIME_SLOTS.map(slot => {

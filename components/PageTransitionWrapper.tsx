@@ -1,6 +1,6 @@
 'use client'
 import { usePathname } from 'next/navigation'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useIsPresent } from 'motion/react'
 import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
 import { PEER, DEEPER, MODE } from '@/lib/motion'
 
@@ -136,6 +136,14 @@ const exitVariants = {
 function AnimatedPage({ children, direction }: { children: ReactNode; direction: Direction }) {
   const listenersRef = useRef(new Set<Listener>())
   const hasEnteredRef = useRef(false)
+  // AnimatePresence keeps an exiting page mounted (opacity fading toward 0,
+  // per exitVariants above) for however long its exit transition takes —
+  // during that whole window it was staying fully focusable and readable by
+  // a screen reader, an invisible duplicate of whatever's entering. `inert`
+  // pulls it out of both tab order and the accessibility tree for exactly
+  // that window; `useIsPresent` flips false the instant AnimatePresence
+  // starts this exit, no separate timer to keep in sync with the fade.
+  const isPresent = useIsPresent()
 
   const subscribe = useCallback((fn: Listener) => {
     listenersRef.current.add(fn)
@@ -159,6 +167,8 @@ function AnimatedPage({ children, direction }: { children: ReactNode; direction:
         variants={exitVariants}
         exit="exit"
         onAnimationComplete={notify}
+        inert={!isPresent}
+        aria-hidden={!isPresent || undefined}
       >
         {children}
       </motion.div>

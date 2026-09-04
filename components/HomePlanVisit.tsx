@@ -24,8 +24,8 @@ export default function HomePlanVisit() {
             )}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-heading-m text-ink truncate">{t.home.bookGuidedTour}</span>
-            <span className="text-label-m text-ink-secondary truncate">{t.home.bookGuidedTourDesc}</span>
+            <span className="text-heading-m text-ink">{t.home.bookGuidedTour}</span>
+            <span className="text-label-m text-ink-secondary">{t.home.bookGuidedTourDesc}</span>
           </div>
         </div>
         <ChevronRightIcon size={24} className="text-ink shrink-0" />

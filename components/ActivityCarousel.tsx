@@ -102,10 +102,11 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
             const durationTag = getDurationTag(a)
             const ageTag      = getAgeTag(a)
             return (
-              <div
+              <button
                 key={a.id}
+                type="button"
                 onClick={() => router.push(`/activities/${a.id}/book?from=carousel`)}
-                className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
+                className="w-[262px] shrink-0 flex flex-col text-left rounded-card overflow-hidden border border-hairline bg-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               >
                 <motion.div layoutId={`chip-carousel-${a.id}`} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
                   <Image src={a.image} alt={a.title} fill sizes="262px" className="object-cover" priority={i === 0} />
@@ -126,7 +127,7 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
                     <ChevronRightIcon size={17} />
                   </div>
                 </div>
-              </div>
+              </button>
             )
           })}
         </motion.div>

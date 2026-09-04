@@ -34,9 +34,10 @@ function ActivityListCard({ activity: a, bookThis, lang, t }: {
   const durationTag = getDurationTag(a)
   const ageTag      = getAgeTag(a)
   return (
-    <div
+    <button
+      type="button"
       onClick={() => router.push(`/activities/${a.id}/book?from=list`)}
-      className="w-full flex items-stretch gap-4 bg-white active:bg-[#f5f5f5] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
+      className="w-full flex items-stretch text-left gap-4 bg-white active:bg-[#f5f5f5] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
     >
       <motion.div layoutId={`chip-list-${a.id}`} transition={LIFT} className="relative w-[126px] min-h-[120px] shrink-0 overflow-hidden rounded-card">
         <Image src={a.image} alt={a.title} fill sizes="126px" className="object-cover" />
@@ -55,7 +56,7 @@ function ActivityListCard({ activity: a, bookThis, lang, t }: {
           <ChevronRightIcon size={17} />
         </div>
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -103,7 +104,7 @@ export default function ActivitiesClient() {
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className="relative flex-1 min-w-0 h-[40px] rounded-pill flex items-center justify-center text-sm font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none"
+              className="relative flex-1 min-w-0 min-h-11 rounded-pill flex items-center justify-center text-sm font-semibold text-black truncate px-1 outline-none focus:outline-none focus-visible:outline-none"
             >
               {filter === f.value && (
                 <motion.div

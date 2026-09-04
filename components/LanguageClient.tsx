@@ -72,7 +72,7 @@ export default function LanguageClient() {
         <div className="flex gap-[12px] items-center w-full">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
+            className="relative flex items-center gap-[12px] active:opacity-60 transition-opacity before:content-[''] before:absolute before:-inset-y-[12px] before:inset-x-0"
             aria-label="Back"
           >
             <ChevronLeft />

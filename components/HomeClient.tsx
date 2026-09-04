@@ -77,7 +77,7 @@ export default function HomeClient() {
       {/* ── Welcome copy + primary CTA — normal flow below the photo ── */}
       <section className="relative flex flex-col gap-3 px-5 pt-3 pb-4 bg-canvas -mt-8">
         <div className="flex flex-col gap-2 text-ink">
-          <h2 className="splash-rise text-[32px] leading-[2.5rem] font-semibold max-w-[284px]">
+          <h2 className="splash-rise text-[2rem] leading-[2.5rem] font-semibold max-w-[284px]">
             {t.home.heroHeading}
           </h2>
           <p className="splash-rise text-body-l text-ink-secondary">
@@ -87,7 +87,7 @@ export default function HomeClient() {
 
         <button
           onClick={() => setSheetOpen(true)}
-          className="splash-rise flex items-center justify-center gap-1.5 w-full h-[48px] rounded-pill bg-ink text-white text-label-l"
+          className="splash-rise flex items-center justify-center gap-1.5 w-full min-h-12 rounded-pill bg-ink text-white text-label-l"
         >
           <img src="/audio-headphone-white.svg" width={14} height={14} alt="" aria-hidden="true" />
           {t.home.startAudioGuide}

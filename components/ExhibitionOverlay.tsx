@@ -84,7 +84,7 @@ export default function ExhibitionOverlay({ id, origin, onClose }: { id: string;
       >
         <button
           onClick={onClose}
-          className="flex items-center gap-3"
+          className="relative flex items-center gap-3 before:content-[''] before:absolute before:-inset-y-[12px] before:inset-x-0"
           aria-label={t.exhibitionDetail.back}
         >
           <ChevronLeftIcon />

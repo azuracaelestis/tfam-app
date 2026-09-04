@@ -44,7 +44,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
       role="switch"
       aria-checked={value}
       onClick={() => onChange(!value)}
-      className={`relative w-[50px] h-[28px] rounded-full border border-[#d9d9d9] p-[4px] flex items-center shrink-0 transition-colors ${value ? 'bg-black justify-end' : 'bg-[#9c9c9c] justify-start'}`}
+      className={`relative w-[50px] h-[28px] rounded-full border border-[#d9d9d9] p-[4px] flex items-center shrink-0 transition-colors before:content-[''] before:absolute before:-inset-y-[9px] before:inset-x-0 ${value ? 'bg-black justify-end' : 'bg-[#9c9c9c] justify-start'}`}
     >
       <span className="block size-[19px] bg-white rounded-full shrink-0" />
     </button>
@@ -92,7 +92,7 @@ export default function NotificationsClient() {
       <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
+          className="relative flex items-center gap-[12px] active:opacity-60 transition-opacity before:content-[''] before:absolute before:-inset-y-[12px] before:inset-x-0"
           aria-label="Back"
         >
           <ChevronLeft />
@@ -151,7 +151,7 @@ export default function NotificationsClient() {
                     <span className="text-[14px] font-normal text-black whitespace-nowrap">{t.notifications.categories[cat]}</span>
                     <button
                       onClick={() => removeInterest(cat as Category)}
-                      className="shrink-0 active:opacity-60"
+                      className="relative shrink-0 active:opacity-60 before:content-[''] before:absolute before:-inset-[19px]"
                       aria-label={`Remove ${cat}`}
                     >
                       <RemoveIcon />

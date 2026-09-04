@@ -104,7 +104,7 @@ export default function ConfirmBookingClient({
       <header className="sticky top-0 z-10 bg-white h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-[12px] active:opacity-60 transition-opacity"
+          className="relative flex items-center gap-[12px] active:opacity-60 transition-opacity before:content-[''] before:absolute before:-inset-y-[12px] before:inset-x-0"
           aria-label="Back"
         >
           <ChevronLeft />
@@ -130,22 +130,38 @@ export default function ConfirmBookingClient({
         {/* Your Details */}
         <div className="flex flex-col gap-[12px]">
           <p className="text-[16px] font-semibold text-black leading-none">{t.confirmBooking.yourDetails}</p>
-          <input
-            type="text"
-            placeholder={t.confirmBooking.namePlaceholder}
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
-          />
-          <input
-            ref={emailScope}
-            type="email"
-            placeholder={t.confirmBooking.emailPlaceholder}
-            value={email}
-            onChange={handleEmailChange}
-            onBlur={handleEmailBlur}
-            className={`w-full bg-[#f5f5f5] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none transition-colors border ${emailError ? 'border-red-500 focus:border-red-500' : 'border-[#d6d6d6] focus:border-black'}`}
-          />
+          <div className="flex flex-col gap-[6px]">
+            <label htmlFor="booking-name" className="text-[13px] font-medium text-black">
+              {t.confirmBooking.namePlaceholder}
+            </label>
+            <input
+              id="booking-name"
+              type="text"
+              autoComplete="name"
+              required
+              placeholder={t.confirmBooking.namePlaceholder}
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none focus:border-black transition-colors"
+            />
+          </div>
+          <div className="flex flex-col gap-[6px]">
+            <label htmlFor="booking-email" className="text-[13px] font-medium text-black">
+              {t.confirmBooking.emailPlaceholder}
+            </label>
+            <input
+              id="booking-email"
+              ref={emailScope}
+              type="email"
+              autoComplete="email"
+              required
+              placeholder={t.confirmBooking.emailPlaceholder}
+              value={email}
+              onChange={handleEmailChange}
+              onBlur={handleEmailBlur}
+              className={`w-full bg-[#f5f5f5] rounded-[12px] px-[16px] py-[14px] text-[15px] text-black placeholder:text-[#aaa] outline-none transition-colors border ${emailError ? 'border-red-500 focus:border-red-500' : 'border-[#d6d6d6] focus:border-black'}`}
+            />
+          </div>
         </div>
 
         {/* Info banner */}

@@ -14,16 +14,18 @@ export default function HomeCards() {
 
   const item = (label: string, icon: string, href?: string) => {
     const inner = (
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between gap-2 w-full">
         <div className="flex items-center gap-3 min-w-0">
           <img src={`/${icon}`} width={20} height={20} alt="" aria-hidden="true" className="shrink-0" />
-          <span className="text-heading-m text-ink truncate">{label}</span>
+          <span className="text-heading-m text-ink">{label}</span>
         </div>
         <ChevronRightIcon size={24} className="text-ink shrink-0" />
       </div>
     )
 
-    const className = 'bg-white border border-hairline rounded-card h-[44px] px-3 flex items-center w-full'
+    // min-h, not h: at 200% text size "Floor Map" needs two lines' worth of
+    // height, and a fixed height would just clip it instead of growing.
+    const className = 'bg-white border border-hairline rounded-card min-h-11 px-3 py-2 flex items-center w-full'
 
     return href ? (
       <button key={label} onClick={() => router.push(href)} className={className}>

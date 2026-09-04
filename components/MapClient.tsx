@@ -82,7 +82,7 @@ function AmenityChips({
             key={chip}
             onClick={() => !isDisabled && onChange(chip === active ? null : chip)}
             disabled={isDisabled}
-            className={`shrink-0 flex items-center gap-2 h-[35px] rounded-full border border-[#ddd] px-5 text-sm font-normal transition-colors duration-150 ${
+            className={`shrink-0 flex items-center gap-2 min-h-11 rounded-full border border-[#ddd] px-5 text-sm font-normal transition-colors duration-150 ${
               isDisabled ? 'bg-white text-[#ddd] cursor-not-allowed'
                 : chip === active ? 'bg-[#f2f2f2] text-[#4f4f4f]'
                 : 'bg-white text-[#4f4f4f]'
@@ -133,7 +133,7 @@ function RouteBanner({
       </div>
       <button
         onClick={onHide}
-        className="shrink-0 border border-black rounded-2xl px-5 py-1 text-sm text-black bg-white"
+        className="shrink-0 border border-black rounded-2xl px-5 min-h-11 flex items-center justify-center text-sm text-black bg-white"
       >
         {t.map.hide}
       </button>

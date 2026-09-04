@@ -119,15 +119,23 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
 
                 <div className="flex flex-col gap-4 p-3">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-[20px] font-semibold text-black leading-normal">{displayTitle}</h3>
+                    <h3 className="text-[1.25rem] font-semibold text-black leading-normal">{displayTitle}</h3>
                     <p className="text-xs text-ink-secondary leading-normal">{metaLine(ex, lang)}</p>
                   </div>
-                  <p className="text-sm font-normal text-black leading-[18px] h-[54px] line-clamp-3">
+                  {/* leading and min-h both in rem (not the old leading-[18px]
+                      h-[54px] px pairing): at 200% text size the old fixed px
+                      line-height stayed put while the font-size doubled,
+                      so lines rendered taller than their own box and
+                      overlapped. rem units grow together, and line-clamp-3
+                      itself already caps the content at 3 lines — min-h
+                      only keeps short descriptions the same height as long
+                      ones, it never causes clipping. */}
+                  <p className="text-sm font-normal text-black leading-[1.125rem] min-h-[3.375rem] line-clamp-3">
                     {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
                   </p>
                   <button
                     onClick={() => onOpen(ex.id)}
-                    className="flex items-center gap-0.5 text-sm font-semibold text-black"
+                    className="relative flex items-center gap-0.5 text-sm font-semibold text-black before:content-[''] before:absolute before:-inset-y-3 before:inset-x-0"
                   >
                     {t.whatsOn.explore}
                     <ChevronRightIcon size={17} />

@@ -33,7 +33,7 @@ export default function HomeFeaturedExhibition() {
         <h2 className="text-heading-l text-ink">{t.home.todayAtMuseum}</h2>
         <button
           onClick={() => router.push('/whats-on')}
-          className="flex items-center gap-0.5 text-sm text-ink"
+          className="relative flex items-center gap-0.5 text-sm text-ink before:content-[''] before:absolute before:-inset-3"
         >
           {t.home.viewAll}
           <ChevronRightIcon size={13} />

@@ -136,7 +136,7 @@ export default function PlayClient({ code }: { code: string }) {
 
   if (!artwork) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 px-6 text-center font-noto">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 px-6 text-center font-noto" role="alert">
         <p className="text-tfam-dark font-semibold text-lg">{t.play.artworkNotFound}</p>
         <p className="text-tfam-mid text-sm">{t.play.artworkNotFoundDetail.replace('__CODE__', code)}</p>
         <button
@@ -170,7 +170,7 @@ export default function PlayClient({ code }: { code: string }) {
       <header className="h-[60px] px-5 flex items-end pb-[10px] shrink-0">
         <button
           onClick={handleBack}
-          className="flex items-center gap-3"
+          className="relative flex items-center gap-3 before:content-[''] before:absolute before:-inset-y-[12px] before:inset-x-0"
           aria-label={t.play.backToHome}
         >
           <ChevronLeftIcon />

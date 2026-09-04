@@ -1,8 +1,39 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'motion/react'
 import Numpad from './Numpad'
 import { SHEET, MODE } from '@/lib/motion'
+
+const SHEET_TITLE_ID = 'audio-guide-sheet-title'
+
+// Walks from `target` up to <body>, marking every sibling along the way
+// inert — this sheet isn't portaled (it's just a `fixed` sibling wherever
+// its two consumers, HomeClient and ExhibitionOverlay, happen to render
+// it), so there's no single "background root" node to hand off to a
+// library; walking the ancestor chain finds one without needing to know
+// either consumer's DOM shape. Returns a cleanup that undoes exactly the
+// elements this call touched — one already inert for an unrelated reason
+// is left alone, both going in and on cleanup.
+function hideOthers(target: Element | null): () => void {
+  if (!target) return () => {}
+  const madeInert: Element[] = []
+  let node: Element | null = target
+  while (node && node !== document.body) {
+    const parent: Element | null = node.parentElement
+    if (parent) {
+      Array.from(parent.children).forEach(sibling => {
+        if (sibling !== node && !sibling.hasAttribute('inert')) {
+          sibling.setAttribute('inert', '')
+          madeInert.push(sibling)
+        }
+      })
+    }
+    node = parent
+  }
+  return () => {
+    madeInert.forEach(el => el.removeAttribute('inert'))
+  }
+}
 
 interface AudioInputSheetProps {
   code: string
@@ -27,7 +58,7 @@ function CloseButton({ onClick, className = '' }: { onClick: () => void; classNa
   return (
     <button
       onClick={onClick}
-      className={`w-[30px] h-[30px] flex items-center justify-center rounded-full border border-hairline bg-white shrink-0 ${className}`}
+      className={`relative w-[30px] h-[30px] flex items-center justify-center rounded-full border border-hairline bg-white shrink-0 before:content-[''] before:absolute before:-inset-[8px] ${className}`}
       aria-label="Close"
     >
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -56,17 +87,61 @@ export default function AudioInputSheet({
   open,
 }: AudioInputSheetProps) {
   const [mode, setMode] = useState<'qr' | 'manual'>('qr')
+  const rootRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onClose()
     setMode('qr')
-  }
+  }, [onClose])
+
+  // Move focus into the sheet on open; on close, undo everything in the
+  // order that makes the trigger focusable again BEFORE trying to focus
+  // it — restoring focus while it's still `inert` is a silent no-op, so
+  // this has to be one effect (cleanups run top-to-bottom, same as the
+  // effects that registered them) rather than separate ones that could
+  // race in the wrong order.
+  useEffect(() => {
+    if (!open) return
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null
+    document.body.style.overflow = 'hidden'
+    const restoreInert = hideOthers(rootRef.current)
+    panelRef.current?.focus()
+    return () => {
+      document.body.style.overflow = ''
+      restoreInert()
+      previouslyFocusedRef.current?.focus()
+    }
+  }, [open])
+
+  // Escape dismisses, same as tapping the backdrop or the close button.
+  useEffect(() => {
+    if (!open) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [open, handleClose])
 
   return (
     <div
+      ref={rootRef}
       className={`fixed inset-0 z-50 flex flex-col justify-end overflow-hidden ${
         open ? 'pointer-events-auto' : 'pointer-events-none'
       }`}
+      // Closed just means translated off-screen at opacity:0 — the sheet is
+      // "always mounted" (see the panel's own comment below) so its close
+      // animation has something to animate from next time it opens. Without
+      // this, its three controls (Close, Scan QR code, Enter code manually)
+      // stay in the tab order and the accessibility tree indefinitely, on
+      // every screen that renders this component, whether or not anyone's
+      // ever opened it. Same inert + aria-hidden pairing as the page
+      // transition's outgoing-screen fix — not animation-gated, since ax
+      // tree membership isn't something a sighted visitor perceives.
+      inert={!open}
+      aria-hidden={!open || undefined}
     >
       {/* Backdrop */}
       <motion.div
@@ -84,7 +159,12 @@ export default function AudioInputSheet({
           internal scroll — see the `shrink-0` note below for why that
           matters more than just "make it tall enough". */}
       <motion.div
-        className="relative bg-white rounded-t-[32px] pt-4 pb-6 px-5 flex flex-col gap-4 font-noto h-[650px] max-h-[75vh]"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={SHEET_TITLE_ID}
+        tabIndex={-1}
+        className="relative bg-white rounded-t-[32px] pt-4 pb-6 px-5 flex flex-col gap-4 font-noto h-[650px] max-h-[75vh] outline-none"
         initial={{ y: '100%' }}
         animate={{ y: open ? 0 : '100%', transition: SHEET }}
       >
@@ -115,7 +195,7 @@ export default function AudioInputSheet({
                 <HeadphoneIcon />
               </div>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h2 className="text-[20px] font-bold text-ink leading-normal">Audio Guide</h2>
+                <h2 id={SHEET_TITLE_ID} className="text-[20px] font-bold text-ink leading-normal">Audio Guide</h2>
                 <p className="text-label-m text-ink max-w-[260px]">
                   Scan the QR code next to the artwork label to begin listening.
                 </p>
@@ -173,7 +253,7 @@ export default function AudioInputSheet({
                 <HeadphoneIcon />
               </div>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h2 className="text-[20px] font-bold text-ink leading-normal">Audio Guide</h2>
+                <h2 id={SHEET_TITLE_ID} className="text-[20px] font-bold text-ink leading-normal">Audio Guide</h2>
                 <p className="text-label-m text-ink max-w-[260px]">
                   Find the number next to any artwork label and enter it below
                 </p>
@@ -182,7 +262,7 @@ export default function AudioInputSheet({
 
             {/* Artwork Code input section */}
             <div className="bg-white border border-hairline rounded-card h-[69px] flex items-center px-5 w-full shrink-0">
-              <div className="flex items-center justify-center gap-8 flex-1">
+              <div className="flex items-center justify-center gap-8 flex-1" role="status">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <span key={i} className="text-[24px] font-semibold text-black w-6 text-center leading-none">
                     {i < code.length ? code[i] : '—'}
@@ -202,7 +282,7 @@ export default function AudioInputSheet({
                 pad fits this sheet's fixed height alongside everything else,
                 without the wrapper needing to scroll. */}
             <div className="shrink-0">
-              <Numpad onDigit={onDigit} onDelete={onDelete} keySize={42} gap={9} />
+              <Numpad onDigit={onDigit} onDelete={onDelete} keySize={44} gap={9} />
             </div>
 
             {/* Play button — same h-12 as "Enter code manually" in QR mode,
@@ -221,7 +301,12 @@ export default function AudioInputSheet({
 
             <button
               onClick={() => setMode('qr')}
-              className="text-xs text-ink-secondary text-center w-full shrink-0"
+              // Invisible hit-slop, not real padding: this sheet's fixed
+              // height is already tightly budgeted (see the shrink-0 note
+              // above) to fit both modes without scrolling — extra layout
+              // padding here would blow that budget, so the tap target
+              // grows without the row itself growing.
+              className="relative text-xs text-ink-secondary text-center w-full shrink-0 before:content-[''] before:absolute before:-inset-y-[14px] before:inset-x-0"
             >
               Back to QR scan
             </button>

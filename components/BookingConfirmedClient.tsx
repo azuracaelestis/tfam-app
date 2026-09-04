@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { type Activity } from '@/lib/activities'
 import { useTranslation } from '@/lib/useTranslation'
@@ -90,6 +91,14 @@ export default function BookingConfirmedClient({
   const [lang] = useLanguage()
   const locale = lang === 'zh' ? 'zh-TW' : 'en-US'
 
+  // Landing here completes the booking flow — left on <body>, focus (and so
+  // a screen reader's announcement) would otherwise silently vanish after a
+  // multi-step form instead of confirming what just happened.
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    headingRef.current?.focus()
+  }, [])
+
   const slotDisplay   = slot.replace('-', '–')
   const fee           = activity.tags.includes('Free') ? t.activities.tagFree : (activity.tags.find(tag => tag.startsWith('NT$')) ?? '—')
   const activityTitle = lang === 'zh' && activity.titleZh ? activity.titleZh : activity.title
@@ -102,7 +111,13 @@ export default function BookingConfirmedClient({
         <CheckCircleIcon />
 
         {/* Title */}
-        <p className="text-[20px] font-bold text-black text-center leading-none">{t.bookingConfirmed.title}</p>
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-[20px] font-bold text-black text-center leading-none outline-none"
+        >
+          {t.bookingConfirmed.title}
+        </h1>
 
         {/* Summary card */}
         <div className="w-full bg-[#f5f5f5] border border-[#d6d6d6] rounded-[16px] px-[24px] py-[16px] flex flex-col gap-[8px]">

@@ -35,21 +35,22 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
   const t = useTranslation()
   const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
   return (
-    <div
+    <button
+      type="button"
       onClick={() => onOpen(ex.id)}
-      className="w-[361px] flex items-stretch gap-[9px] bg-white active:bg-[#EEEEEE] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
+      className="w-[361px] flex items-stretch text-left gap-[9px] bg-white active:bg-[#EEEEEE] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
     >
       <motion.div layoutId={`hero-whats-on-${ex.id}`} transition={LIFT} className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
       </motion.div>
       <div className="flex-1 min-w-0 flex flex-col gap-1 justify-center py-3">
-        <p className="text-base font-semibold text-black leading-snug truncate">{displayTitle}</p>
-        <p className="text-xs text-ink-secondary leading-normal whitespace-nowrap">{metaLine(ex, lang)}</p>
+        <p className="text-base font-semibold text-black leading-snug">{displayTitle}</p>
+        <p className="text-xs text-ink-secondary leading-normal">{metaLine(ex, lang)}</p>
         <div className="flex items-center gap-2 flex-wrap">
           {ex.categories.map(cat => (
             <div key={cat} className="flex items-center gap-2 bg-[#f2f2f2] rounded-[8px] px-2 py-1">
               <img src="/tag.svg" width={8} height={8} alt="" aria-hidden="true" className="shrink-0" />
-              <span className="text-[12px] text-black whitespace-nowrap">
+              <span className="text-xs text-black whitespace-nowrap">
                 {translateCat(t, cat)}
               </span>
             </div>
@@ -57,7 +58,7 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
         </div>
       </div>
       <ChevronRightIcon size={24} className="text-ink shrink-0 self-center" />
-    </div>
+    </button>
   )
 }
 
@@ -73,18 +74,18 @@ function ComingSoonCard({ ex, notified, onToggle, lang }: ComingSoonCardProps & 
   const t = useTranslation()
   const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
   return (
-    <div className="flex h-[130px] gap-4 bg-white border border-hairline rounded-card overflow-hidden pr-5">
+    <div className="flex min-h-[130px] gap-4 bg-white border border-hairline rounded-card overflow-hidden pr-5">
       <div className="relative w-[148px] h-[130px] shrink-0 overflow-hidden rounded-card">
         <Image src={ex.image} alt={ex.title} fill className="object-cover" />
       </div>
       <div className="flex-1 flex flex-col gap-3 justify-center min-w-0 py-3">
         <div className="flex flex-col gap-1">
-          <p className="text-base font-semibold text-black leading-snug truncate">{displayTitle}</p>
-          <p className="text-xs text-ink-secondary leading-normal truncate">{metaLine(ex, lang, cat => translateCat(t, cat))}</p>
+          <p className="text-base font-semibold text-black leading-snug">{displayTitle}</p>
+          <p className="text-xs text-ink-secondary leading-normal">{metaLine(ex, lang, cat => translateCat(t, cat))}</p>
         </div>
         <button
           onClick={onToggle}
-          className={`h-[44px] w-full rounded-pill flex items-center justify-center gap-2 text-sm font-semibold transition-colors ${
+          className={`min-h-11 w-full rounded-pill flex items-center justify-center gap-2 text-sm font-semibold transition-colors ${
             notified
               ? 'bg-[#F4F4F4] border border-[#DDDDDD] text-[#4F4F4F]'
               : 'bg-white border border-black text-black'
@@ -200,7 +201,7 @@ export default function WhatsOnClient() {
 
       {/* ── Header ── */}
       <header className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0">
-        <h1 className="text-[32px] font-semibold text-black leading-normal">{t.whatsOn.title}</h1>
+        <h1 className="text-[2rem] font-semibold text-black leading-normal">{t.whatsOn.title}</h1>
         <p className="text-sm text-ink-secondary">{t.whatsOn.subtitle}</p>
       </header>
 
@@ -226,10 +227,10 @@ export default function WhatsOnClient() {
               key={tab.value}
               ref={el => { tabRefs.current[i] = el }}
               onClick={() => snapToIndex(i)}
-              className="relative z-10 flex-1 min-w-0 h-[44px] rounded-pill flex items-center justify-center gap-2 font-bold text-[16px] text-black outline-none focus:outline-none focus-visible:outline-none"
+              className="relative z-10 flex-1 min-w-0 min-h-11 py-1 rounded-pill flex items-center justify-center gap-2 font-bold text-base text-black outline-none focus:outline-none focus-visible:outline-none"
             >
               {tab.label}
-              <span className="bg-[#ececec] rounded-full min-w-[29px] h-[27px] flex items-center justify-center text-[14px] font-bold text-black px-1">
+              <span className="bg-[#ececec] rounded-full min-w-[1.8125rem] min-h-[1.6875rem] flex items-center justify-center text-sm font-bold text-black px-1">
                 {countFor(tab)}
               </span>
             </button>

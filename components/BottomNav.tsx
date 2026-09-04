@@ -58,7 +58,11 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="splash-rise fixed bottom-0 left-0 right-0 h-[69px] bg-white border-t border-border-card flex items-center justify-between px-3 z-40"
+      // min-h, not h: at 200% text size five labels ("Activities",
+      // "Settings", ...) don't all fit their own tab's width on one line —
+      // a fixed height forced them to overlap into neighbouring tabs
+      // instead of wrapping to a second line and growing the bar.
+      className="splash-rise fixed bottom-0 left-0 right-0 min-h-[4.3125rem] bg-white border-t border-border-card flex items-center justify-between px-3 z-40"
       aria-label="Main navigation"
     >
       {ITEMS.map((item, i) => {
@@ -83,7 +87,7 @@ export default function BottomNav() {
               aria-hidden="true"
             />
             <span
-              className={`text-2xs leading-tight text-center whitespace-nowrap ${
+              className={`text-2xs leading-tight text-center ${
                 isActive ? 'text-black font-medium' : 'text-gray-400'
               }`}
             >
@@ -96,7 +100,7 @@ export default function BottomNav() {
           <button
             key={item.key}
             onClick={() => handleTap(item.href)}
-            className="relative flex-1 h-full flex flex-col items-center justify-center gap-2 py-2.5"
+            className="relative flex-1 min-w-0 h-full flex flex-col items-center justify-center gap-2 py-2.5"
             aria-current={isActive ? 'page' : undefined}
           >
             {inner}
