@@ -1,8 +1,9 @@
 'use client'
 import { usePathname } from 'next/navigation'
-import { AnimatePresence, motion, useIsPresent } from 'motion/react'
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react'
 import { createContext, useCallback, useContext, useEffect, useRef, type ReactNode } from 'react'
-import { PEER, DEEPER, MODE } from '@/lib/motion'
+import { LayoutRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+import { PEER, DEEPER, MODE, TAB_BOUNCE } from '@/lib/motion'
 
 type Listener = () => void
 
@@ -37,6 +38,16 @@ export function useSkeletonEligible(): boolean {
 // The five bottom-nav destinations are peers with no hierarchy — matched
 // exactly, not by prefix, so e.g. '/whats-on/[id]' is never mistaken for one.
 const TAB_ROUTES = new Set(['/', '/whats-on', '/map', '/activities', '/settings'])
+// Left-to-right order of the bottom bar, used to pick which way a tab switch
+// bounces: +1 = target tab is to the right, -1 = to the left.
+const TAB_ORDER = ['/', '/whats-on', '/map', '/activities', '/settings']
+
+function tabSide(prev: string, next: string): -1 | 0 | 1 {
+  const a = TAB_ORDER.indexOf(prev)
+  const b = TAB_ORDER.indexOf(next)
+  if (a < 0 || b < 0 || a === b) return 0
+  return b > a ? 1 : -1
+}
 
 // The exact /activities <-> /activities/[id]/book pair, and no other segment
 // depth — /activities/[id]/book/confirm is one level further and must stay a
@@ -88,15 +99,17 @@ function classify(prev: string, next: string): Direction {
 // becoming the player), and a wrapper-level transform here would compound
 // with that. But unlike 'lift', 'mode' is NOT a no-op on exit — see
 // exitVariants below.
-function initialFor(direction: Direction) {
+function initialFor(direction: Direction, side: number) {
   if (direction === 'lift' || direction === 'mode') return false
+  if (direction === 'peer' && side !== 0) return { x: side > 0 ? TAB_BOUNCE.enterOffset : `-${TAB_BOUNCE.enterOffset}`, opacity: TAB_BOUNCE.enterOpacity }
   if (direction === 'deeper') return { x: '100%', opacity: 1 }
   if (direction === 'back') return { x: '-28%', opacity: 0.45 }
   return { opacity: 0 }
 }
 
-function animateFor(direction: Direction) {
+function animateFor(direction: Direction, side: number) {
   if (direction === 'lift' || direction === 'mode') return {}
+  if (direction === 'peer' && side !== 0) return { x: 0, opacity: 1, transition: TAB_BOUNCE.enter }
   if (direction === 'peer') return { opacity: 1, transition: PEER }
   return { x: 0, opacity: 1, transition: DEEPER }
 }
@@ -105,8 +118,11 @@ function animateFor(direction: Direction) {
 // functions can only be referenced via a `variants` object + label, not
 // passed directly as a prop, so this is the one case that keeps that shape.
 const exitVariants = {
-  exit: (direction: Direction) => {
+  exit: ({ direction, side }: { direction: Direction; side: number }) => {
     if (direction === 'lift') return {}
+    if (direction === 'peer' && side !== 0) {
+      return { x: side > 0 ? `-${TAB_BOUNCE.exitOffset}` : TAB_BOUNCE.exitOffset, opacity: 1, transition: TAB_BOUNCE.exit }
+    }
     // The page being left behind (or left behind by /play arriving) has no
     // competing layoutId animation on its own side, so — unlike 'lift' — the
     // wrapper is free to actually fall back and dim: real motion, not a
@@ -116,6 +132,19 @@ const exitVariants = {
     if (direction === 'back') return { x: '100%', opacity: 1, transition: DEEPER }
     return { opacity: 0, transition: PEER }
   },
+}
+
+// Next's App Router hands the layout a `children` that always resolves to the
+// CURRENT route, even inside an element AnimatePresence is keeping alive for
+// its exit. Without this, the page being left silently re-renders as the page
+// being entered — invisible in a cross-dissolve (same content fading into
+// itself) but obvious the moment the two pages travel apart: you see the
+// destination twice. Pinning the router context captured at mount keeps each
+// exiting page rendering the route it actually was.
+function FrozenRouter({ children }: { children: ReactNode }) {
+  const context = useContext(LayoutRouterContext)
+  const frozen = useRef(context).current
+  return <LayoutRouterContext.Provider value={frozen}>{children}</LayoutRouterContext.Provider>
 }
 
 // Per-navigation instance: own listener set + motion.div + context provider.
@@ -144,7 +173,7 @@ const exitVariants = {
 // frozen at whatever they were when it was mounted, since React no longer
 // re-renders it once it's dropped from the tree) can still learn the direction
 // of the navigation that is removing it right now.
-function AnimatedPage({ children, direction, skeletonEligible }: { children: ReactNode; direction: Direction; skeletonEligible: boolean }) {
+function AnimatedPage({ children, direction, side, skeletonEligible }: { children: ReactNode; direction: Direction; side: number; skeletonEligible: boolean }) {
   const listenersRef = useRef(new Set<Listener>())
   const hasEnteredRef = useRef(false)
   // AnimatePresence keeps an exiting page mounted (opacity fading toward 0,
@@ -173,15 +202,15 @@ function AnimatedPage({ children, direction, skeletonEligible }: { children: Rea
     <TransitionContext.Provider value={{ subscribe, skeletonEligible }}>
       <motion.div
         className="absolute inset-0 overflow-y-auto"
-        initial={initialFor(direction)}
-        animate={animateFor(direction)}
+        initial={initialFor(direction, side)}
+        animate={animateFor(direction, side)}
         variants={exitVariants}
         exit="exit"
         onAnimationComplete={notify}
         inert={!isPresent}
         aria-hidden={!isPresent || undefined}
       >
-        {children}
+        <FrozenRouter>{children}</FrozenRouter>
       </motion.div>
     </TransitionContext.Provider>
   )
@@ -191,6 +220,9 @@ export default function PageTransitionWrapper({ children }: { children: ReactNod
   const pathname = usePathname()
   const prevPathnameRef = useRef(pathname)
   const direction = classify(prevPathnameRef.current, pathname)
+  // Reduced motion keeps the plain cross-dissolve: no sideways travel at all.
+  const reduceMotion = useReducedMotion()
+  const side = reduceMotion ? 0 : tabSide(prevPathnameRef.current, pathname)
   const skeletonEligible = (direction === 'deeper' || direction === 'back') && !TAB_ROUTES.has(pathname)
 
   // Bumped once per actual pathname change (see navKeyRef below) — read
@@ -208,8 +240,8 @@ export default function PageTransitionWrapper({ children }: { children: ReactNod
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <AnimatePresence mode="sync" initial={false} custom={direction}>
-        <AnimatedPage key={`${pathname}-${navKeyRef.current}`} direction={direction} skeletonEligible={skeletonEligible}>
+      <AnimatePresence mode="sync" initial={false} custom={{ direction, side }}>
+        <AnimatedPage key={`${pathname}-${navKeyRef.current}`} direction={direction} side={side} skeletonEligible={skeletonEligible}>
           {children}
         </AnimatedPage>
       </AnimatePresence>

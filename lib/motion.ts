@@ -6,6 +6,28 @@
 
 export const PEER = { duration: 0.18, ease: 'linear' } as const
 
+// Bottom-nav tab switch, measured from the "page transition" reference
+// recording (frame-stepped): the two pages behave as one horizontal strip
+// that pushes across together — the incoming page travels the full screen
+// width from the side of the tapped tab while the outgoing page is pushed
+// off the opposite edge by the same amount. Progress is front-loaded (about
+// 45% of the distance by ~25ms, 75% by ~75ms, done by ~125ms in the
+// recording), i.e. a strong ease-out with no overshoot. The incoming page
+// also fades up from about half opacity while it lands.
+export const TAB_BOUNCE = {
+  enter: {
+    x: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
+    opacity: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: {
+    x: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
+  },
+  // Entry offset / exit travel as a share of screen width.
+  enterOffset: '100%',
+  exitOffset: '100%',
+  enterOpacity: 0.5,
+} as const
+
 export const DEEPER = { duration: 0.34, ease: [0.32, 0.72, 0, 1] } as const
 
 // Reserved — not yet consumed. Landing with R1 (LIFT), R4 (SHEET),
