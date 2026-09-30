@@ -40,7 +40,7 @@ function ActivityListCard({ activity: a, bookThis, lang, t }: {
       className="w-full flex items-stretch text-left gap-4 bg-white active:bg-[#f5f5f5] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
     >
       <motion.div layoutId={`chip-list-${a.id}`} transition={LIFT} className="relative w-[126px] min-h-[120px] shrink-0 overflow-hidden rounded-card">
-        <Image src={a.image} alt={a.title} fill sizes="126px" className="object-cover" />
+        <Image src={a.image} alt={a.title} fill sizes="126px" className="object-cover" loading="eager" decoding="sync" />
       </motion.div>
       <div className="flex-1 min-w-0 flex flex-col gap-4 justify-center py-4">
         <div className="flex flex-col gap-1">

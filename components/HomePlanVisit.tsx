@@ -20,7 +20,7 @@ export default function HomePlanVisit() {
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative shrink-0 size-[45px] rounded-xl overflow-hidden bg-hairline">
             {activity && (
-              <Image src={activity.image} alt="" fill sizes="45px" className="object-cover" />
+              <Image src={activity.image} alt="" fill sizes="45px" className="object-cover" loading="eager" decoding="sync" />
             )}
           </div>
           <div className="flex flex-col min-w-0">

@@ -41,7 +41,7 @@ function CurrentCard({ ex, onOpen, lang }: { ex: Exhibition; onOpen: (id: string
       className="w-[361px] flex items-stretch text-left gap-[9px] bg-white active:bg-[#EEEEEE] border border-hairline rounded-card overflow-hidden pr-5 transition-colors duration-75 cursor-pointer"
     >
       <motion.div layoutId={`hero-whats-on-${ex.id}`} transition={LIFT} className="relative w-[121px] min-h-[94px] shrink-0 overflow-hidden">
-        <Image src={ex.image} alt={ex.title} fill className="object-cover" />
+        <Image src={ex.image} alt={ex.title} fill className="object-cover" loading="eager" decoding="sync" />
       </motion.div>
       <div className="flex-1 min-w-0 flex flex-col gap-1 justify-center py-3">
         <p className="text-base font-semibold text-black leading-snug">{displayTitle}</p>
@@ -76,7 +76,7 @@ function ComingSoonCard({ ex, notified, onToggle, lang }: ComingSoonCardProps & 
   return (
     <div className="flex min-h-[130px] gap-4 bg-white border border-hairline rounded-card overflow-hidden pr-5">
       <div className="relative w-[148px] h-[130px] shrink-0 overflow-hidden rounded-card">
-        <Image src={ex.image} alt={ex.title} fill className="object-cover" />
+        <Image src={ex.image} alt={ex.title} fill className="object-cover" loading="eager" decoding="sync" />
       </div>
       <div className="flex-1 flex flex-col gap-3 justify-center min-w-0 py-3">
         <div className="flex flex-col gap-1">

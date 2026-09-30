@@ -9,6 +9,7 @@ import { getById } from '@/lib/exhibitions'
 import { STATE } from '@/lib/motion'
 import BottomNav from './BottomNav'
 import GalleryPreviewSheet from './GalleryPreviewSheet'
+import { useOnTransitionComplete } from './PageTransitionWrapper'
 
 // ── Floor Switcher ────────────────────────────────────────────────────────────
 //
@@ -26,6 +27,23 @@ function FloorSwitcher({
   activeId: string
   onChange: (id: string) => void
 }) {
+  // Same root cause as the R1 hero layoutIds (Home card, carousel cards),
+  // but NOT the fix that worked there — a first attempt at a fix here made
+  // the id unique per mount (so it could never match a stale registry entry
+  // from a previous Map visit), and that turned out to only be half the
+  // story. The real cause: `layoutId` performs its FLIP projection on live
+  // `getBoundingClientRect()` measurements, and this pill mounts WHILE its
+  // ancestor page container is still mid-flight through its own x-transform
+  // (the tab-switch slide isn't done yet). Motion measures a rect off a
+  // moving target, then spends the next several frames visibly fighting to
+  // reconcile that against the parent's continuing motion — a fresh,
+  // never-reused id doesn't help, because the mismatch isn't with a STALE
+  // rect, it's with the CURRENT, still-changing one. Withholding `layoutId`
+  // until the page's own entrance transition is confirmed done (so the
+  // parent is no longer moving under it) removes the moving target
+  // entirely — same fix as HomeFeaturedExhibition.tsx, for the same reason.
+  const [pillReady, setPillReady] = useState(false)
+  useOnTransitionComplete(() => setPillReady(true))
   return (
     <div className="bg-white border border-[#ddd] rounded-full h-[46px] p-px flex items-center">
       {floors.map(floor => {
@@ -43,7 +61,7 @@ function FloorSwitcher({
           >
             {isActive && (
               <motion.div
-                layoutId="map-floor-pill"
+                layoutId={pillReady ? "map-floor-pill" : undefined}
                 className="absolute inset-0 rounded-full bg-[#0a0a0a]"
                 transition={STATE}
               />

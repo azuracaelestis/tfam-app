@@ -6,6 +6,7 @@ import type { PanInfo } from 'motion/react'
 import { type Exhibition, metaLine } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import ChevronRightIcon from './icons/ChevronRightIcon'
+import { useOnTransitionComplete } from './PageTransitionWrapper'
 import { LIFT } from '@/lib/motion'
 
 interface ExhibitionCarouselProps {
@@ -46,6 +47,14 @@ function SliderArrowRightIcon() {
 }
 
 export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: ExhibitionCarouselProps) {
+  // See the matching comment in HomeFeaturedExhibition.tsx: withholding
+  // layoutId until this screen's own entrance transition has finished stops
+  // Motion from re-running the 0.52s LIFT transition from a PRIOR mount's
+  // stale rect (same id, different — possibly long-gone — screen instance),
+  // which otherwise trails visibly behind the page's own, much quicker
+  // arrival.
+  const [liftReady, setLiftReady] = useState(false)
+  useOnTransitionComplete(() => setLiftReady(true))
   const t = useTranslation()
   const [activeIndex, setActiveIndex] = useState(0)
   // Usability testing found visitors never discovered this carousel could be
@@ -107,13 +116,15 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                 onClick={() => onOpen(ex.id)}
                 className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
               >
-                <motion.div layoutId={`hero-carousel-${ex.id}`} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
+                <motion.div layoutId={liftReady ? `hero-carousel-${ex.id}` : undefined} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
                   <Image
                     src={ex.image}
                     alt={ex.title}
                     fill
                     className="object-cover"
                     priority={i === 0}
+                    loading="eager"
+                    decoding="sync"
                   />
                 </motion.div>
 

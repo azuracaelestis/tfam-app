@@ -1,11 +1,13 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'motion/react'
 import { getById } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
+import { useOnTransitionComplete } from './PageTransitionWrapper'
 import { LIFT } from '@/lib/motion'
 import ChevronRightIcon from './icons/ChevronRightIcon'
 
@@ -22,6 +24,22 @@ export default function HomeFeaturedExhibition() {
   const [lang] = useLanguage()
   const { open } = useExhibitionOverlay()
   const ex = getById('forms-in-motion')
+
+  // The shared layoutId below is what makes tapping this card morph smoothly
+  // into the exhibition overlay (R1). But Motion's layoutId registry isn't
+  // scoped to this mount: this whole component remounts fresh on every Home
+  // visit (PageTransitionWrapper keys pages by navigation instance), and a
+  // PRIOR Home visit's card can still be sitting in that registry under the
+  // same id. A brand-new mount picks that up as "the same element reappeared"
+  // and re-runs the 0.52s LIFT transition FROM the old rect — independent of,
+  // and much slower than, the page's own ~0.25s tab-switch slide. Visually:
+  // the page arrives on time, and the thumbnail keeps drifting into place
+  // for another ~250ms after it. Withholding `layoutId` until the page's own
+  // entrance is done removes any rect for Motion to react to, so the card
+  // settles rigidly with the page. It only needs to be a real layoutId
+  // target once the visitor can actually tap it.
+  const [liftReady, setLiftReady] = useState(false)
+  useOnTransitionComplete(() => setLiftReady(true))
 
   if (!ex) return null
 
@@ -44,8 +62,8 @@ export default function HomeFeaturedExhibition() {
         onClick={() => open(ex.id, 'home')}
         className="splash-rise bg-white border border-hairline rounded-card p-3 flex gap-3 items-center text-left w-full"
       >
-        <motion.div layoutId={`hero-home-${ex.id}`} transition={LIFT} className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
-          <Image src={ex.image} alt={ex.title} fill sizes="121px" className="object-cover" />
+        <motion.div layoutId={liftReady ? `hero-home-${ex.id}` : undefined} transition={LIFT} className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
+          <Image src={ex.image} alt={ex.title} fill sizes="121px" className="object-cover" priority decoding="sync" />
         </motion.div>
         <div className="flex flex-col gap-2 min-w-0">
           <div className="flex flex-col">

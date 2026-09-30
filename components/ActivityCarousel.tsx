@@ -109,7 +109,7 @@ export default function ActivityCarousel({ activities }: { activities: Activity[
                 className="w-[262px] shrink-0 flex flex-col text-left rounded-card overflow-hidden border border-hairline bg-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
               >
                 <motion.div layoutId={`chip-carousel-${a.id}`} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
-                  <Image src={a.image} alt={a.title} fill sizes="262px" className="object-cover" priority={i === 0} />
+                  <Image src={a.image} alt={a.title} fill sizes="262px" className="object-cover" priority={i === 0} loading="eager" decoding="sync" />
                 </motion.div>
                 <div className="flex flex-col gap-4 p-3">
                   <div className="flex flex-col gap-1">
