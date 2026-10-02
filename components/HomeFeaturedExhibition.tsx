@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'motion/react'
 import { getById } from '@/lib/exhibitions'
@@ -8,7 +8,7 @@ import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
 import { useOnTransitionComplete } from './PageTransitionWrapper'
-import { LIFT } from '@/lib/motion'
+import { LIFT, ROW_LIFT } from '@/lib/motion'
 import ChevronRightIcon from './icons/ChevronRightIcon'
 
 function untilDate(iso: string, lang: 'en' | 'zh') {
@@ -22,8 +22,17 @@ export default function HomeFeaturedExhibition() {
   const router = useRouter()
   const t = useTranslation()
   const [lang] = useLanguage()
-  const { open } = useExhibitionOverlay()
+  const { open, current } = useExhibitionOverlay()
   const ex = getById('forms-in-motion')
+
+  // Row Lift (Option 06): this section has no sibling cards to part, but the
+  // same beat still applies to its own header (recede) and the card's own
+  // copy (fade) while the hero lifts into the overlay — see ExhibitionCarousel
+  // / WhatsOnClient for the carousel's version of this choreography.
+  const [isLifting, setIsLifting] = useState(false)
+  useEffect(() => {
+    if (!current) setIsLifting(false)
+  }, [current])
 
   // The shared layoutId below is what makes tapping this card morph smoothly
   // into the exhibition overlay (R1). But Motion's layoutId registry isn't
@@ -47,7 +56,11 @@ export default function HomeFeaturedExhibition() {
 
   return (
     <div className="flex flex-col gap-2 px-5 py-4 bg-canvas">
-      <div className="splash-rise flex items-center justify-between">
+      <motion.div
+        className="splash-rise flex items-center justify-between"
+        animate={isLifting ? { opacity: 0.3, scale: 0.96 } : { opacity: 1, scale: 1 }}
+        transition={ROW_LIFT.recede}
+      >
         <h2 className="text-heading-l text-ink">{t.home.todayAtMuseum}</h2>
         <button
           onClick={() => router.push('/whats-on')}
@@ -56,16 +69,20 @@ export default function HomeFeaturedExhibition() {
           {t.home.viewAll}
           <ChevronRightIcon size={13} />
         </button>
-      </div>
+      </motion.div>
 
       <button
-        onClick={() => open(ex.id, 'home')}
+        onClick={() => { setIsLifting(true); open(ex.id, 'home') }}
         className="splash-rise bg-white border border-hairline rounded-card p-3 flex gap-3 items-center text-left w-full"
       >
         <motion.div layoutId={liftReady ? `hero-home-${ex.id}` : undefined} transition={LIFT} className="relative shrink-0 w-[121px] h-[90px] rounded-card overflow-hidden">
           <Image src={ex.image} alt={ex.title} fill sizes="121px" className="object-cover" priority decoding="sync" />
         </motion.div>
-        <div className="flex flex-col gap-2 min-w-0">
+        <motion.div
+          className="flex flex-col gap-2 min-w-0"
+          animate={isLifting ? { opacity: 0 } : { opacity: 1 }}
+          transition={ROW_LIFT.copyFade}
+        >
           <div className="flex flex-col">
             <span className="text-heading-m text-ink truncate">{ex.title}</span>
             <span className="text-label-m text-ink-secondary truncate tracking-[-0.322px]">{meta}</span>
@@ -73,7 +90,7 @@ export default function HomeFeaturedExhibition() {
           <p className="text-label-m text-ink-secondary line-clamp-2">
             {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : 'Exploring transformation in contemporary art.'}
           </p>
-        </div>
+        </motion.div>
       </button>
     </div>
   )
