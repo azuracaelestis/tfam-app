@@ -66,6 +66,45 @@ The map, not every file:
   relative paths like `../../../`.
 - Design mobile-first.
 
+## Design System
+Tokens live in the `@theme inline` block of `app/globals.css`. Figma is the
+source of truth for layout; tokens are the source of truth for values.
+- Style with token utilities: type (`text-title-l`, `text-body-m`,
+  `text-label-l`… — each one sets size, line-height and weight together),
+  colors (`text-text-primary`, `bg-surface`, `border-border-default`…),
+  radius (`rounded-card`, `rounded-pill`…).
+- Never add raw hex colors (`#4f4f4f`) or arbitrary values (`text-[14px]`,
+  `gap-[12px]`, `bg-[#d6d6d6]`) in new or edited code.
+- If Figma MCP returns a raw value, snap it to the nearest existing token
+  and say which token you chose. If no token is close, stop and ask before
+  adding one; never invent a new token silently.
+- When you touch a file that already has raw values, convert them to
+  tokens only if asked. Don't mix a cleanup into an unrelated change.
+- Legacy aliases (`ink`, `ink-secondary`, `hairline`, `tfam-*`) still work
+  but don't use them in new code.
+
+## Motion
+- All transition timing and easing comes from `lib/motion.ts` (`PEER`,
+  `TAB_BOUNCE`, `DEEPER`, `LIFT`, `SHEET`, `MODE`, `STATE`). Never retype a
+  duration or ease inline.
+- Every animation must respect `prefers-reduced-motion`.
+- Measure motion end to end: what matters is time from tap to a usable
+  screen, not the length of one animation.
+- The WebGL splash (`components/SplashScreen.tsx`) is raw WebGL with inline
+  GLSL, no library. Its handoff to Home is coordinated with the
+  `data-splash` attribute set in `app/layout.tsx` and styles in
+  `globals.css`. Change these three together, never one alone.
+- Explore new motion in a separate sandbox first; port into this repo only
+  as a reviewed diff.
+
+## Workflow
+- Never work directly on `main`. Create a branch for every feature or
+  experiment (`feat/...`, `fix/...`, `exp/...`).
+- Commit messages follow Conventional Commits with a scope, e.g.
+  `fix(i18n): ...`, `feat(motion): ...`. Reference usability findings by ID
+  (F01) when a change fixes one.
+- For bugs: report the root cause before changing any file.
+
 ## Patterns to AVOID
 - Do NOT add a state-management library (Redux, Zustand, etc.). React state
   and props are enough for this app's size.
@@ -79,8 +118,14 @@ The map, not every file:
 - Treat `package-lock.json` as managed by npm — don't hand-edit it.
 
 ## Known gaps
-- Map screen floor-plan art (`ui-v2`) has room names and exhibition titles
-  baked into the SVG per floor. This text does not respond to language
-  switching. Needs a decision: maintain per-language art, or redesign to
-  render labels as real text over a plain background. See conversation
-  2026-08-30 for full context.
+- About 140 raw hex colors and ~570 arbitrary Tailwind values still exist in
+  `components/` from before the design system (heaviest: `ChooseDateClient`,
+  `NotificationsClient`, `ConfirmBookingClient`). Clean up per screen, on a
+  branch, only when asked.
+- Overlapping gray tokens need a decision: `border-input` (`#d9d9d9`),
+  `border-card` (`#d6d6d6`), `border-default` (`#dddddd`), `tfam-border`
+  (`#e5e5e5`), and two near-blacks (`tfam-dark` `#111111`, `text-primary`
+  `#0a0a0a`). Until decided, use `border-default` and `text-primary`.
+- No ESLint or tests yet (see Definition of Done).
+- Resolved 2026-08-31: Map room labels now render as real, translated text
+  via `RoomLabel` (commit `e34b627`).
