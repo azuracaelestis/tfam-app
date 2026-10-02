@@ -22,7 +22,7 @@ function ChooseDateSkeleton() {
         </div>
         <SkeletonBlock className="h-[268px] w-full" />
       </div>
-      <SkeletonBlock className="h-[48px] w-full rounded-[80px]" />
+      <SkeletonBlock className="h-[48px] w-full rounded-pill" />
     </div>
   )
 }
@@ -195,7 +195,7 @@ export default function ChooseDateClient({
           aria-label="Back to Activities"
         >
           <ChevronLeft />
-          <span className="text-[20px] font-bold text-black leading-none">{t.chooseDate.back}</span>
+          <span className="text-heading-l text-black">{t.chooseDate.back}</span>
         </button>
       </header>
 
@@ -204,7 +204,7 @@ export default function ChooseDateClient({
       <div className="flex flex-col gap-[36px] px-5 pt-[16px]">
 
         {/* Activity summary card */}
-        <div className="bg-[#ececec] border border-[#ddd] rounded-[8px] px-[24px] py-[12px] flex items-center gap-4">
+        <div className="bg-[#ececec] border border-border-default rounded-card px-[24px] py-[12px] flex items-center gap-4">
           <motion.div
             layoutId={chipLayoutId}
             transition={LIFT}
@@ -218,7 +218,7 @@ export default function ChooseDateClient({
             animate={{ opacity: 1, transition: CONTENT_ENTER }}
             exit={{ opacity: 0, transition: CONTENT_EXIT }}
           >
-            <p className="text-[20px] font-semibold text-black leading-snug">{activity.title}</p>
+            <p className="text-heading-l text-black">{activity.title}</p>
             <p className="text-[15px] font-normal text-black leading-snug">
               {activity.tags.join(' · ')}
             </p>
@@ -238,17 +238,17 @@ export default function ChooseDateClient({
             <button
               onClick={prevMonth}
               disabled={isCurrentMonth}
-              className="size-11 shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] disabled:opacity-20 transition-colors"
+              className="size-11 shrink-0 flex items-center justify-center rounded-full bg-surface border border-border-card active:bg-surface disabled:opacity-20 transition-colors"
               aria-label={t.chooseDate.prevMonth}
             >
               <MonthNavChevron direction="left" />
             </button>
-            <p className="flex-1 text-[16px] font-semibold text-black text-center leading-none">
+            <p className="flex-1 text-heading-m text-black text-center">
               {getMonthHeading(year, month, locale)}
             </p>
             <button
               onClick={nextMonth}
-              className="size-11 shrink-0 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#d6d6d6] active:bg-[#ececec] transition-colors"
+              className="size-11 shrink-0 flex items-center justify-center rounded-full bg-surface border border-border-card active:bg-surface transition-colors"
               aria-label={t.chooseDate.nextMonth}
             >
               <MonthNavChevron direction="right" />
@@ -286,10 +286,10 @@ export default function ChooseDateClient({
                       <div key={ci} className="flex items-center justify-center h-[32px]">
                         <button
                           onClick={() => handleDayClick(day)}
-                          className="relative bg-black p-[4px] rounded-[8px] active:opacity-70 before:content-[''] before:absolute before:-inset-[6px]"
+                          className="relative bg-black p-[4px] rounded-card active:opacity-70 before:content-[''] before:absolute before:-inset-[6px]"
                         >
                           <div className="size-[24px] rounded-[4px] flex items-center justify-center">
-                            <span className="text-[14px] font-bold text-white leading-none">{day}</span>
+                            <span className="text-label-m text-white">{day}</span>
                           </div>
                         </button>
                       </div>
@@ -301,10 +301,10 @@ export default function ChooseDateClient({
                       <div key={ci} className="flex items-center justify-center h-[32px]">
                         <button
                           onClick={() => handleDayClick(day)}
-                          className="relative bg-[#ececec] border border-[#ddd] p-[4px] rounded-[8px] active:opacity-70 before:content-[''] before:absolute before:-inset-[6px]"
+                          className="relative bg-[#ececec] border border-border-default p-[4px] rounded-card active:opacity-70 before:content-[''] before:absolute before:-inset-[6px]"
                         >
                           <div className="size-[24px] rounded-[4px] flex items-center justify-center">
-                            <span className="text-[14px] font-bold text-black leading-none">{day}</span>
+                            <span className="text-label-m text-black">{day}</span>
                           </div>
                         </button>
                       </div>
@@ -314,14 +314,14 @@ export default function ChooseDateClient({
                   if (allFull && entry) {
                     return (
                       <div key={ci} className="flex items-center justify-center h-[32px]">
-                        <span className="text-[14px] font-normal text-black line-through leading-none">{day}</span>
+                        <span className="text-label-m text-black line-through">{day}</span>
                       </div>
                     )
                   }
 
                   return (
                     <div key={ci} className={`flex items-center justify-center h-[32px] ${isPast ? 'opacity-30' : ''}`}>
-                      <span className="text-[14px] font-normal text-black leading-none">{day}</span>
+                      <span className="text-label-m text-black">{day}</span>
                     </div>
                   )
                 })}
@@ -333,15 +333,15 @@ export default function ChooseDateClient({
           <div className="flex items-center gap-[18px]">
             <div className="flex items-center gap-[4px]">
               <div className="bg-black size-[10px] rounded-[2px] shrink-0" />
-              <span className="text-[14px] text-black leading-none">{t.chooseDate.legendSelected}</span>
+              <span className="text-label-m text-black">{t.chooseDate.legendSelected}</span>
             </div>
             <div className="flex items-center gap-[4px]">
-              <div className="bg-[#f5f5f5] border-[0.5px] border-[#ececec] size-[10px] rounded-[2px] shrink-0" />
-              <span className="text-[14px] text-black leading-none">{t.chooseDate.legendAvailable}</span>
+              <div className="bg-[#ececec] border-[0.5px] border-border-default size-[10px] rounded-[2px] shrink-0" />
+              <span className="text-label-m text-black">{t.chooseDate.legendAvailable}</span>
             </div>
             <div className="flex items-center gap-[4px]">
-              <div className="bg-[#f5f5f5] size-[10px] rounded-[2px] shrink-0" />
-              <span className="text-[14px] text-black line-through leading-none">{t.chooseDate.legendFull}</span>
+              <div className="bg-surface size-[10px] rounded-[2px] shrink-0" />
+              <span className="text-label-m text-black line-through">{t.chooseDate.legendFull}</span>
             </div>
           </div>
         </motion.div>
@@ -351,7 +351,7 @@ export default function ChooseDateClient({
             moment a sighted visitor sees them appear. */}
         {selectedDate && selectedDateEntry && (
           <div className="flex flex-col gap-[12px]" role="status">
-            <p className="text-[16px] font-semibold text-black leading-none">{t.chooseDate.chooseATime}</p>
+            <p className="text-heading-m text-black">{t.chooseDate.chooseATime}</p>
             <div className="flex gap-[8px]">
               {TIME_SLOTS.map(slot => {
                 const isFull = selectedDateEntry.fullSlots.includes(slot)
@@ -374,7 +374,7 @@ export default function ChooseDateClient({
                   return (
                     <div
                       key={slot}
-                      className="flex-1 bg-[#f5f5f5] py-[12px] px-[4px] rounded-[12px] flex items-center justify-center"
+                      className="flex-1 bg-surface py-[12px] px-[4px] rounded-[12px] flex items-center justify-center"
                     >
                       <span className="text-[13px] font-normal text-black line-through opacity-50 text-center leading-tight">{label}</span>
                     </div>
@@ -385,7 +385,7 @@ export default function ChooseDateClient({
                   <button
                     key={slot}
                     onClick={() => handleSlotClick(slot)}
-                    className="flex-1 bg-[#f5f5f5] border border-[#d9d9d9] py-[12px] px-[4px] rounded-[12px] flex items-center justify-center active:opacity-70"
+                    className="flex-1 bg-surface border border-border-input py-[12px] px-[4px] rounded-[12px] flex items-center justify-center active:opacity-70"
                   >
                     <span className="text-[13px] font-bold text-black text-center leading-tight">{label}</span>
                   </button>
@@ -406,7 +406,7 @@ export default function ChooseDateClient({
           <button
             onClick={handleCTA}
             disabled={!selectedDate || !selectedSlot}
-            className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-[80px] bg-black text-white text-[16px] font-bold disabled:opacity-40 transition-opacity active:bg-[#333]"
+            className="flex items-center justify-center gap-[8px] h-[48px] w-full rounded-pill bg-black text-white text-label-l disabled:opacity-40 transition-opacity active:bg-[#333]"
           >
             <ClockIcon />
             {t.chooseDate.chooseTimeSlot}
