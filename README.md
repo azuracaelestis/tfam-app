@@ -1,4 +1,4 @@
-# TFAM Audio Guide
+# TFAM App
 
 A mobile web app for visitors to the Taipei Fine Arts Museum. It lets
 visitors browse what's on, see activities and book them, navigate a floor
