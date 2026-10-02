@@ -144,37 +144,74 @@ export interface ScheduledDate {
 export const TIME_SLOTS = ['09:00-12:00', '14:00-16:00', '18:00-20:00'] as const
 export type TimeSlot = typeof TIME_SLOTS[number]
 
+// Dates are kept rolling a few weeks out from "today" on purpose — every
+// activity needs at least one real future date for ChooseDateClient to show
+// anything bookable at all (it finds the first scheduled date >= today and
+// opens the calendar on that month). Previously only 5 of the 10 activities
+// had entries here, and even those had drifted entirely into the past, so
+// every activity (including ones with data) showed a dateless calendar.
 export const scheduledDates: Record<string, ScheduledDate[]> = {
   'watercolor-basics': [
-    { date: '2026-09-05', fullSlots: ['09:00-12:00'] },
-    { date: '2026-09-12', fullSlots: [] },
-    { date: '2026-09-19', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
-    { date: '2026-09-26', fullSlots: [] },
-    { date: '2026-10-03', fullSlots: ['14:00-16:00'] },
     { date: '2026-10-10', fullSlots: [] },
+    { date: '2026-10-17', fullSlots: ['09:00-12:00'] },
+    { date: '2026-10-24', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-10-31', fullSlots: [] },
+    { date: '2026-11-07', fullSlots: ['14:00-16:00'] },
+    { date: '2026-11-14', fullSlots: [] },
+  ],
+  'curator-led': [
+    { date: '2026-10-11', fullSlots: [] },
+    { date: '2026-10-18', fullSlots: ['18:00-20:00'] },
+    { date: '2026-10-25', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-11-01', fullSlots: [] },
+    { date: '2026-11-08', fullSlots: [] },
   ],
   'ink-painting-workshop': [
-    { date: '2026-09-06', fullSlots: [] },
-    { date: '2026-09-13', fullSlots: ['18:00-20:00'] },
-    { date: '2026-09-20', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
-    { date: '2026-09-27', fullSlots: [] },
+    { date: '2026-10-12', fullSlots: [] },
+    { date: '2026-10-19', fullSlots: ['18:00-20:00'] },
+    { date: '2026-10-26', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-11-02', fullSlots: [] },
   ],
   'photography-walk': [
-    { date: '2026-09-07', fullSlots: [] },
-    { date: '2026-09-14', fullSlots: ['09:00-12:00', '14:00-16:00'] },
-    { date: '2026-09-21', fullSlots: [] },
-    { date: '2026-09-28', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-10-13', fullSlots: [] },
+    { date: '2026-10-20', fullSlots: ['09:00-12:00', '14:00-16:00'] },
+    { date: '2026-10-27', fullSlots: [] },
+    { date: '2026-11-03', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
   ],
   'guided-exhibition-tour': [
-    { date: '2026-09-02', fullSlots: [] },
-    { date: '2026-09-09', fullSlots: ['09:00-12:00'] },
-    { date: '2026-09-16', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
-    { date: '2026-09-23', fullSlots: ['14:00-16:00'] },
+    { date: '2026-10-14', fullSlots: [] },
+    { date: '2026-10-21', fullSlots: ['09:00-12:00'] },
+    { date: '2026-10-28', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-11-04', fullSlots: ['14:00-16:00'] },
   ],
   'sculpture-workshop': [
-    { date: '2026-09-04', fullSlots: [] },
-    { date: '2026-09-11', fullSlots: [] },
-    { date: '2026-09-18', fullSlots: ['18:00-20:00'] },
-    { date: '2026-09-25', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-10-15', fullSlots: [] },
+    { date: '2026-10-22', fullSlots: [] },
+    { date: '2026-10-29', fullSlots: ['18:00-20:00'] },
+    { date: '2026-11-05', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+  ],
+  'lantern-festival': [
+    { date: '2026-10-16', fullSlots: [] },
+    { date: '2026-10-23', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-10-30', fullSlots: [] },
+    { date: '2026-11-06', fullSlots: ['14:00-16:00'] },
+  ],
+  'moon-festival': [
+    { date: '2026-10-09', fullSlots: [] },
+    { date: '2026-10-16', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-10-23', fullSlots: [] },
+  ],
+  'family-art-tour': [
+    { date: '2026-10-10', fullSlots: [] },
+    { date: '2026-10-17', fullSlots: [] },
+    { date: '2026-10-24', fullSlots: ['09:00-12:00'] },
+    { date: '2026-10-31', fullSlots: [] },
+    { date: '2026-11-07', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+  ],
+  'printmaking-workshop': [
+    { date: '2026-10-13', fullSlots: [] },
+    { date: '2026-10-20', fullSlots: [] },
+    { date: '2026-10-27', fullSlots: ['09:00-12:00', '14:00-16:00', '18:00-20:00'] }, // all full
+    { date: '2026-11-03', fullSlots: ['18:00-20:00'] },
   ],
 }

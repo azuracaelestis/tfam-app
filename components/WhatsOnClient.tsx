@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useRef, useState, useLayoutEffect, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, useMotionValue, useTransform, animate } from 'motion/react'
 import type { PanInfo } from 'motion/react'
@@ -15,7 +15,7 @@ import {
 import { useTranslation } from '@/lib/useTranslation'
 import { useLanguage } from '@/lib/useLanguage'
 import { useExhibitionOverlay } from '@/contexts/ExhibitionOverlayContext'
-import { LIFT } from '@/lib/motion'
+import { LIFT, ROW_LIFT } from '@/lib/motion'
 
 // ── Current card ──────────────────────────────────────────────────────────────
 
@@ -114,9 +114,18 @@ const SWIPE_VELOCITY     = 400
 export default function WhatsOnClient() {
   const t = useTranslation()
   const [lang] = useLanguage()
-  const { open } = useExhibitionOverlay()
+  const { open, current } = useExhibitionOverlay()
   const [activeTab, setActiveTab] = useState<ExhibitionStatus>('current')
   const [notified,  setNotified]  = useState<Set<string>>(new Set())
+
+  // Row Lift (Option 06): id of the carousel card currently lifting into the
+  // overlay — recedes this screen's header + tab pill in step with the
+  // carousel's own sibling-card recede (see ExhibitionCarousel). Cleared
+  // once the overlay closes, so the next open starts from a clean state.
+  const [liftingId, setLiftingId] = useState<string | null>(null)
+  useEffect(() => {
+    if (!current) setLiftingId(null)
+  }, [current])
 
   const TABS = [
     { label: t.whatsOn.current,    value: 'current'     as ExhibitionStatus },
@@ -200,18 +209,32 @@ export default function WhatsOnClient() {
     <div className="min-h-screen bg-white flex flex-col font-noto pb-[69px]">
 
       {/* ── Header ── */}
-      <header className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0">
+      <motion.header
+        className="bg-white px-5 pt-3 pb-3 flex flex-col gap-1 shrink-0"
+        animate={liftingId ? { opacity: 0.3, scale: 0.96 } : { opacity: 1, scale: 1 }}
+        transition={ROW_LIFT.recede}
+      >
         <h1 className="text-[2rem] font-semibold text-black leading-normal">{t.whatsOn.title}</h1>
         <p className="text-sm text-ink-secondary">{t.whatsOn.subtitle}</p>
-      </header>
+      </motion.header>
 
       {/* ── Carousel ── */}
       <div className="shrink-0 mb-[32px]">
-        <ExhibitionCarousel exhibitions={featured} onOpen={(id) => open(id, 'carousel')} lang={lang} />
+        <ExhibitionCarousel
+          exhibitions={featured}
+          onOpen={(id) => open(id, 'carousel')}
+          lang={lang}
+          liftingId={liftingId}
+          onLift={setLiftingId}
+        />
       </div>
 
       {/* ── Tabs + swipeable track ── */}
-      <div className="flex-1 flex flex-col px-4 gap-[18px]">
+      <motion.div
+        className="flex-1 flex flex-col px-4 gap-[18px]"
+        animate={liftingId ? { opacity: 0.3, scale: 0.96 } : { opacity: 1, scale: 1 }}
+        transition={ROW_LIFT.recede}
+      >
 
         <div className="relative bg-icon-bg rounded-pill p-1 flex gap-1 overflow-hidden">
           {/* The pill's x is a READOUT of trackX (see pillX above), not its
@@ -275,7 +298,7 @@ export default function WhatsOnClient() {
           </motion.div>
         </div>
 
-      </div>
+      </motion.div>
 
     </div>
   )

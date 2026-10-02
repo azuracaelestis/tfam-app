@@ -36,3 +36,16 @@ export const LIFT = { duration: 0.52, ease: [0.2, 0.85, 0.25, 1] } as const
 export const SHEET = { duration: 0.38, ease: [0.32, 0.94, 0.36, 1] } as const
 export const MODE = { duration: 0.62, ease: [0.22, 1, 0.3, 1] } as const
 export const STATE = { duration: 0.22, ease: 'easeOut' } as const
+
+// "Row Lift" (design spec Option 06) — the beats around a LIFT shared-element
+// morph (which already carries beat 1, thumb→hero, at the matching 520ms/
+// cb(.2,.85,.25,1)): the tapped card's own copy fades, sibling cards and the
+// screen's header/filter recede to get out of the hero's way, then the
+// destination's title/meta and buttons rise in, staggered, once the hero is
+// most of the way through landing.
+export const ROW_LIFT = {
+  recede: { duration: 0.16, ease: 'easeIn' },           // siblings + header/filter
+  copyFade: { duration: 0.16, ease: 'linear' },         // tapped row's own text
+  titleRise: { duration: 0.22, ease: [0.2, 0.9, 0.3, 1], delay: 0.3 },
+  buttonsRise: { duration: 0.18, ease: [0.2, 0.9, 0.3, 1], delay: 0.34 },
+} as const

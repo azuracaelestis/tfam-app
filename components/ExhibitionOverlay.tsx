@@ -104,6 +104,7 @@ export default function ExhibitionOverlay({ id, origin, onClose }: { id: string;
           lang={lang}
           onStartAudio={() => setSheetOpen(true)}
           onSeeOnMap={handleSeeOnMap}
+          riseIn={origin === 'carousel' || origin === 'home'}
         />
       </motion.div>
 

@@ -7,12 +7,17 @@ import { type Exhibition, metaLine } from '@/lib/exhibitions'
 import { useTranslation } from '@/lib/useTranslation'
 import ChevronRightIcon from './icons/ChevronRightIcon'
 import { useOnTransitionComplete } from './PageTransitionWrapper'
-import { LIFT } from '@/lib/motion'
+import { LIFT, ROW_LIFT } from '@/lib/motion'
 
 interface ExhibitionCarouselProps {
   exhibitions: Exhibition[]
   onOpen: (id: string) => void
   lang: 'en' | 'zh'
+  // Row Lift (Option 06): id of the card currently lifting into the overlay,
+  // or null. Lifted up to WhatsOnClient so its header/filter can recede in
+  // the same beat as this carousel's sibling cards — see WhatsOnClient.
+  liftingId?: string | null
+  onLift?: (id: string) => void
 }
 
 const CARD_W      = 262
@@ -46,7 +51,7 @@ function SliderArrowRightIcon() {
   )
 }
 
-export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: ExhibitionCarouselProps) {
+export default function ExhibitionCarousel({ exhibitions, onOpen, lang, liftingId = null, onLift }: ExhibitionCarouselProps) {
   // See the matching comment in HomeFeaturedExhibition.tsx: withholding
   // layoutId until this screen's own entrance transition has finished stops
   // Motion from re-running the 0.52s LIFT transition from a PRIOR mount's
@@ -110,11 +115,16 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
         >
           {exhibitions.map((ex, i) => {
             const displayTitle = lang === 'zh' && ex.titleZh ? ex.titleZh : ex.title
+            const isLifting = liftingId === ex.id
+            const isSibling = liftingId !== null && !isLifting
+            const handleTap = () => { onLift?.(ex.id); onOpen(ex.id) }
             return (
-              <div
+              <motion.div
                 key={ex.id}
-                onClick={() => onOpen(ex.id)}
+                onClick={handleTap}
                 className="w-[262px] shrink-0 rounded-card overflow-hidden border border-hairline bg-white cursor-pointer"
+                animate={isSibling ? { opacity: 0.3, scale: 0.96 } : { opacity: 1, scale: 1 }}
+                transition={ROW_LIFT.recede}
               >
                 <motion.div layoutId={liftReady ? `hero-carousel-${ex.id}` : undefined} transition={LIFT} className="relative w-full h-[158px] overflow-hidden">
                   <Image
@@ -128,7 +138,11 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                   />
                 </motion.div>
 
-                <div className="flex flex-col gap-4 p-3">
+                <motion.div
+                  className="flex flex-col gap-4 p-3"
+                  animate={isLifting ? { opacity: 0 } : { opacity: 1 }}
+                  transition={ROW_LIFT.copyFade}
+                >
                   <div className="flex flex-col gap-1">
                     <h3 className="text-[1.25rem] font-semibold text-black leading-normal">{displayTitle}</h3>
                     <p className="text-xs text-ink-secondary leading-normal">{metaLine(ex, lang)}</p>
@@ -145,14 +159,14 @@ export default function ExhibitionCarousel({ exhibitions, onOpen, lang }: Exhibi
                     {lang === 'zh' && ex.descriptionZh ? ex.descriptionZh : ex.description}
                   </p>
                   <button
-                    onClick={() => onOpen(ex.id)}
+                    onClick={handleTap}
                     className="relative flex items-center gap-0.5 text-sm font-semibold text-black before:content-[''] before:absolute before:-inset-y-3 before:inset-x-0"
                   >
                     {t.whatsOn.explore}
                     <ChevronRightIcon size={17} />
                   </button>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )
           })}
         </motion.div>
